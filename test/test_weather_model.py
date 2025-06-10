@@ -456,36 +456,35 @@ def test_get_bounds_indices_4() -> None:
     assert bounds_list == (0, 4, 0, 9)
 
 
-def test_hrrr_badloc(wm:hrrr=HRRR) -> None:
+def test_hrrr_badloc(hrrr: HRRR) -> None:
     """Test HRRR out of bounds."""
-    wm = wm()
+    wm = hrrr
     wm.set_latlon_bounds([-10, 10, -10, 10])
-    wm.setTime(datetime.datetime(2020, 10, 1, 0, 0, 0))
-    with pytest.raises(ValueError):
-        wm._fetch('dummy_filename')
+    wm.setTime(dt.datetime(2020, 10, 1, 0, 0, 0))
+    with pytest.raises(ValueError, match='Longitude is either flipped or you are crossing the international date line'):
+        wm._fetch(Path('dummy_filename'))
 
-def test_hrrrak_dl(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
+
+def test_hrrrak_dl(tmp_path: Path, hrrrak: HRRRAK) -> None:
     """Test HRRR-AK."""
-    wm = wm()
-    d  = tmp_path / "files"
-    d.mkdir()
-    fname = d / "hrrr_ak.nc"
+    wm = hrrrak
+    d = tmp_path / 'files'
+    d.mkdir(exist_ok=True)
+    fname = d / 'hrrr_ak.nc'
     wm.set_latlon_bounds([65, 67, -160, -150])
-    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 0))
+    wm.setTime(dt.datetime(2020, 12, 1, 0, 0, 0))
 
     wm._fetch(fname)
-    assert True
 
-def test_hrrrak_dl2(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
+
+def test_hrrrak_dl2(tmp_path: Path, hrrrak: HRRRAK) -> None:
     """Test the international date line crossing."""
-    wm = wm()
-    d  = tmp_path / "files"
-    d.mkdir()
-    fname = d / "hrrr_ak.nc"
+    wm = hrrrak
+    d = tmp_path / 'files'
+    d.mkdir(exist_ok=True)
+    fname = d / 'hrrr_ak.nc'
 
     wm.set_latlon_bounds([50, 52, 179, -179])
-    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 0))
+    wm.setTime(dt.datetime(2020, 12, 1, 0, 0, 0))
 
     wm._fetch(fname)
-    assert True
-
