@@ -267,7 +267,7 @@ class HRRR(WeatherModel):
     def __pressure_levels__(self):
         raise NotImplementedError('Pressure levels do not go high enough for HRRR.')
 
-    def _fetch(self, out) -> None:
+    def _fetch(self, out: Path) -> None:
         """Fetch weather model data from HRRR."""
         self._files = out
         corrected_DT = round_date(self._time, dt.timedelta(hours=self._time_res))

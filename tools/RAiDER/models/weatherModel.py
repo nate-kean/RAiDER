@@ -172,7 +172,7 @@ class WeatherModel(ABC):
         """Returns the time of the weather model."""
         return self._time
 
-    def setTime(self, time: dt.datetime, fmt: str='%Y-%m-%dT%H:%M:%S') -> None:
+    def setTime(self, time: Union[dt.datetime, str], fmt: str='%Y-%m-%dT%H:%M:%S') -> None:
         """Set the time for a weather model."""
         if isinstance(time, str):
             self._time = dt.datetime.strptime(time, fmt)

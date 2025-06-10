@@ -1,14 +1,14 @@
 import os
-import pytest
 
 import numpy as np
+import pytest
 import xarray as xr
-
 from pyproj import CRS, Transformer
+
+from RAiDER.delay import transformPoints
+from RAiDER.delayFcns import getInterpolators
 from test import TEST_DIR
 
-from RAiDER.delayFcns import getInterpolators
-from RAiDER.delay import transformPoints
 
 SCENARIO1_DIR = os.path.join(TEST_DIR, "scenario_1", "golden_data")
 
@@ -34,8 +34,7 @@ def wmdata():
 
 def test_getInterpolators(wmdata):
     ds = wmdata
-    tw, th = getInterpolators(ds, kind='pointwise')
-    assert True # always pass unless an error is raised
+    getInterpolators(ds, kind='pointwise')
 
 def test_getInterpolators_2(wmdata, caplog):
     ds = wmdata

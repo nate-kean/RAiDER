@@ -132,7 +132,6 @@ def test_download_tropo_delays2(tmp_path):
 
         # try downloading the delays
         download_tropo_delays(stats=stations, years=[2022], writeDir=tmp_path)
-        assert True
 
 
 def test_filterByBBox1():

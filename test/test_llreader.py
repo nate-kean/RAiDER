@@ -1,19 +1,23 @@
 import os
 from pathlib import Path
-import pytest
 
 import numpy as np
 import pandas as pd
-
-from test import GEOM_DIR, TEST_DIR
+import pytest
 from pyproj import CRS
 
 from RAiDER.cli.raider import calcDelays
-
-from RAiDER.utilFcns import rio_open
 from RAiDER.llreader import (
-    StationFile, RasterRDR, BoundingBox, GeocodedFile, bounds_from_latlon_rasters, bounds_from_csv
+    BoundingBox,
+    GeocodedFile,
+    RasterRDR,
+    StationFile,
+    bounds_from_csv,
+    bounds_from_latlon_rasters,
 )
+from RAiDER.utilFcns import rio_open
+from test import GEOM_DIR, TEST_DIR
+
 
 SCENARIO0_DIR = TEST_DIR / "scenario_0"
 SCENARIO1_DIR = TEST_DIR / "scenario_1/geom"
@@ -65,7 +69,6 @@ def test_set_xygrid():
     r.set_output_spacing(ll_res=0.1)
     r.set_output_xygrid(dst_crs=4978)
     r.set_output_xygrid(dst_crs=crs)
-    assert True
 
 
 def test_latlon_reader():
