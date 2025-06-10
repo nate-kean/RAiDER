@@ -5,14 +5,16 @@ When update_rc_file is True, the RC file should be:
 - and for .netrc files, it should ONLY update the set of credentials related to
   the given weather model's API URL.
 '''
-import pytest
-
 from pathlib import Path
 from platform import system
-from RAiDER.models import credentials
+
+import pytest
 from test import random_string
 
+from RAiDER.models import credentials
 
+
+# fmt: off
 @pytest.mark.parametrize(
     'model_name,template',
     [
@@ -69,7 +71,8 @@ from test import random_string
         ),
     ]
 )
-def test_updateTrue(model_name, template):
+# fmt: on
+def test_updateTrue(model_name, template) -> None:
     # Get the rc file's path
     hidden_ext = '_' if system() == "Windows" else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]

@@ -12,6 +12,7 @@ from test import random_string
 from RAiDER.models import credentials
 
 
+# fmt: off
 @pytest.mark.parametrize(
     'model_name,template,env_var_name_uid,env_var_name_key',
     [
@@ -78,6 +79,7 @@ from RAiDER.models import credentials
         ),
     ]
 )
+# fmt: on
 def test_envVars(
     monkeypatch,
     model_name,

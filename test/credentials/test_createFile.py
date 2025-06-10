@@ -1,19 +1,22 @@
-'''
+"""
 When update_rc_file is either True or False, the relevant API RC file should be
 created if it doesn't exist.
-'''
-from typing import Tuple
+"""
 
-import pytest
 import os
 from pathlib import Path
 from platform import system
-from RAiDER.models import credentials
+from typing import Tuple
+
+import pytest
 from test import random_string
+
+from RAiDER.models import credentials
 
 
 def get_creds_cds(rc_path: Path) -> Tuple[str, str]:
     import cdsapi
+
     cds_credentials = cdsapi.api.read_config(rc_path)
     uid, key = cds_credentials['key'].split(':')
     return uid, key
@@ -21,20 +24,22 @@ def get_creds_cds(rc_path: Path) -> Tuple[str, str]:
 
 def get_creds_ecmwf(rc_path: Path) -> Tuple[str, str]:
     import ecmwfapi
+
     # Get current ECMWF API RC file path
-    old_rc_path = os.getenv("ECMWF_API_RC_FILE", ecmwfapi.api.DEFAULT_RCFILE_PATH)
+    old_rc_path = os.getenv('ECMWF_API_RC_FILE', ecmwfapi.api.DEFAULT_RCFILE_PATH)
 
     # Point ecmwfapi to current dir to avoid overwriting ~/.ecmwfapirc
-    os.environ["ECMWF_API_RC_FILE"] = str(rc_path)
+    os.environ['ECMWF_API_RC_FILE'] = str(rc_path)
     key, _, uid = ecmwfapi.api.get_apikey_values()
 
     # Point ecmwfapi back to previous value and remove local API file
-    os.environ["ECMWF_API_RC_FILE"] = old_rc_path
+    os.environ['ECMWF_API_RC_FILE'] = old_rc_path
     return uid, key
 
 
 def get_creds_netrc(rc_path: Path) -> Tuple[str, str]:
     import netrc
+
     host = 'urs.earthdata.nasa.gov'
     netrc_credentials = netrc.netrc(rc_path)
     uid, _, key = netrc_credentials.authenticators(host)
@@ -48,12 +53,12 @@ def get_creds_netrc(rc_path: Path) -> Tuple[str, str]:
         ('ERA5T', get_creds_cds),
         ('HRES', get_creds_ecmwf),
         ('GMAO', get_creds_netrc),
-        ('MERRA2', get_creds_netrc)
-    )
+        ('MERRA2', get_creds_netrc),
+    ),
 )
 def test_createFile(model_name, get_creds):
     # Get the rc file's path
-    hidden_ext = '_' if system() == "Windows" else '.'
+    hidden_ext = '_' if system() == 'Windows' else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]
     if rc_filename is None:
         return
