@@ -1,10 +1,10 @@
-'''
+"""
 When update_rc_file is True, the RC file should be:
 - updated if it already exists,
 - created if it doesn't,
 - and for .netrc files, it should ONLY update the set of credentials related to
   the given weather model's API URL.
-'''
+"""
 from pathlib import Path
 from platform import system
 

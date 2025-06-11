@@ -1,3 +1,4 @@
+import calendar
 import datetime as dt
 import os
 
@@ -26,8 +27,6 @@ def Model():
 
 class MERRA2(WeatherModel):
     def __init__(self) -> None:
-        import calendar
-
         # initialize a weather model
         WeatherModel.__init__(self)
 
