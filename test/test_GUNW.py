@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 import unittest
-
 from datetime import datetime
 from pathlib import Path
 
@@ -15,24 +14,28 @@ import rasterio as rio
 import xarray as xr
 
 import RAiDER
+import RAiDER.aria.prepFromGUNW
 import RAiDER.cli.raider as raider
 import RAiDER.s1_azimuth_timing
 from RAiDER import aws
-import RAiDER.aria.prepFromGUNW
 from RAiDER.aria.prepFromGUNW import (
+    _get_acq_time_from_gunw_id,
     check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation,
-    check_weather_model_availability,_get_acq_time_from_gunw_id,
-    get_slc_ids_from_gunw,get_acq_time_from_slc_id,identify_which_hrrr
+    check_weather_model_availability,
+    get_acq_time_from_slc_id,
+    get_slc_ids_from_gunw,
+    identify_which_hrrr,
 )
 from RAiDER.cli.raider import calcDelaysGUNW
-from RAiDER.models.hrrr import HRRR, HRRRAK
 from RAiDER.models.customExceptions import (
-     NoWeatherModelData, WrongNumberOfFiles,
-) 
+    NoWeatherModelData,
+    WrongNumberOfFiles,
+)
+from RAiDER.models.hrrr import HRRR, HRRRAK
 
 
 def compute_transform(lats, lons):
-    """ Hand roll an affine transform from lat/lon coords """
+    """Hand roll an affine transform from lat/lon coords"""
     a = lons[1] - lons[0]  # lon spacing
     b = 0
     c = lons[0] - a/2  # lon start, adjusted by half a grid cell
@@ -246,7 +249,6 @@ def test_azimuth_timing_interp_against_center_time_interp(weather_model_name: st
     sec: S1B_IW_SLC__1SDV_20210711T015011_20210711T015038_027740_034F80_376C,
          S1B_IW_SLC__1SDV_20210711T014922_20210711T014949_027740_034F80_859D
     """
-
     out_0 = gunw_azimuth_test.name.replace('.nc', '__ct_interp.nc')
     out_1 = gunw_azimuth_test.name.replace('.nc', '__az_interp.nc')
 
@@ -423,7 +425,6 @@ def test_provenance_metadata_for_tropo_group(weather_model_name: str,
     """
     Same mocks as `test_azimuth_timing_interp_against_center_time_interp` above.
     """
-
     out = gunw_azimuth_test.name.replace('.nc', '__ct_interp.nc')
 
     out_path = shutil.copy(gunw_azimuth_test, tmp_path / out)
@@ -481,7 +482,6 @@ def test_provenance_metadata_for_tropo_group(weather_model_name: str,
 def test_hrrr_availability_check_using_gunw_ids(mocker):
     """Hits the HRRR servers and makes sure that for certain dates they are indeed flagged as false
     """
-
     # All dates in 2023 are available
     gunw_id = 'S1-GUNW-A-R-106-tops-20230108_20230101-225947-00078W_00041N-PP-4be8-v3_0_0'
     assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
@@ -516,7 +516,8 @@ def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker):
 
 def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_for_azimuth_time_test, mocker):
     """Makes sure for azimuth-time-grid interpolation that an error is raised if one of the files fails to
-    download and does not do additional processing"""
+    download and does not do additional processing
+    """
     # The first part is the same mock up as done in test_azimuth_timing_interp_against_center_time_interp
     # Maybe better mocks could be done - but this is sufficient or simply a factory for this test given
     # This is reused so many times.
@@ -597,9 +598,9 @@ def test_invalid_reference_or_secondary():
 
 
 def test_check_hrrr_availability_all_true():
-    """Tests if check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation returns True 
-    when all check_hrrr_dataset_availability return True"""
-    
+    """Tests if check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation returns True
+    when all check_hrrr_dataset_availability return True
+    """
     gunw_id = "S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0"
     
     # Mock _get_acq_time_from_gunw_id to return expected times

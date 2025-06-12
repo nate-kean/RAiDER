@@ -2,7 +2,7 @@ import datetime as dt
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Literal, Optional, Union, List, Tuple
+from typing import List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr

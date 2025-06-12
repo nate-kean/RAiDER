@@ -8,7 +8,6 @@ import xarray as xr
 from herbie import Herbie
 from pyproj import CRS, Transformer
 from shapely.geometry import Polygon, box
-from typing import Optional, Union, List, Tuple
 
 from RAiDER.logger import logger
 from RAiDER.models.customExceptions import NoWeatherModelData
@@ -98,7 +97,7 @@ def download_hrrr_file(ll_bounds, DATE, out, model='hrrr', product='nat', fxx=0,
     except NoWeatherModelData as e:
         logger.error(e)
         logger.error('lat/lon bounds: %s', ll_bounds)
-        logger.error('Weather model is {}'.format(model))
+        logger.error(f'Weather model is {model}')
         raise
 
     # bookkeepping

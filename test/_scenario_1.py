@@ -1,16 +1,16 @@
 import datetime
 import os
-import pytest
 
 import numpy as np
+import pytest
 
-from test import TEST_DIR, pushd
-
-from RAiDER.losreader import Zenith
-from RAiDER.delay import main
-from RAiDER.utilFcns import rio_open
 from RAiDER.checkArgs import makeDelayFileNames
 from RAiDER.cli.validators import get_wm_by_name
+from RAiDER.delay import main
+from RAiDER.losreader import Zenith
+from RAiDER.utilFcns import rio_open
+from test import TEST_DIR, pushd
+
 
 SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_1")
 _RTOL = 1e-2
@@ -18,63 +18,63 @@ _RTOL = 1e-2
 
 @pytest.mark.long
 def test_tropo_delay_ERAI(tmp_path):
-    '''
+    """
     Scenario:
     1: Small area, ERAI, Zenith delay
-    '''
+    """
     core_test_tropo_delay(tmp_path, modelName="ERAI")
 
 
 @pytest.mark.long
 def test_tropo_delay_ERA5(tmp_path):
-    '''
+    """
     Scenario:
     1: Small area, ERA5, Zenith delay
-    '''
+    """
     core_test_tropo_delay(tmp_path, modelName="ERA5")
 
 
 @pytest.mark.long
 def test_tropo_delay_ERA5T(tmp_path):
-    '''
+    """
     Scenario:
     1: Small area, ERA5T, Zenith delay
-    '''
+    """
     core_test_tropo_delay(tmp_path, modelName="ERA5T")
 
 
 @pytest.mark.long
 def test_tropo_delay_MERRA2(tmp_path):
-    '''
+    """
     Scenario:
     1: Small area, MERRA2, Zenith delay
-    '''
+    """
     core_test_tropo_delay(tmp_path, modelName="MERRA2")
 
 
 @pytest.mark.skip(reason="NCMR keeps hanging")
 def test_tropo_delay_NCMR(tmp_path):
-    '''
+    """
     Scenario:
     1: Small area, NCMR, Zenith delay
-    '''
+    """
     core_test_tropo_delay(tmp_path, modelName="NCMR")
 
 
 @pytest.mark.long
 def test_tropo_delay_GMAO(tmp_path):
-    '''
+    """
     Scenario:
     1: Small area, GMAO, Zenith delay
-    '''
+    """
     core_test_tropo_delay(tmp_path, modelName="GMAO")
 
 
 def core_test_tropo_delay(tmp_path, modelName):
-    '''
+    """
     Scenario:
     1: Small area, Zenith delay
-    '''
+    """
     lats = rio_open(os.path.join(
         SCENARIO_DIR, 'geom', 'lat.dat'
     ))

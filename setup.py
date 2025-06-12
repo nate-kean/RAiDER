@@ -11,6 +11,7 @@ import numpy as np
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import Extension, setup
 
+
 # Cythonize should be imported after setuptools. See:
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#configuring-the-c-build
 from Cython.Build import cythonize  # isort:skip

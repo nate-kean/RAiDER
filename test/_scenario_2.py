@@ -1,15 +1,17 @@
 # Unit and other tests
-from datetime import datetime
-import numpy as np
 import os
+from datetime import datetime
+from shutil import copyfile
+
+import numpy as np
 import pandas as pd
 import pytest
-from shutil import copyfile
-from test import TEST_DIR, pushd
 
+from RAiDER.cli.validators import get_wm_by_name
 from RAiDER.delay import main
 from RAiDER.losreader import Zenith
-from RAiDER.cli.validators import get_wm_by_name
+from test import TEST_DIR, pushd
+
 
 SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_2")
 _RTOL = 1e-2
@@ -17,10 +19,10 @@ _RTOL = 1e-2
 
 @pytest.mark.long
 def test_computeDelay(tmp_path):
-    '''
+    """
     Scenario to use:
     2: GNSS station list
-    '''
+    """
     wetName = 'stations_with_Delays.csv'
     wetFile = os.path.join(SCENARIO_DIR, wetName)
     # Not used for station file input, only passed for consistent input arguments

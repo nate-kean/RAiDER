@@ -1,25 +1,23 @@
-import pytest
 import glob
-import shutil
 import os
+import shutil
 import subprocess
+
 import numpy as np
+import pytest
 import xarray as xr
-
-
-from test import (
-    WM, TEST_DIR
-)
 
 from RAiDER.logger import logger
 from RAiDER.utilFcns import write_yaml
+from test import TEST_DIR, WM
+
 
 wm = 'ERA5' if WM == 'ERA-5' else WM
 
 
 @pytest.mark.long
 def test_cube_timemean():
-    """ Test the mean interpolation by computing cube delays at 1:30PM vs mean of 12 PM / 3PM for GMAO """
+    """Test the mean interpolation by computing cube delays at 1:30PM vs mean of 12 PM / 3PM for GMAO"""
     SCENARIO_DIR = os.path.join(TEST_DIR, "INTERP_TIME")
     os.makedirs(SCENARIO_DIR, exist_ok=True)
     ## make the lat lon grid
@@ -45,7 +43,7 @@ def test_cube_timemean():
 
         ## run raider for the default date
         cmd  = f'raider.py {cfg}'
-        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
+        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
         assert np.isclose(proc.returncode, 0)
 
     ## run interpolation in the middle of the two
@@ -53,7 +51,7 @@ def test_cube_timemean():
     cfg  = write_yaml(grp, 'temp.yaml')
 
     cmd  = f'raider.py {cfg}'
-    proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
+    proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
     assert np.isclose(proc.returncode, 0)
 
 
@@ -80,7 +78,7 @@ def test_cube_timemean():
 
 @pytest.mark.long
 def test_cube_weighting():
-    """ Test the weighting by comparing a small crop with numpy directly """
+    """Test the weighting by comparing a small crop with numpy directly"""
     from datetime import datetime
     SCENARIO_DIR = os.path.join(TEST_DIR, "INTERP_TIME")
     os.makedirs(SCENARIO_DIR, exist_ok=True)
@@ -107,7 +105,7 @@ def test_cube_weighting():
 
         ## run raider for the default date
         cmd  = f'raider.py {cfg}'
-        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
+        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
         assert np.isclose(proc.returncode, 0)
 
     ## run interpolation very near the first
@@ -115,7 +113,7 @@ def test_cube_weighting():
     cfg  = write_yaml(grp, 'temp.yaml')
 
     cmd  = f'raider.py {cfg}'
-    proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
+    proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
 
     ## double check on weighting
 

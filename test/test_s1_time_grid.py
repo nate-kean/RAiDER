@@ -9,9 +9,11 @@ import xarray as xr
 
 import RAiDER.s1_azimuth_timing
 from RAiDER.s1_azimuth_timing import (
-    get_inverse_weights_for_dates, get_n_closest_datetimes,
-    get_s1_azimuth_time_grid, get_slc_id_from_point_and_time,
-    get_times_for_azimuth_interpolation
+    get_inverse_weights_for_dates,
+    get_n_closest_datetimes,
+    get_s1_azimuth_time_grid,
+    get_slc_id_from_point_and_time,
+    get_times_for_azimuth_interpolation,
 )
 
 
@@ -30,7 +32,6 @@ def test_get_slc_id():
 
     Makes sure that there is no SLC 10 degrees translated along longitude at exactly same time.
     """
-
     lon = np.linspace(-119, -114, 6)
     lat = np.linspace(36, 33, 4)
 
@@ -68,7 +69,6 @@ def test_s1_timing_array_wrt_slc_center_time(gunw_azimuth_test: Path,
 
     The input (leftmost) datetime should not deviate too much from azimuth time grid and that is the content of test.
     """
-
     group = 'science/grids/imagingGeometry'
     with xr.open_dataset(gunw_azimuth_test, group=group, mode='r') as ds:
         res_x, res_y = ds.rio.resolution()
@@ -156,7 +156,8 @@ def test_s1_timing_array_wrt_variance(gunw_azimuth_test: Path,
 
 def test_n_closest_dts():
     """Check that the n closest datetimes are correct and in correct order.
-    Order being absolute distance to supplied datetime"""
+    Order being absolute distance to supplied datetime
+    """
     n_target_datetimes = 3
     time_step = 6
     dt = datetime.datetime(2023, 1, 1, 11, 1, 1)
@@ -234,7 +235,6 @@ def test_inverse_weighting(input_time: np.datetime64,
         This is a single float because the 1 second delta does (in X construction)
         does not impact weights significantly (only tested 1e-3)
     """
-
     N = 4
 
     date_0 = np.datetime64('2021-01-01T06:00:00')

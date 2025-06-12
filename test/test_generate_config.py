@@ -1,17 +1,17 @@
-'''
+"""
 Tests the functionality of `raider.py --generate_config <example_file>`.
 For any given example file name, the script should produce that run
 configuration file in the current working directory, along wihh any
 corresponding data files.
 If such a file already exists, the script should prompt the user to
 confirm overwriting the file.
-'''
-import pytest
-
+"""
 import os
 import subprocess
 import tempfile
 from contextlib import contextmanager
+
+import pytest
 
 
 @contextmanager

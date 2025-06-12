@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # The purpose of these tests is to verify that the axis parameter for trapz is
 # equivalent to calling apply_along_axis(trapz, axis).
 

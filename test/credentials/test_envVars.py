@@ -1,7 +1,7 @@
-'''
+"""
 Environment variables specific to each model are accepted iff uid and key
 arguments are None.
-'''
+"""
 
 from pathlib import Path
 from platform import system

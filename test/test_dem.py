@@ -1,7 +1,7 @@
 import pytest
 
-from test import TEST_DIR, pushd
 from RAiDER.dem import download_dem
+from test import TEST_DIR, pushd
 
 
 def test_download_dem_1():

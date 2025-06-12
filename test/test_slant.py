@@ -1,17 +1,15 @@
-from RAiDER.cli.raider import calcDelays
-import pytest
 import glob
 import os
-import subprocess
 import shutil
 
 import numpy as np
+import pytest
 import xarray as xr
 
-from test import (
-    TEST_DIR, WM_DIR, ORB_DIR, make_delay_name
-)
+from RAiDER.cli.raider import calcDelays
 from RAiDER.utilFcns import write_yaml
+from test import ORB_DIR, TEST_DIR, WM_DIR, make_delay_name
+
 
 @pytest.mark.parametrize('weather_model_name', ['ERA5'])
 def test_slant_proj(weather_model_name):

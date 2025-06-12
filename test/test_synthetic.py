@@ -98,7 +98,7 @@ def length_of_ray(target_xyz: list, model_zs, los, max_height):
 
 
 @dataclass
-class StudyArea(object):
+class StudyArea:
     """Object with shared parameters related to the study area.
 
     region the short name corresponding to a specific bounding box.
@@ -210,7 +210,7 @@ def test_dl_real(tmp_path, region, mod="ERA5"):
 
         ## run raider to download the real weather model
         cmd  = f'raider.py {cfg}'
-        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
+        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
         assert proc.returncode == 0, 'RAiDER did not complete successfully'
 
 

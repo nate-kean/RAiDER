@@ -1,11 +1,12 @@
-'''
+"""
 When update_rc_file is False, the RC file should NOT be modified if it already
 exists.
-'''
-import pytest
-
+"""
 from pathlib import Path
 from platform import system
+
+import pytest
+
 from RAiDER.models import credentials
 
 

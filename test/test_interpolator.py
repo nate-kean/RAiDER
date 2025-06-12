@@ -1,13 +1,13 @@
-import os
 from pathlib import Path
+
 import numpy as np
-import rasterio as rio
 import pytest
+import rasterio as rio
 from scipy.interpolate import RegularGridInterpolator
 
 from RAiDER.interpolate import interpolate, interpolate_along_axis
-from RAiDER.interpolator import RegularGridInterpolator as Interpolator, interpolateDEM
-from RAiDER.interpolator import fillna3D, interp_along_axis, interpVector
+from RAiDER.interpolator import RegularGridInterpolator as Interpolator
+from RAiDER.interpolator import fillna3D, interpVector, interp_along_axis, interpolateDEM
 
 
 @pytest.fixture

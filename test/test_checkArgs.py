@@ -41,7 +41,7 @@ def isWriteable(dirpath: Path) -> bool:
         with (dirpath / 'tmp.txt').open('w'):
             pass
         return True
-    except IOError:
+    except OSError:
         return False
 
 
@@ -126,7 +126,7 @@ def test_checkArgs_outloc_4(args):
 
 
 def test_filenames_1(args):
-    """tests that the correct filenames are generated."""
+    """Tests that the correct filenames are generated."""
     args = args
     argDict = checkArgs(args)
     assert 'Delay' not in argDict.wetFilenames[0]

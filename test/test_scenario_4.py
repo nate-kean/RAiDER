@@ -1,18 +1,19 @@
-import datetime 
+import datetime
 import os
-import pytest
-import xarray
 
 import numpy as np
+import pytest
+import xarray
 from pyproj import CRS
 
-from RAiDER.delay import tropo_delay, _get_delays_on_cube
+from RAiDER.delay import _get_delays_on_cube, tropo_delay
 from RAiDER.llreader import RasterRDR
 from RAiDER.losreader import Zenith
-from RAiDER.processWM import prepareWeatherModel
 from RAiDER.models.merra2 import MERRA2
-
+from RAiDER.processWM import prepareWeatherModel
 from test import TEST_DIR, pushd
+
+
 SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_4")
 
 @pytest.mark.long

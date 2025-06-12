@@ -1,6 +1,6 @@
 import datetime as dt
-from typing import Optional
 import warnings
+from typing import Optional
 
 import asf_search as asf
 import numpy as np

@@ -3,6 +3,7 @@ from typing import Callable
 
 import pytest
 
+
 test_dir = Path(__file__).parents[0]
 TEST_DIR = test_dir.resolve()
 
@@ -138,7 +139,7 @@ def weather_model_dict_for_gunw_integration_test():
 
 @pytest.fixture(scope='session')
 def data_for_hrrr_ztd():
-    '''Obtained via:
+    """Obtained via:
     ```
     from RAiDER.processWM import prepareWeatherModel
     from RAiDER.models import HRRR
@@ -149,6 +150,6 @@ def data_for_hrrr_ztd():
     bounds = [36, 37, -92, -91]
     wmfiles = [prepareWeatherModel(model, dt, bounds) for dt in datetimes]
     ```
-    '''
+    """
     test_data_dir = TEST_DIR / 'scenario_1' / 'HRRR_ztd_test'
     return test_data_dir / 'HRRR_2020_01_01_T12_00_00_35N_38N_93W_90W.nc'

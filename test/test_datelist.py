@@ -2,9 +2,9 @@ import datetime
 import os
 import shutil
 
+from RAiDER.cli.raider import read_run_config_file
 from RAiDER.utilFcns import write_yaml
 from test import TEST_DIR, WM, pushd
-from RAiDER.cli.raider import read_run_config_file
 
 
 def test_datelist(tmp_path):

@@ -1,14 +1,13 @@
+import os
+
+import numpy as np
+import pandas as pd
+import pytest
+import rasterio
+from scipy.interpolate import griddata
+
 from RAiDER.cli.raider import calcDelays
 from RAiDER.utilFcns import write_yaml
-import pytest
-import os
-import pandas as pd
-import subprocess
-import numpy as np
-
-from scipy.interpolate import griddata
-import rasterio
-
 from test import TEST_DIR, WM_DIR, pushd
 
 
@@ -19,7 +18,7 @@ SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_6")
 @pytest.mark.parametrize("wm", "ERA5".split())
 def test_cube_intersect(tmp_path, wm):
     # with pushd(tmp_path):
-        """ Test the intersection of lat/lon files with the DEM (model height levels?) """
+        """Test the intersection of lat/lon files with the DEM (model height levels?)"""
         outdir = os.path.join('.', "output")
         ## make the lat lon grid
         # S, N, W, E = 33.5, 34, -118.0, -117.5

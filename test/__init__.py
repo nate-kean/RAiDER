@@ -1,11 +1,12 @@
 import os
-import string
 import random
+import string
 from contextlib import contextmanager
 from pathlib import Path
 
 import numpy as np
 import xarray as xr
+
 
 test_dir = Path(__file__).parents[0]
 
@@ -29,7 +30,7 @@ def pushd(dir):
 
 
 def makeLatLonGrid(bbox, reg, out_dir, spacing=0.1):
-    """ Make lat lons at a specified spacing """
+    """Make lat lons at a specified spacing"""
     S, N, W, E = bbox
     lat_st, lat_en = S, N
     lon_st, lon_en = W, E

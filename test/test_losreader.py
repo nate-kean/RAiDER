@@ -1,19 +1,20 @@
-import pytest
-import os
 import datetime
+import os
+
 import numpy as np
+import pytest
+
 import RAiDER
 from RAiDER.losreader import (
-    read_ESA_Orbit_file,
-    read_txt_file,
-    cut_times,
-    inc_hd_to_enu,
-    get_sv,
-    getZenithLookVecs,
     Conventional,
     Zenith,
+    cut_times,
+    getZenithLookVecs,
+    get_sv,
+    inc_hd_to_enu,
+    read_ESA_Orbit_file,
+    read_txt_file,
 )
-
 from test import ORB_DIR
 
 

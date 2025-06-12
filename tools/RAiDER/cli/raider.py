@@ -16,6 +16,7 @@ import yaml
 import RAiDER.aria.calcGUNW
 import RAiDER.aria.prepFromGUNW
 from RAiDER import aws
+from RAiDER.aria.prepFromGUNW import identify_which_hrrr
 from RAiDER.aria.types import CalcDelaysArgs, CalcDelaysArgsUnparsed
 from RAiDER.cli.parser import add_cpus, add_out, add_verbose
 from RAiDER.cli.types import (
@@ -30,7 +31,6 @@ from RAiDER.cli.types import (
     RuntimeGroup,
     TimeGroup,
 )
-from RAiDER.aria.prepFromGUNW import identify_which_hrrr
 from RAiDER.cli.validators import DateListAction, date_type
 from RAiDER.gnss.types import RAiDERCombineArgs
 from RAiDER.logger import logger, logging

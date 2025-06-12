@@ -1,6 +1,7 @@
 
 from RAiDER.cli.raider import drop_nans
 
+
 def test_drop_nans():
     test_d = {
         'key1': 1,

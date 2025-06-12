@@ -1,22 +1,23 @@
-'''
+"""
 Regression tests for issue #648:
 Bad error message when GUNW file missing in S3 bucket
 
 Program should raise an error if the GUNW product file, metadata file,
 or browse image is missing that clearly explains what went wrong, as opposed to
 a generic error message resulting from a side effect of the error.
-'''
+"""
+import shutil
 from contextlib import contextmanager
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import List
 
 import pytest
-from test import TEST_DIR
 
-import shutil
-from tempfile import TemporaryDirectory
-from pathlib import Path
 import RAiDER.aws
 import RAiDER.cli.raider
+from test import TEST_DIR
+
 
 EXAMPLE_GUNW_PATH = Path(TEST_DIR) / 'gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc'
 EXAMPLE_JSON_DATA_PATH = Path(TEST_DIR) / 'gunw_test_data/S1-GUNW-A-R-064-tops-20210723_20210711-015001-35393N_33512N-PP-6267-v2_0_4.json'

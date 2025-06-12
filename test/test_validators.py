@@ -1,19 +1,23 @@
-from argparse import ArgumentParser
-from datetime import datetime, time, date
-
 import os
-import pytest
+from argparse import ArgumentParser
+from datetime import date, time
 
 import numpy as np
-
-from test import TEST_DIR
+import pytest
 
 from RAiDER.cli.types import DateGroupUnparsed, LOSGroupUnparsed, TimeGroup
 from RAiDER.cli.validators import (
-    getBufferedExtent, isOutside, isInside,
     coerce_into_date,
-    parse_bbox, parse_dates, parse_weather_model, get_los
+    getBufferedExtent,
+    get_los,
+    isInside,
+    isOutside,
+    parse_bbox,
+    parse_dates,
+    parse_weather_model,
 )
+from test import TEST_DIR
+
 
 SCENARIO = os.path.join(TEST_DIR, "scenario_4")
 

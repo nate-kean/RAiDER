@@ -112,7 +112,7 @@ def get_raster_ext(fmt):
 
 def makeDelayFileNames(date: Optional[dt.date], los: Optional[LOS], outformat: str, weather_model_name: str, out: Path) -> tuple[str, str]:
     """
-    return names for the wet and hydrostatic delays.
+    Return names for the wet and hydrostatic delays.
 
     # Examples:
     >>> makeDelayFileNames(dt.datetime(2020, 1, 1, 0, 0, 0), None, "h5", "model_name", "some_dir")

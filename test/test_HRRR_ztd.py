@@ -1,8 +1,9 @@
-from test import TEST_DIR, pushd
-
 import numpy as np
 import xarray as xr
+
 from RAiDER.cli.raider import calcDelays
+from test import TEST_DIR, pushd
+
 
 def test_scenario_1(tmp_path, data_for_hrrr_ztd, mocker):
     SCENARIO_DIR = TEST_DIR / "scenario_1"

@@ -1,16 +1,16 @@
+from unittest import mock
+
 import pytest
 import requests
-from unittest import mock
 
 from RAiDER.gnss.downloadGNSSDelays import (
     check_url,
-    in_box,
+    download_UNR,
     fix_lons,
     get_ID,
-    download_UNR,
+    in_box,
     main,
 )
-
 from test import pushd
 
 

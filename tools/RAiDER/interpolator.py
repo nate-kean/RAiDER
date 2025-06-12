@@ -5,7 +5,7 @@
 # RESERVED. United States Government Sponsorship acknowledged.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-from contextlib import contextmanager  
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Tuple, Union
 
@@ -189,7 +189,7 @@ def reproject_raster(in_path, crs):
     # reproject raster to project crs
     import rasterio
     from rasterio.io import MemoryFile
-    from rasterio.warp import calculate_default_transform, reproject, Resampling
+    from rasterio.warp import Resampling, calculate_default_transform, reproject
 
     with rasterio.open(in_path) as src:
         src_crs = src.crs

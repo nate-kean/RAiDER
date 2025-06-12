@@ -9,15 +9,13 @@ import datetime as dt
 import sys
 from pathlib import Path
 
-from RAiDER.aria.types import CalcDelaysArgs
 import numpy as np
 import pandas as pd
-import rasterio
 import shapely.wkt
 import xarray as xr
-import rioxarray as rio
 from shapely.geometry import box
 
+from RAiDER.aria.types import CalcDelaysArgs
 from RAiDER.logger import logger
 from RAiDER.models import credentials
 from RAiDER.models.customExceptions import NoWeatherModelData
