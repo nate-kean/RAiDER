@@ -1,7 +1,7 @@
 from RAiDER.cli.raider import drop_nans
 
 
-def test_drop_nans():
+def test_drop_nans() -> None:
     test_d = {
         'key1': 1,
         'key2': 'string',

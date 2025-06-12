@@ -30,7 +30,7 @@ def readRSC(rscFilename):
     return fields
 
 
-def vrtStr(xSize, ySize, lon1, lat1, lonStep, latStep, filename, dtype='Float32'):
+def vrtStr(xSize, ySize, lon1, lat1, lonStep, latStep, filename, dtype='Float32') -> str:
     return (
         f'<VRTDataset rasterXSize="{xSize}" rasterYSize="{ySize}">'
         '  <SRS>EPSG:4326</SRS>'

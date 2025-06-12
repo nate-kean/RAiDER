@@ -22,7 +22,7 @@ def get_start_time_from_slc_id(slc_id: str) -> datetime.datetime:
     return pd.Timestamp(acq_start_time_token)
 
 
-def test_get_slc_id():
+def test_get_slc_id() -> None:
     """
     Function tested gets SLC with respect to space and time.
 
@@ -69,7 +69,7 @@ def test_s1_timing_array_wrt_slc_center_time(
     orbit_dict_for_azimuth_time_test: dict,
     slc_id_dict_for_azimuth_time_test: dict,
     mocker,
-):
+) -> None:
     """Make sure the SLC start time is within reasonable amount of grid. The flow chart is:
 
     (datetime, lon, lat) --> SLC id --> orbit --> azimuth time grid (via ISCE3)
@@ -121,8 +121,8 @@ def test_s1_timing_array_wrt_variance(
     orbit_dict_for_azimuth_time_test: dict,
     slc_id_dict_for_azimuth_time_test: dict,
     mocker,
-):
-    """Make sure along the hgt dimension of grid there is very small deviations"""
+) -> None:
+    """Make sure along the hgt dimension of grid there is very small deviations."""
     group = 'science/grids/imagingGeometry'
     with xr.open_dataset(gunw_azimuth_test, group=group, mode='r') as ds:
         res_x, res_y = ds.rio.resolution()
@@ -160,9 +160,9 @@ def test_s1_timing_array_wrt_variance(
     assert RAiDER.s1_azimuth_timing.get_orbits_from_slc_ids.call_count == 1
 
 
-def test_n_closest_dts():
+def test_n_closest_dts() -> None:
     """Check that the n closest datetimes are correct and in correct order.
-    Order being absolute distance to supplied datetime
+    Order being absolute distance to supplied datetime.
     """
     n_target_datetimes = 3
     time_step = 6
@@ -243,8 +243,8 @@ def test_inverse_weighting(
     input_time: np.datetime64,
     temporal_window: Union[int, float],
     expected_weights: list[float],
-):
-    """The test is designed to determine valid inverse weighting
+) -> None:
+    """The test is designed to determine valid inverse weighting.
 
     Parameters
     ----------
@@ -297,7 +297,7 @@ def test_inverse_weighting(
     np.testing.assert_almost_equal(1, sum_weights_per_pixel)
 
 
-def test_triple_date_usage():
+def test_triple_date_usage() -> None:
     """This test shows that when a time grid has pixels that are closer to two different pairs of date and that the
     inverse weights come out correctly. Put slightly differently, the scenario is when one of the 3 closest dates
     occurs at "center time" of the grid and some pixels require dates before the center time and some pixels
@@ -338,8 +338,8 @@ def test_triple_date_usage():
     np.testing.assert_almost_equal(1, sum_weights_per_pixel)
 
 
-def test_error_catching_with_s1_grid():
-    """Tests proper error handling with improper inputs"""
+def test_error_catching_with_s1_grid() -> None:
+    """Tests proper error handling with improper inputs."""
     N = 10
     M = 11
     P = 12
@@ -360,7 +360,7 @@ def test_error_catching_with_s1_grid():
         get_s1_azimuth_time_grid(lon, lat, hgt, dt)
 
 
-def test_duplicate_orbits(mocker, orbit_paths_for_duplicate_orbit_xml_test):
+def test_duplicate_orbits(mocker, orbit_paths_for_duplicate_orbit_xml_test) -> None:
     hgt = np.linspace(-500, 26158.0385, 20)
     lat = np.linspace(40.647867694896775, 44.445117773316184, 20)
     lon = np.linspace(-74, -79, 20)
@@ -387,7 +387,7 @@ def test_duplicate_orbits(mocker, orbit_paths_for_duplicate_orbit_xml_test):
     assert RAiDER.s1_azimuth_timing.get_orbits_from_slc_ids.call_count == 1
 
 
-def test_get_times_for_az():
+def test_get_times_for_az() -> None:
     # Within 5 minutes of time-step (aka model time) so returns 3 times
     dt = datetime.datetime(2023, 1, 1, 11, 1, 0)
     out = get_times_for_azimuth_interpolation(dt, 1)
@@ -422,7 +422,7 @@ def test_get_times_for_az():
     assert out == out_expected
 
 
-def test_error_for_weighting_when_dates_not_unique():
+def test_error_for_weighting_when_dates_not_unique() -> None:
     dates = [datetime.datetime(2023, 1, 1)] * 2
     with pytest.raises(ValueError):
         get_inverse_weights_for_dates(np.zeros((3, 3)), dates)

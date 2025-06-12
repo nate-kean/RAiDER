@@ -8,15 +8,15 @@ test_dir = Path(__file__).parents[0]
 TEST_DIR = test_dir.resolve()
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser) -> None:
     parser.addoption('--skip-isce3', action='store_true', default=False, help='skip tests which require ISCE3')
 
 
-def pytest_configure(config):
+def pytest_configure(config) -> None:
     config.addinivalue_line('markers', 'isce3: mark test as requiring ISCE3 to run')
 
 
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(config, items) -> None:
     if config.getoption('--skip-isce3'):
         skip_isce3 = pytest.mark.skip(reason='--skip-isce3 option given')
         for item in items:
@@ -99,7 +99,7 @@ def weather_model_dict_for_azimuth_time_test():
 
 @pytest.fixture(scope='session')
 def weather_model_dict_for_center_time_test():
-    """Order is important here; will be in chronological order with respect to closest date times"""
+    """Order is important here; will be in chronological order with respect to closest date times."""
     test_data = TEST_DIR / 'gunw_azimuth_test_data' / 'weather_files'
     return {
         'HRRR': [

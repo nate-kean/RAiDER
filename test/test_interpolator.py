@@ -30,7 +30,7 @@ def nanArr():
     return array, true_array
 
 
-def test_interpVector():
+def test_interpVector() -> None:
     # fmt: off
     vec = np.array([
         0,   1,          2,          3,           4,          5,
@@ -44,12 +44,12 @@ def test_interpVector():
     )
 
 
-def test_fillna3D(nanArr):
+def test_fillna3D(nanArr) -> None:
     arr, tarr = nanArr
     assert np.allclose(fillna3D(arr), tarr, equal_nan=True)
 
 
-def test_interp_along_axis():
+def test_interp_along_axis() -> None:
     z2 = np.tile(np.arange(100)[..., np.newaxis], (5, 1, 5)).swapaxes(1, 2)
     zvals = 0.3 * z2 - 12.75
 
@@ -69,7 +69,7 @@ def shuffle_along_axis(a, axis):
     return np.take_along_axis(a, idx, axis=axis)
 
 
-def test_interpolate_along_axis():
+def test_interpolate_along_axis() -> None:
     # Rejects scalar values
     with pytest.raises(TypeError):
         interpolate_along_axis(np.array(0), np.array(0), np.array(0))
@@ -107,7 +107,7 @@ def test_interpolate_along_axis():
         interpolate_along_axis(np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((2, 3)), axis=0, max_threads=1)
 
 
-def test_interp_along_axis_1d():
+def test_interp_along_axis_1d() -> None:
     def f(x):
         return 2 * x
 
@@ -120,7 +120,7 @@ def test_interp_along_axis_1d():
     assert np.allclose(interpolate_along_axis(xs, ys, points, axis=0, max_threads=1), f(points))
 
 
-def test_interp_along_axis_1d_out_of_bounds():
+def test_interp_along_axis_1d_out_of_bounds() -> None:
     def f(x):
         return 2 * x
 
@@ -137,7 +137,7 @@ def test_interp_along_axis_1d_out_of_bounds():
     )
 
 
-def test_interp_along_axis_2d():
+def test_interp_along_axis_2d() -> None:
     def f(x):
         return 2 * x
 
@@ -164,7 +164,7 @@ def test_interp_along_axis_2d():
     # fmt: on
 
 
-def test_interp_along_axis_2d_threads_edge_case():
+def test_interp_along_axis_2d_threads_edge_case() -> None:
     def f(x):
         return 2 * x
 
@@ -200,7 +200,7 @@ def test_interp_along_axis_2d_threads_edge_case():
     # fmt: on
 
 
-def test_interp_along_axis_3d():
+def test_interp_along_axis_3d() -> None:
     def f(x):
         return 2 * x
 
@@ -233,7 +233,7 @@ def test_interp_along_axis_3d():
     # fmt: on
 
 
-def test_interp_along_axis_3d_axis1():
+def test_interp_along_axis_3d_axis1() -> None:
     def f(x):
         return 2 * x
 
@@ -267,7 +267,7 @@ def test_interp_along_axis_3d_axis1():
 
 
 @pytest.mark.parametrize('num_points', (7, 200, 500))
-def test_interp_along_axis_3d_large(num_points):
+def test_interp_along_axis_3d_large(num_points) -> None:
     def f(x):
         return 2 * x
 
@@ -288,7 +288,7 @@ def test_interp_along_axis_3d_large(num_points):
     assert np.allclose(interpolate_along_axis(xs, ys, points, axis=2, assume_sorted=True), ans)
 
 
-def test_interp_along_axis_3d_large_unsorted():
+def test_interp_along_axis_3d_large_unsorted() -> None:
     def f(x):
         return 2 * x
 
@@ -309,7 +309,7 @@ def test_interp_along_axis_3d_large_unsorted():
     assert np.allclose(interpolate_along_axis(xs, ys, points, axis=2), ans)
 
 
-def test_grid_dim_mismatch():
+def test_grid_dim_mismatch() -> None:
     with pytest.raises(TypeError):
         interpolate(
             points=(np.zeros((10,)), np.zeros((5,))),
@@ -318,7 +318,7 @@ def test_grid_dim_mismatch():
         )
 
 
-def test_basic():
+def test_basic() -> None:
     ans = interpolate(
         points=(np.array([0, 1]),),
         values=np.array([0, 1]),
@@ -330,7 +330,7 @@ def test_basic():
     assert ans == np.array([0.5])
 
 
-def test_1d_out_of_bounds():
+def test_1d_out_of_bounds() -> None:
     ans = interpolate(
         points=(np.array([0, 1]),),
         values=np.array([0, 1]),
@@ -343,7 +343,7 @@ def test_1d_out_of_bounds():
     assert ans == np.array([100])
 
 
-def test_1d_fill_value():
+def test_1d_fill_value() -> None:
     ans = interpolate(
         points=(np.array([0, 1]),),
         values=np.array([0, 1]),
@@ -356,7 +356,7 @@ def test_1d_fill_value():
     assert np.all(np.isnan(ans))
 
 
-def test_small():
+def test_small() -> None:
     ans = interpolate(
         points=(np.array([1, 2, 3, 4, 5, 6]),),
         values=np.array([10, 9, 30, 10, 6, 1]),
@@ -367,7 +367,7 @@ def test_small():
     assert np.allclose(ans, np.array([9.75, 27.9, 29.8, 2.5]), atol=1e-15)
 
 
-def test_small_not_sorted():
+def test_small_not_sorted() -> None:
     ans = interpolate(
         points=(np.array([1, 2, 3, 4, 5, 6]),),
         values=np.array([10, 9, 30, 10, 6, 1]),
@@ -378,7 +378,7 @@ def test_small_not_sorted():
     assert np.allclose(ans, np.array([27.9, 9.75, 2.5, 29.8]), atol=1e-15)
 
 
-def test_exact_points():
+def test_exact_points() -> None:
     ans = interpolate(
         points=(np.array([1, 2, 3, 4, 5, 6]),),
         values=np.array([10, 9, 30, 10, 6, 1]),
@@ -389,7 +389,7 @@ def test_exact_points():
     assert np.allclose(ans, np.array([10, 9, 30, 10, 6, 1]), atol=1e-15)
 
 
-def test_2d_basic():
+def test_2d_basic() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
 
@@ -404,7 +404,7 @@ def test_2d_basic():
     assert ans == np.array([1])
 
 
-def test_2d_out_of_bounds():
+def test_2d_out_of_bounds() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
 
@@ -420,7 +420,7 @@ def test_2d_out_of_bounds():
     assert ans == np.array([200])
 
 
-def test_2d_fill_value():
+def test_2d_fill_value() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
 
@@ -436,7 +436,7 @@ def test_2d_fill_value():
     assert np.all(np.isnan(ans))
 
 
-def test_2d_square_small():
+def test_2d_square_small() -> None:
     def f(x, y):
         return x**2 + 3 * y
 
@@ -462,7 +462,7 @@ def test_2d_square_small():
     assert np.allclose(ans, ans_scipy, atol=1e-15)
 
 
-def test_2d_rectangle_small():
+def test_2d_rectangle_small() -> None:
     def f(x, y):
         return x**2 + 3 * y
 
@@ -488,7 +488,7 @@ def test_2d_rectangle_small():
     assert np.allclose(ans, ans_scipy, atol=1e-15)
 
 
-def test_2d_rectangle_small_2():
+def test_2d_rectangle_small_2() -> None:
     def f(x, y):
         return x**2 + 3 * y
 
@@ -514,7 +514,7 @@ def test_2d_rectangle_small_2():
     assert np.allclose(ans, ans_scipy, atol=1e-15)
 
 
-def test_2d_square_large():
+def test_2d_square_large() -> None:
     def f(x, y):
         return x**2 + 3 * y
 
@@ -541,7 +541,7 @@ def test_2d_square_large():
     assert np.allclose(ans, ans_scipy, atol=1e-15)
 
 
-def test_3d_basic():
+def test_3d_basic() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
     zs = np.array([0, 1])
@@ -558,7 +558,7 @@ def test_3d_basic():
     assert ans == np.array([1.5])
 
 
-def test_3d_out_of_bounds():
+def test_3d_out_of_bounds() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
     zs = np.array([0, 1])
@@ -576,7 +576,7 @@ def test_3d_out_of_bounds():
     assert ans == np.array([300])
 
 
-def test_3d_fill_value():
+def test_3d_fill_value() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
     zs = np.array([0, 1])
@@ -594,7 +594,7 @@ def test_3d_fill_value():
     assert np.all(np.isnan(ans))
 
 
-def test_3d_cube_small():
+def test_3d_cube_small() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -625,7 +625,7 @@ def test_3d_cube_small():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_3d_cube_small_not_sorted():
+def test_3d_cube_small_not_sorted() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -655,7 +655,7 @@ def test_3d_cube_small_not_sorted():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_3d_prism_small():
+def test_3d_prism_small() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -686,7 +686,7 @@ def test_3d_prism_small():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_3d_prism_small_2():
+def test_3d_prism_small_2() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -717,7 +717,7 @@ def test_3d_prism_small_2():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_3d_prism_small_3():
+def test_3d_prism_small_3() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -748,7 +748,7 @@ def test_3d_prism_small_3():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_3d_cube_large():
+def test_3d_cube_large() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -780,7 +780,7 @@ def test_3d_cube_large():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_4d_basic():
+def test_4d_basic() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
     zs = np.array([0, 1])
@@ -797,7 +797,7 @@ def test_4d_basic():
     assert ans == np.array([2])
 
 
-def test_4d_out_of_bounds():
+def test_4d_out_of_bounds() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
     zs = np.array([0, 1])
@@ -815,7 +815,7 @@ def test_4d_out_of_bounds():
     assert ans == np.array([400])
 
 
-def test_4d_fill_value():
+def test_4d_fill_value() -> None:
     xs = np.array([0, 1])
     ys = np.array([0, 1])
     zs = np.array([0, 1])
@@ -833,7 +833,7 @@ def test_4d_fill_value():
     assert np.all(np.isnan(ans))
 
 
-def test_4d_cube_small():
+def test_4d_cube_small() -> None:
     def f(x, y, z, w):
         return x**2 + 3 * y - z * w
 
@@ -866,7 +866,7 @@ def test_4d_cube_small():
     assert np.allclose(ans, ans_scipy, 1e-15)
 
 
-def test_interpolate_wrapper():
+def test_interpolate_wrapper() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -890,7 +890,7 @@ def test_interpolate_wrapper():
     assert np.allclose(ans2, ans_scipy, 1e-15, equal_nan=True)
 
 
-def test_interpolate_wrapper2():
+def test_interpolate_wrapper2() -> None:
     def f(x, y, z):
         return x**2 + 3 * y - z
 
@@ -917,7 +917,7 @@ def test_interpolate_wrapper2():
     assert np.allclose(ans2, ans_scipy, 1e-15, equal_nan=True)
 
 
-def test_interpolateDEM():
+def test_interpolateDEM() -> None:
     from affine import Affine
 
     s = 10
@@ -947,7 +947,7 @@ def test_interpolateDEM():
     dem_file.unlink()
 
 
-def test_interpolateDEM_2():
+def test_interpolateDEM_2() -> None:
     from affine import Affine
 
     s = 10

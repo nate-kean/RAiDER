@@ -5,7 +5,7 @@ import numpy as np
 # equivalent to calling apply_along_axis(trapz, axis).
 
 
-def test_integrate_along_axis():
+def test_integrate_along_axis() -> None:
     # fmt: off
     y = np.array(
         [
@@ -23,7 +23,7 @@ def test_integrate_along_axis():
         )
 
 
-def test_integrate_along_axis_2():
+def test_integrate_along_axis_2() -> None:
     # fmt: off
     y = np.array(
         [
@@ -41,7 +41,7 @@ def test_integrate_along_axis_2():
         )
 
 
-def test_integrate_along_axis_large():
+def test_integrate_along_axis_large() -> None:
     y = np.random.standard_normal(100_000).reshape(100, 100, 10)
     x = np.linspace(0, 1000, num=y.shape[2])
 

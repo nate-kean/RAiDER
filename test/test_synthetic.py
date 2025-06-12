@@ -105,7 +105,7 @@ class StudyArea:
         Fort (Fortaleza, Brazil; equator)
     """
 
-    def __init__(self, region: str, wmName: str, path: str):
+    def __init__(self, region: str, wmName: str, path: str) -> None:
         self.region = region
         self.wmName = wmName
         self.wd = op.join(path, 'synthetic_test')
@@ -137,7 +137,7 @@ class StudyArea:
 
         self.wm_dir_synth = op.join(self.wd, 'weather_files_synth')
 
-    def setup_region(self):
+    def setup_region(self) -> None:
         """Setup the bounding box and choose orbit file based on region name.
 
         Possible regions are:
@@ -180,7 +180,7 @@ class StudyArea:
 
 @pytest.mark.skip()
 @pytest.mark.parametrize('region', 'AK LA Fort'.split())
-def test_dl_real(tmp_path, region, mod='ERA5'):
+def test_dl_real(tmp_path, region, mod='ERA5') -> None:
     """Download the real weather model to overwrite.
 
     This 'golden dataset' shouldnt be changed
@@ -201,7 +201,7 @@ def test_dl_real(tmp_path, region, mod='ERA5'):
 
 
 @pytest.mark.parametrize('region', 'AK LA Fort'.split())
-def test_hydrostatic_eq(tmp_path, region, mod='ERA-5'):
+def test_hydrostatic_eq(tmp_path, region, mod='ERA-5') -> None:
     """Test hydrostatic equation: Hydro Refractivity = k1 * (Pressure/Temp).
 
     The hydrostatic delay reduces to an integral along the ray path when P=T.
@@ -267,7 +267,7 @@ def test_hydrostatic_eq(tmp_path, region, mod='ERA-5'):
 
 
 @pytest.mark.parametrize('region', 'AK LA Fort'.split())
-def test_wet_eq_linear(tmp_path, region, mod='ERA-5'):
+def test_wet_eq_linear(tmp_path, region, mod='ERA-5') -> None:
     """Test linear part of wet equation.
     Wet Refractivity = k2 * (E/T) + k3 * (E/T^2)
     E = relative humidty; T = temperature.
@@ -344,7 +344,7 @@ def test_wet_eq_linear(tmp_path, region, mod='ERA-5'):
 
 
 @pytest.mark.parametrize('region', 'AK LA Fort'.split())
-def test_wet_eq_nonlinear(tmp_path, region, mod='ERA-5'):
+def test_wet_eq_nonlinear(tmp_path, region, mod='ERA-5') -> None:
     """Test the nonlinear part of the wet equation."""
     """
     Wet Refractivity = k2 * (E/T) + k3 * (E/T^2)

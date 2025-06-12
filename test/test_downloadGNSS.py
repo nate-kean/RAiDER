@@ -15,14 +15,14 @@ from test import pushd
 
 
 # Test check_url with a valid and invalid URL
-def test_check_url_valid():
+def test_check_url_valid() -> None:
     valid_url = 'https://www.example.com/test.txt'
     with mock.patch.object(requests.Session, 'head') as mock_head:
         mock_head.return_value.status_code = 200  # Simulate successful response
         assert check_url(valid_url) == valid_url
 
 
-def test_check_url_invalid():
+def test_check_url_invalid() -> None:
     invalid_url = 'https://www.not-a-real-website.com/notfound.txt'
     with mock.patch.object(requests.Session, 'head') as mock_head:
         mock_head.return_value.status_code = 404  # Simulate not found response
@@ -30,14 +30,14 @@ def test_check_url_invalid():
 
 
 # Test in_box with points inside and outside the box
-def test_in_box_inside():
+def test_in_box_inside() -> None:
     lat = 38.0
     lon = -97.0
     llbox = [30, 40, -100, -90]  # Sample bounding box
     assert in_box(lat, lon, llbox)
 
 
-def test_in_box_outside():
+def test_in_box_outside() -> None:
     lat = 50.0
     lon = -80.0
     llbox = [30, 40, -100, -90]  # Sample bounding box
@@ -45,28 +45,28 @@ def test_in_box_outside():
 
 
 # Test fix_lons with various longitudes
-def test_fix_lons_positive():
+def test_fix_lons_positive() -> None:
     lon = 200.0
     assert fix_lons(lon) == -160.0
 
 
-def test_fix_lons_negative():
+def test_fix_lons_negative() -> None:
     lon = -220.0
     assert fix_lons(lon) == 140.0
 
 
-def test_fix_lons_positive_180():
+def test_fix_lons_positive_180() -> None:
     lon = 180.0
     assert fix_lons(lon) == 180.0
 
 
-def test_fix_lons_negative_180():
+def test_fix_lons_negative_180() -> None:
     lon = -180.0
     assert fix_lons(lon) == -180.0
 
 
 # Test get_ID with a valid line
-def test_get_ID_valid():
+def test_get_ID_valid() -> None:
     line = 'ABCD 35.0 -98.0 100.0'
     stat_id, lat, lon, height = get_ID(line)
     assert stat_id == 'ABCD'
@@ -76,13 +76,13 @@ def test_get_ID_valid():
 
 
 # Test get_ID with an invalid line (not enough elements)
-def test_get_ID_invalid():
+def test_get_ID_invalid() -> None:
     line = 'ABCD 35.0'  # Missing longitude and height
     with pytest.raises(ValueError):
         get_ID(line)
 
 
-def test_download_UNR(tmp_path):
+def test_download_UNR(tmp_path) -> None:
     expected_path = 'https://geodesy.unr.edu/gps_timeseries/trop/MORZ/MORZ.2020.trop.zip'
     statID = 'MORZ'
     year = 2020
@@ -91,21 +91,21 @@ def test_download_UNR(tmp_path):
         assert outDict['path'] == expected_path
 
 
-def test_download_UNR_2():
+def test_download_UNR_2() -> None:
     statID = 'MORZ'
     year = 2000
     with pytest.raises(ValueError):
         download_UNR(statID, year, download=True)
 
 
-def test_download_UNR_3():
+def test_download_UNR_3() -> None:
     statID = 'DUMY'
     year = 2020
     with pytest.raises(ValueError):
         download_UNR(statID, year, download=True)
 
 
-def test_download_UNR_4():
+def test_download_UNR_4() -> None:
     statID = 'MORZ'
     year = 2020
     with pytest.raises(NotImplementedError):
@@ -113,6 +113,6 @@ def test_download_UNR_4():
 
 
 @pytest.mark.skip
-def test_main():
+def test_main() -> None:
     iargs = None
     main(inps=iargs)

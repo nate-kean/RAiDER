@@ -33,7 +33,7 @@ def temp_file():
     # fmt: on
 
 
-def test_getDateTime():
+def test_getDateTime() -> None:
     f1 = Path('20080101T060000')
     f2 = Path('20080101T560000')
     f3 = Path('20080101T0600000')
@@ -49,7 +49,7 @@ def test_getDateTime():
         getDateTime(f5)
 
 
-def test_addDateTimeToFiles1(tmp_path, temp_file):
+def test_addDateTimeToFiles1(tmp_path, temp_file) -> None:
     df = temp_file
 
     with pushd(tmp_path):
@@ -60,7 +60,7 @@ def test_addDateTimeToFiles1(tmp_path, temp_file):
         assert 'Datetime' not in df.columns
 
 
-def test_addDateTimeToFiles2(tmp_path, temp_file):
+def test_addDateTimeToFiles2(tmp_path, temp_file) -> None:
     f1 = '20080101T060000'
     df = temp_file
 
@@ -72,7 +72,7 @@ def test_addDateTimeToFiles2(tmp_path, temp_file):
         assert 'Datetime' in df.columns
 
 
-def test_concatDelayFiles(tmp_path, temp_file):
+def test_concatDelayFiles(tmp_path, temp_file) -> None:
     f1 = '20080101T060000'
     df = temp_file
 
@@ -89,17 +89,17 @@ def test_concatDelayFiles(tmp_path, temp_file):
     assert file_len(out_path) == file_length
 
 
-def test_get_stats_by_llh2():
+def test_get_stats_by_llh2() -> None:
     stations = get_stats_by_llh(llhBox=[10, 18, 360 - 93, 360 - 88])
     assert isinstance(stations, pd.DataFrame)
 
 
-def test_get_stats_by_llh3():
+def test_get_stats_by_llh3() -> None:
     with pytest.raises(ValueError):
         get_stats_by_llh(llhBox=[10, 18, -93, -88])
 
 
-def test_get_station_list():
+def test_get_station_list() -> None:
     stations, output_file = get_station_list(
         stationFile=os.path.join(SCENARIO2_DIR, 'stations.csv'), writeStationFile=False
     )
@@ -107,17 +107,17 @@ def test_get_station_list():
     assert isinstance(output_file, pd.DataFrame)
 
 
-def test_download_tropo_delays1():
+def test_download_tropo_delays1() -> None:
     with pytest.raises(NotImplementedError):
         download_tropo_delays(stats=['GUAT', 'SLAC', 'CRSE'], years=[2022], gps_repo='dummy_repo')
 
 
-def test_download_tropo_delays2():
+def test_download_tropo_delays2() -> None:
     with pytest.raises(NoStationDataFoundError):
         download_tropo_delays(stats=['dummy_station'], years=[2022])
 
 
-def test_download_tropo_delays2(tmp_path):
+def test_download_tropo_delays2(tmp_path) -> None:
     with pushd(tmp_path):
         stations, output_file = get_station_list(stationFile=os.path.join(SCENARIO2_DIR, 'stations.csv'))
 
@@ -130,13 +130,13 @@ def test_download_tropo_delays2(tmp_path):
         download_tropo_delays(stats=stations, years=[2022], writeDir=tmp_path)
 
 
-def test_filterByBBox1():
+def test_filterByBBox1() -> None:
     _, station_data = get_station_list(stationFile=os.path.join(SCENARIO2_DIR, 'stations.csv'), writeStationFile=False)
     with pytest.raises(ValueError):
         filterToBBox(station_data, llhBox=[34, 38, -120, -115])
 
 
-def test_filterByBBox2():
+def test_filterByBBox2() -> None:
     _, station_data = get_station_list(stationFile=os.path.join(SCENARIO2_DIR, 'stations.csv'), writeStationFile=False)
     new_data = filterToBBox(station_data, llhBox=[34, 38, 240, 245])
     for stat in ['CAPE', 'MHMS', 'NVCO']:

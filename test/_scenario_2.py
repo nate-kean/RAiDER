@@ -18,10 +18,10 @@ _RTOL = 1e-2
 
 
 @pytest.mark.long
-def test_computeDelay(tmp_path):
+def test_computeDelay(tmp_path) -> None:
     """
     Scenario to use:
-    2: GNSS station list
+    2: GNSS station list.
     """
     wetName = 'stations_with_Delays.csv'
     wetFile = os.path.join(SCENARIO_DIR, wetName)

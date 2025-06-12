@@ -17,63 +17,63 @@ _RTOL = 1e-2
 
 
 @pytest.mark.long
-def test_tropo_delay_ERAI(tmp_path):
+def test_tropo_delay_ERAI(tmp_path) -> None:
     """
     Scenario:
-    1: Small area, ERAI, Zenith delay
+    1: Small area, ERAI, Zenith delay.
     """
     core_test_tropo_delay(tmp_path, modelName='ERAI')
 
 
 @pytest.mark.long
-def test_tropo_delay_ERA5(tmp_path):
+def test_tropo_delay_ERA5(tmp_path) -> None:
     """
     Scenario:
-    1: Small area, ERA5, Zenith delay
+    1: Small area, ERA5, Zenith delay.
     """
     core_test_tropo_delay(tmp_path, modelName='ERA5')
 
 
 @pytest.mark.long
-def test_tropo_delay_ERA5T(tmp_path):
+def test_tropo_delay_ERA5T(tmp_path) -> None:
     """
     Scenario:
-    1: Small area, ERA5T, Zenith delay
+    1: Small area, ERA5T, Zenith delay.
     """
     core_test_tropo_delay(tmp_path, modelName='ERA5T')
 
 
 @pytest.mark.long
-def test_tropo_delay_MERRA2(tmp_path):
+def test_tropo_delay_MERRA2(tmp_path) -> None:
     """
     Scenario:
-    1: Small area, MERRA2, Zenith delay
+    1: Small area, MERRA2, Zenith delay.
     """
     core_test_tropo_delay(tmp_path, modelName='MERRA2')
 
 
 @pytest.mark.skip(reason='NCMR keeps hanging')
-def test_tropo_delay_NCMR(tmp_path):
+def test_tropo_delay_NCMR(tmp_path) -> None:
     """
     Scenario:
-    1: Small area, NCMR, Zenith delay
+    1: Small area, NCMR, Zenith delay.
     """
     core_test_tropo_delay(tmp_path, modelName='NCMR')
 
 
 @pytest.mark.long
-def test_tropo_delay_GMAO(tmp_path):
+def test_tropo_delay_GMAO(tmp_path) -> None:
     """
     Scenario:
-    1: Small area, GMAO, Zenith delay
+    1: Small area, GMAO, Zenith delay.
     """
     core_test_tropo_delay(tmp_path, modelName='GMAO')
 
 
-def core_test_tropo_delay(tmp_path, modelName):
+def core_test_tropo_delay(tmp_path, modelName) -> None:
     """
     Scenario:
-    1: Small area, Zenith delay
+    1: Small area, Zenith delay.
     """
     lats = rio_open(os.path.join(SCENARIO_DIR, 'geom', 'lat.dat'))
     lons = rio_open(os.path.join(SCENARIO_DIR, 'geom', 'lon.dat'))

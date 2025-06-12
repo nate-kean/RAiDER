@@ -31,7 +31,7 @@ def pushd(dir):
 
 
 def makeLatLonGrid(bbox, reg, out_dir, spacing=0.1):
-    """Make lat lons at a specified spacing"""
+    """Make lat lons at a specified spacing."""
     S, N, W, E = bbox
     lat_st, lat_en = S, N
     lon_st, lon_en = W, E
@@ -50,7 +50,7 @@ def makeLatLonGrid(bbox, reg, out_dir, spacing=0.1):
     return dst_lat, dst_lon
 
 
-def make_delay_name(weather_model_name, date, time, kind='ztd'):
+def make_delay_name(weather_model_name, date, time, kind='ztd') -> str:
     assert kind in 'ztd std ray'.split(), 'Incorrect type of delays.'
     return f'{weather_model_name}_tropo_{date}T{time.replace(":", "")}_{kind}.nc'
 

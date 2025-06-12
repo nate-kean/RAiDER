@@ -39,7 +39,7 @@ def llfiles():
     return SCENARIO1_DIR / 'lat.dat', SCENARIO1_DIR / 'lon.dat'
 
 
-def test_latlon_reader_2():
+def test_latlon_reader_2() -> None:
     with pytest.raises(ValueError):
         RasterRDR(lat_file=None, lon_file=None)
 
@@ -47,7 +47,7 @@ def test_latlon_reader_2():
         RasterRDR(lat_file='doesnotexist.rdr', lon_file='doesnotexist.rdr')
 
 
-def test_aoi_epsg():
+def test_aoi_epsg() -> None:
     bbox = [20, 27, -115, -104]
     r = BoundingBox(bbox)
     r.set_output_spacing(ll_res=0.05)
@@ -55,14 +55,14 @@ def test_aoi_epsg():
     assert test == 0.05 * 1e5
 
 
-def test_set_output_dir():
+def test_set_output_dir() -> None:
     bbox = [20, 27, -115, -104]
     r = BoundingBox(bbox)
     r.set_output_directory('dummy_directory')
     assert r._output_directory == 'dummy_directory'
 
 
-def test_set_xygrid():
+def test_set_xygrid() -> None:
     bbox = [20, 27, -115, -104]
     crs = CRS.from_epsg(4326)
     r = BoundingBox(bbox)
@@ -71,7 +71,7 @@ def test_set_xygrid():
     r.set_output_xygrid(dst_crs=crs)
 
 
-def test_latlon_reader():
+def test_latlon_reader() -> None:
     latfile = Path(GEOM_DIR) / 'lat.rdr'
     lonfile = Path(GEOM_DIR) / 'lon.rdr'
     lat_true, _ = rio_open(latfile)
@@ -90,7 +90,7 @@ def test_latlon_reader():
     assert all([np.allclose(b, t, rtol=1e-4) for b, t in zip(query.bounds(), bounds_true)])
 
 
-def test_badllfiles(station_file):
+def test_badllfiles(station_file) -> None:
     latfile = os.path.join(GEOM_DIR, 'lat.rdr')
     lonfile = os.path.join(GEOM_DIR, 'lon_dummy.rdr')
     station_file = station_file
@@ -102,7 +102,7 @@ def test_badllfiles(station_file):
         RasterRDR(lat_file=station_file, lon_file=lonfile)
 
 
-def test_read_bbox():
+def test_read_bbox() -> None:
     bbox = [20, 27, -115, -104]
     query = BoundingBox(bbox)
     assert query.type() == 'bounding_box'
@@ -110,7 +110,7 @@ def test_read_bbox():
     assert query.projection() == 'EPSG:4326'
 
 
-def test_read_station_file(station_file):
+def test_read_station_file(station_file) -> None:
     query = StationFile(station_file)
     lats, lons = query.readLL()
     stats = pd.read_csv(station_file).drop_duplicates(subset=['Lat', 'Lon'])
@@ -125,7 +125,7 @@ def test_read_station_file(station_file):
     assert all([np.allclose(b, t, rtol=1e-4) for b, t in zip(query.bounds(), bounds_true)])
 
 
-def test_bounds_from_latlon_rasters():
+def test_bounds_from_latlon_rasters() -> None:
     lat_path = Path(GEOM_DIR) / 'lat.rdr'
     lon_path = Path(GEOM_DIR) / 'lon.rdr'
     snwe, _, _ = bounds_from_latlon_rasters(str(lat_path), str(lon_path))
@@ -134,18 +134,18 @@ def test_bounds_from_latlon_rasters():
     assert all([np.allclose(b, t, rtol=1e-4) for b, t in zip(snwe, bounds_true)])
 
 
-def test_bounds_from_csv(station_file):
+def test_bounds_from_csv(station_file) -> None:
     bounds_true = [33.746, 36.795, -118.312, -114.892]
     snwe = bounds_from_csv(station_file)
     assert all([np.allclose(b, t) for b, t in zip(snwe, bounds_true)])
 
 
-def test_readZ_sf(station_file):
+def test_readZ_sf(station_file) -> None:
     aoi = StationFile(station_file)
     assert np.allclose(aoi.readZ(), 0.1)
 
 
-def test_GeocodedFile():
+def test_GeocodedFile() -> None:
     aoi = GeocodedFile(SCENARIO0_DIR / 'small_dem.tif', is_dem=True)
     z = aoi.readZ()
     x, y = aoi.readLL()

@@ -86,7 +86,7 @@ def test_envVars(
     template,
     env_var_name_uid,
     env_var_name_key
-):
+) -> None:
     hidden_ext = '_' if system() == "Windows" else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]
     if rc_filename is None:

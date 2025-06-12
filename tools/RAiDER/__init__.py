@@ -1,5 +1,5 @@
 """
-Raytracing Atmospheric Delay Estimation for RADAR
+Raytracing Atmospheric Delay Estimation for RADAR.
 
 Copyright (c) 2019-2022, California Institute of Technology ("Caltech"). All rights reserved.
 """

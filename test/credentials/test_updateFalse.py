@@ -12,7 +12,7 @@ from RAiDER.models import credentials
 
 
 @pytest.mark.parametrize('model_name', 'ERA5 ERA5T HRES GMAO MERRA2'.split())
-def test_updateFalse(model_name):
+def test_updateFalse(model_name) -> None:
     # Get the rc file's path
     hidden_ext = '_' if system() == 'Windows' else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]

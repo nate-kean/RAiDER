@@ -1,6 +1,6 @@
 """
 Created on Wed Sep  9 10:26:44 2020 @author: prashant
-Modified by Yang Lei, GPS/Caltech
+Modified by Yang Lei, GPS/Caltech.
 """
 
 import datetime as dt

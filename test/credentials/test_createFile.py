@@ -56,7 +56,7 @@ def get_creds_netrc(rc_path: Path) -> Tuple[str, str]:
         ('MERRA2', get_creds_netrc),
     ),
 )
-def test_createFile(model_name, get_creds):
+def test_createFile(model_name, get_creds) -> None:
     # Get the rc file's path
     hidden_ext = '_' if system() == 'Windows' else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]

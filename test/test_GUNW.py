@@ -35,7 +35,7 @@ from RAiDER.models.hrrr import HRRR, HRRRAK
 
 
 def compute_transform(lats, lons):
-    """Hand roll an affine transform from lat/lon coords"""
+    """Hand roll an affine transform from lat/lon coords."""
     a = lons[1] - lons[0]  # lon spacing
     b = 0
     c = lons[0] - a / 2  # lon start, adjusted by half a grid cell
@@ -53,7 +53,7 @@ def test_GUNW_dataset_update(
     weather_model_name,
     weather_model_dict_for_gunw_integration_test,
     mocker,
-):
+) -> None:
     """The GUNW from test gunw factor is:
 
     S1-GUNW-D-R-071-tops-20200130_20200124-135156-34956N_32979N-PP-913f-v2_0_4.nc
@@ -102,7 +102,7 @@ def test_GUNW_dataset_update(
     [os.remove(f) for f in glob.glob(f'{weather_model_name}*')]
 
 
-def test_GUNW_hyp3_metadata_update(test_gunw_json_path, test_gunw_json_schema_path, tmp_path, mocker):
+def test_GUNW_hyp3_metadata_update(test_gunw_json_path, test_gunw_json_schema_path, tmp_path, mocker) -> None:
     """This test performs the GUNW entrypoint with bucket/prefix provided and only updates the json.
     Monkey patches the upload/download to/from s3 and the actual computation.
     """
@@ -233,7 +233,7 @@ def test_azimuth_timing_interp_against_center_time_interp(
     weather_model_dict_for_azimuth_time_test,
     weather_model_dict_for_center_time_test,
     mocker,
-):
+) -> None:
     """This test shows that the azimuth timing interpolation does not deviate from
     the center time by more than 1 mm for the HRRR model. This is expected since the model times are
     6 hours apart and a the azimuth time is changing the interpolation weights for a given pixel at the order
@@ -357,7 +357,7 @@ def test_azimuth_timing_interp_against_center_time_interp(
 
 
 @pytest.mark.parametrize('weather_model_name', ['HRRR', 'HRES', 'ERA5', 'ERA5T'])
-def test_check_weather_model_availability(test_gunw_path_factory, weather_model_name, mocker):
+def test_check_weather_model_availability(test_gunw_path_factory, weather_model_name, mocker) -> None:
     # Should be True for all weather models
     # S1-GUNW-D-R-071-tops-20200130_20200124-135156-34956N_32979N-PP-913f-v2_0_4.nc
     test_gunw_path = test_gunw_path_factory()
@@ -375,7 +375,7 @@ def test_check_weather_model_availability(test_gunw_path_factory, weather_model_
 
 
 @pytest.mark.parametrize('weather_model_name', ['HRRR'])
-def test_check_weather_model_availability_over_alaska(test_gunw_path_factory, weather_model_name, mocker):
+def test_check_weather_model_availability_over_alaska(test_gunw_path_factory, weather_model_name, mocker) -> None:
     # Should be True for all weather models
     # S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc
     test_gunw_path = test_gunw_path_factory(location='alaska')
@@ -392,19 +392,19 @@ def test_check_weather_model_availability_over_alaska(test_gunw_path_factory, we
     assert cond
 
 
-def test_check_hrrr_availability_outside_united_states(test_gunw_path_factory):
+def test_check_hrrr_availability_outside_united_states(test_gunw_path_factory) -> None:
     # S1-GUNW-D-R-032-tops-20200220_20200214-214625-00120E_00014N-PP-b785-v3_0_1.nc
     test_gunw_path = test_gunw_path_factory(location='philippines')
     assert not check_weather_model_availability(test_gunw_path, 'HRRR')
 
 
 @pytest.mark.parametrize('weather_model_name', ['ERA5', 'GMAO', 'MERRA2', 'HRRR'])
-def test_check_weather_model_availability_2(weather_model_name):
+def test_check_weather_model_availability_2(weather_model_name) -> None:
     gunw_id = Path('test/gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc')
     assert check_weather_model_availability(gunw_id, weather_model_name)
 
 
-def test_check_weather_model_availability_3():
+def test_check_weather_model_availability_3() -> None:
     gunw_id = Path('test/gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc')
     with pytest.raises(ValueError):
         check_weather_model_availability(gunw_id, 'NotAModel')
@@ -418,7 +418,7 @@ def test_weather_model_availability_integration_using_valid_range(
     tmp_path,
     weather_model_name,
     mocker,
-):
+) -> None:
     temp_json_path = tmp_path / 'temp.json'
     test_gunw_path = test_gunw_path_factory(location=location)
     shutil.copy(test_gunw_path, temp_json_path)
@@ -469,7 +469,7 @@ def test_provenance_metadata_for_tropo_group(
     weather_model_dict_for_center_time_test,
     interp_method,
     mocker,
-):
+) -> None:
     """
     Same mocks as `test_azimuth_timing_interp_against_center_time_interp` above.
     """
@@ -536,8 +536,8 @@ def test_provenance_metadata_for_tropo_group(
                 assert ds[var].attrs['model_times_used'] == model_times_used
 
 
-def test_hrrr_availability_check_using_gunw_ids(mocker):
-    """Hits the HRRR servers and makes sure that for certain dates they are indeed flagged as false"""
+def test_hrrr_availability_check_using_gunw_ids(mocker) -> None:
+    """Hits the HRRR servers and makes sure that for certain dates they are indeed flagged as false."""
     # All dates in 2023 are available
     gunw_id = 'S1-GUNW-A-R-106-tops-20230108_20230101-225947-00078W_00041N-PP-4be8-v3_0_0'
     assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
@@ -547,7 +547,7 @@ def test_hrrr_availability_check_using_gunw_ids(mocker):
     assert not check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
 
 
-def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker):
+def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker) -> None:
     """This test performs the GUNW entrypoint with bucket/prefix provided and only updates the json.
     Monkey patches the upload/download to/from s3 and the actual computation.
     """
@@ -578,9 +578,9 @@ def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker):
     RAiDER.aria.prepFromGUNW.check_weather_model_availability.assert_not_called()
 
 
-def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_for_azimuth_time_test, mocker):
+def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_for_azimuth_time_test, mocker) -> None:
     """Makes sure for azimuth-time-grid interpolation that an error is raised if one of the files fails to
-    download and does not do additional processing
+    download and does not do additional processing.
     """
     # The first part is the same mock up as done in test_azimuth_timing_interp_against_center_time_interp
     # Maybe better mocks could be done - but this is sufficient or simply a factory for this test given
@@ -625,8 +625,8 @@ def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_f
     RAiDER.s1_azimuth_timing.get_s1_azimuth_time_grid.assert_not_called()
 
 
-def test_value_error_for_file_inputs_when_no_data_available(mocker):
-    """See test_hyp3_exits_succesfully_when_hrrr_not_available above
+def test_value_error_for_file_inputs_when_no_data_available(mocker) -> None:
+    """See test_hyp3_exits_succesfully_when_hrrr_not_available above.
 
     In this case if a bucket is specified rather than a file; the program exits successfully!
     """
@@ -647,32 +647,32 @@ def test_value_error_for_file_inputs_when_no_data_available(mocker):
     RAiDER.aria.prepFromGUNW.main.assert_not_called()
 
 
-def test_get_acq_time_reference():
-    """Tests if function extracts acquisition time for reference"""
+def test_get_acq_time_reference() -> None:
+    """Tests if function extracts acquisition time for reference."""
     gunw_id = 'S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0'
     expected_time = datetime(2022, 1, 15, 22, 59, 47)
     result = _get_acq_time_from_gunw_id(gunw_id, 'reference')
     assert result == expected_time
 
 
-def test_get_acq_time_secondary():
-    """Tests if function extracts acquisition time for secondary"""
+def test_get_acq_time_secondary() -> None:
+    """Tests if function extracts acquisition time for secondary."""
     gunw_id = 'S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0'
     expected_time = datetime(2021, 12, 22, 22, 59, 47)
     result = _get_acq_time_from_gunw_id(gunw_id, 'secondary')
     assert result == expected_time
 
 
-def test_invalid_reference_or_secondary():
-    """Tests if function raises error for invalid reference_or_secondary value"""
+def test_invalid_reference_or_secondary() -> None:
+    """Tests if function raises error for invalid reference_or_secondary value."""
     gunw_id = 'S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0'
     with pytest.raises(ValueError):
         _get_acq_time_from_gunw_id(gunw_id, 'invalid')
 
 
-def test_check_hrrr_availability_all_true():
+def test_check_hrrr_availability_all_true() -> None:
     """Tests if check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation returns True
-    when all check_hrrr_dataset_availability return True
+    when all check_hrrr_dataset_availability return True.
     """
     gunw_id = 'S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0'
 
@@ -680,7 +680,7 @@ def test_check_hrrr_availability_all_true():
     assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
 
 
-def test_get_slc_ids_from_gunw():
+def test_get_slc_ids_from_gunw() -> None:
     test_path = Path(
         'test/gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc'
     )
@@ -703,16 +703,16 @@ def test_get_slc_ids_from_gunw():
         get_slc_ids_from_gunw(Path('test/weather_files/ERA-5_2020_01_30_T13_52_45_32N_35N_120W_115W.nc'))
 
 
-def test_get_acq_time_valid_slc_id():
-    """Tests if function extracts acquisition time for a valid slc_id"""
+def test_get_acq_time_valid_slc_id() -> None:
+    """Tests if function extracts acquisition time for a valid slc_id."""
     slc_id = 'S1B_OPER_AUX_POEORB_OPOD_20210731T111940_V20210710T225942_20210712T005942.EOF'
     expected_time = pd.Timestamp('20210731T111940')
     result = get_acq_time_from_slc_id(slc_id)
     assert result == expected_time
 
 
-def test_get_acq_time_invalid_slc_id():
-    """Tests if function raises error for an invalid slc_id format"""
+def test_get_acq_time_invalid_slc_id() -> None:
+    """Tests if function raises error for an invalid slc_id format."""
     invalid_slc_id = (
         'test/gunw_azimuth_test_data/S1B_OPER_AUX_POEORB_OPOD_20210731T111940_V20210710T225942_20210712T005942.EOF'
     )
@@ -720,8 +720,8 @@ def test_get_acq_time_invalid_slc_id():
         get_acq_time_from_slc_id(invalid_slc_id)
 
 
-def test_identify_which_hrrr_1():
-    """Tests if function identifies the correct HRRR file"""
+def test_identify_which_hrrr_1() -> None:
+    """Tests if function identifies the correct HRRR file."""
     gunw_id = Path(
         'test/gunw_azimuth_test_data/S1-GUNW-A-R-064-tops-20210723_20210711-015000-00119W_00033N-PP-6267-v2_0_6.nc'
     )
@@ -729,15 +729,15 @@ def test_identify_which_hrrr_1():
     assert result == 'HRRR'
 
 
-def test_identify_which_hrrr_2():
-    """Tests if function identifies the correct HRRR file"""
+def test_identify_which_hrrr_2() -> None:
+    """Tests if function identifies the correct HRRR file."""
     gunw_id = Path('test/gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc')
     result = identify_which_hrrr(gunw_id)
     assert result == 'HRRRAK'
 
 
-def test_cast_to_hrrrak_1():
-    """Tests if function casts the HRRR file to HRRRAK"""
+def test_cast_to_hrrrak_1() -> None:
+    """Tests if function casts the HRRR file to HRRRAK."""
     ak_bounds = [51.0, 71.0, -175.0, -130.0]
     conus_bounds = [34.0, 35.0, -91, -90.0]
     model = HRRR()
@@ -746,46 +746,46 @@ def test_cast_to_hrrrak_1():
     assert model._Name == 'HRRR-AK'
 
 
-def test_cast_to_hrrrak_2():
-    """Tests if function casts the HRRR file to HRRRAK"""
+def test_cast_to_hrrrak_2() -> None:
+    """Tests if function casts the HRRR file to HRRRAK."""
     ak_bounds = [51.0, 71.0, -175.0, -130.0]
     model = HRRRAK()
     model.checkValidBounds(ak_bounds)
     assert model._Name == 'HRRR-AK'
 
 
-def test_cast_to_hrrrak_2b():
-    """Tests if function casts the HRRR file to HRRRAK"""
+def test_cast_to_hrrrak_2b() -> None:
+    """Tests if function casts the HRRR file to HRRRAK."""
     ak_bounds = [60.0, 65.0, -150.0, -120.0]
     model = HRRRAK()
     model.checkValidBounds(ak_bounds)
     assert model._Name == 'HRRR-AK'
 
 
-def test_cast_to_hrrrak_3():
-    """Tests if function casts the HRRR file to HRRRAK"""
+def test_cast_to_hrrrak_3() -> None:
+    """Tests if function casts the HRRR file to HRRRAK."""
     conus_bounds = [34.0, 35.0, -91, -90.0]
     model = HRRR()
     model.checkValidBounds(conus_bounds)
     assert model._Name == 'HRRR'
 
 
-def test_cast_to_hrrrak_4():
-    """Tests if function casts the HRRR file to HRRRAK"""
+def test_cast_to_hrrrak_4() -> None:
+    """Tests if function casts the HRRR file to HRRRAK."""
     europe_bounds = [-1, 1, -1, 1]
     model = HRRR()
     with pytest.raises(ValueError):
         model.checkValidBounds(europe_bounds)
 
 
-def test_identify_which_hrrr_invalid():
-    """Tests if function raises error for an invalid gunw_id format"""
+def test_identify_which_hrrr_invalid() -> None:
+    """Tests if function raises error for an invalid gunw_id format."""
     invalid_gunw_id = 'dummy.nc'
     with pytest.raises(NoWeatherModelData):
         identify_which_hrrr(invalid_gunw_id)
 
 
-def test_check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation_again():
-    """Tests if function raises error for an invalid gunw_id format"""
+def test_check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation_again() -> None:
+    """Tests if function raises error for an invalid gunw_id format."""
     gunw_id = 'S1-GUNW-D-R-044-tops-20240418_20240406-171649-00163W_00069N-PP-af6b-v3_0_1.nc'
     assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id, 'hrrrak') is True

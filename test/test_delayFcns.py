@@ -35,12 +35,12 @@ def wmdata():
     return xr.load_dataset(os.path.join(SCENARIO1_DIR, 'HRRR_tropo_20200101T120000_ztd.nc'))
 
 
-def test_getInterpolators(wmdata):
+def test_getInterpolators(wmdata) -> None:
     ds = wmdata
     getInterpolators(ds, kind='pointwise')
 
 
-def test_getInterpolators_2(wmdata, caplog):
+def test_getInterpolators_2(wmdata, caplog) -> None:
     ds = wmdata
     ds['hydro'][0, 0, 0] = np.nan
     # with pytest.raises(RuntimeError):
@@ -48,7 +48,7 @@ def test_getInterpolators_2(wmdata, caplog):
     assert 'Weather model contains NaNs!' in caplog.text, 'No warning was raised!'
 
 
-def test_transformPoints():
+def test_transformPoints() -> None:
     # fmt: off
     lats = np.array([10,   20,  30, 45,  75,  80, 90])
     lons = np.array([ 0, -180, 180, 90, -90, -20, 10])
@@ -69,7 +69,7 @@ def test_transformPoints():
     assert np.allclose(test[2], hts)
 
 
-def test_transformPoints_2(hrrr_proj):
+def test_transformPoints_2(hrrr_proj) -> None:
     hrrr_proj = hrrr_proj
     # fmt: off
     lats = np.array([ 40,  45,  55])
@@ -90,7 +90,7 @@ def test_transformPoints_2(hrrr_proj):
     assert np.allclose(test[2], hts)
 
 
-def test_transformPoints_3():
+def test_transformPoints_3() -> None:
     # fmt: off
     lats = np.array([0,   0,   0])
     lons = np.array([0, -90, 180])

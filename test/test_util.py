@@ -154,27 +154,27 @@ def make_points_3d_data():
     return df.reshape((3, 3, 3, 3, 20)), make_points_args
 
 
-def test_sind():
+def test_sind() -> None:
     assert np.allclose(
         sind(np.array([0, 30, 90, 180])),
         np.array([0, 0.5, 1, 0]),
     )
 
 
-def test_cosd():
+def test_cosd() -> None:
     assert np.allclose(
         cosd(np.array([0, 60, 90, 180])),
         np.array([1, 0.5, 0, -1]),
     )
 
 
-def test_rio_open():
+def test_rio_open() -> None:
     out, _ = rio_open(TEST_DIR / 'test_geom/lat.rdr', False)
 
     assert np.allclose(out.shape, (45, 226))
 
 
-def test_writeArrayToRaster(tmp_path):
+def test_writeArrayToRaster(tmp_path) -> None:
     array = np.transpose(np.array([np.arange(0, 10)])) * np.arange(0, 10)
     path = tmp_path / 'dummy.out'
 
@@ -187,13 +187,13 @@ def test_writeArrayToRaster(tmp_path):
     assert np.allclose(band, array)
 
 
-def test_writeArrayToRaster_2():
+def test_writeArrayToRaster_2() -> None:
     test = np.random.randn(10, 10, 10)
     with pytest.raises(RuntimeError):
         writeArrayToRaster(test, Path('dummy_file'))
 
 
-def test_writeArrayToRaster_3(tmp_path):
+def test_writeArrayToRaster_3(tmp_path) -> None:
     test = np.random.randn(10, 10)
     test = test + test * 1j
     with pushd(tmp_path):
@@ -203,7 +203,7 @@ def test_writeArrayToRaster_3(tmp_path):
         assert tmp['dtype'] == 'complex64'
 
 
-def test_writeArrayToRaster_4(tmp_path):
+def test_writeArrayToRaster_4(tmp_path) -> None:
     SCENARIO0_DIR = TEST_DIR / 'scenario_0'
     geotif = SCENARIO0_DIR / 'small_dem.tif'
     profile = rio_profile(geotif)
@@ -222,7 +222,7 @@ def test_writeArrayToRaster_4(tmp_path):
         assert prof['driver'] == 'GTiff'
 
 
-def test_makePoints0D_cython(make_points_0d_data):
+def test_makePoints0D_cython(make_points_0d_data) -> None:
     from RAiDER.makePoints import makePoints0D
 
     true_ray, args = make_points_0d_data
@@ -231,7 +231,7 @@ def test_makePoints0D_cython(make_points_0d_data):
     assert np.allclose(test_result, true_ray)
 
 
-def test_makePoints1D_cython(make_points_1d_data):
+def test_makePoints1D_cython(make_points_1d_data) -> None:
     from RAiDER.makePoints import makePoints1D
 
     true_ray, args = make_points_1d_data
@@ -240,7 +240,7 @@ def test_makePoints1D_cython(make_points_1d_data):
     assert np.allclose(test_result, true_ray)
 
 
-def test_makePoints2D_cython(make_points_2d_data):
+def test_makePoints2D_cython(make_points_2d_data) -> None:
     from RAiDER.makePoints import makePoints2D
 
     true_ray, args = make_points_2d_data
@@ -249,7 +249,7 @@ def test_makePoints2D_cython(make_points_2d_data):
     assert np.allclose(test_result, true_ray)
 
 
-def test_makePoints3D_Cython_values(make_points_3d_data):
+def test_makePoints3D_Cython_values(make_points_3d_data) -> None:
     from RAiDER.makePoints import makePoints3D
 
     true_rays, args = make_points_3d_data
@@ -260,7 +260,7 @@ def test_makePoints3D_Cython_values(make_points_3d_data):
     assert np.allclose(test_result, true_rays)
 
 
-def test_least_nonzero():
+def test_least_nonzero() -> None:
     a = np.arange(20, dtype='float64').reshape(2, 2, 5)
     a[0, 0, 0] = np.nan
     a[1, 1, 0] = np.nan
@@ -268,7 +268,7 @@ def test_least_nonzero():
     assert np.allclose(_least_nonzero(a), np.array([[1, 5], [10, 16]]), atol=1e-16)
 
 
-def test_least_nonzero_2():
+def test_least_nonzero_2() -> None:
     a = np.array(
         [
             [
@@ -297,7 +297,7 @@ def test_least_nonzero_2():
     )
 
 
-def test_rio_extent():
+def test_rio_extent() -> None:
     # Create a simple georeferenced test file
     test_file = Path('test.tif')
     with rasterio.open(
@@ -316,12 +316,12 @@ def test_rio_extent():
     test_file.unlink()
 
 
-def test_getTimeFromFile():
+def test_getTimeFromFile() -> None:
     name1 = 'abcd_2020_01_01_T00_00_00jijk.xyz'
     assert getTimeFromFile(name1) == datetime.datetime(2020, 1, 1, 0, 0, 0)
 
 
-def test_project():
+def test_project() -> None:
     #   the true UTM coordinates are extracted from this website as an independent check: https://www.latlong.net/lat-long-utm.html
     from RAiDER.utilFcns import project
 
@@ -374,7 +374,7 @@ def test_project():
     assert tup[1] == true_utm[1]
 
 
-def test_WGS84_to_UTM():
+def test_WGS84_to_UTM() -> None:
     from RAiDER.utilFcns import WGS84_to_UTM
 
     lats = np.array([38.0, 38.0, 38.0])
@@ -416,7 +416,7 @@ def test_WGS84_to_UTM():
 
 
 @pytest.mark.skip(reason='Need to ensure this file always get written before this executes')
-def test_read_weather_model_file():
+def test_read_weather_model_file() -> None:
     # TODO: read_wm_file is undefined
     weather_model_obj = read_wm_file(  # noqa: F821
         os.path.join(
@@ -428,119 +428,119 @@ def test_read_weather_model_file():
     assert weather_model_obj.Model() == 'ERA-5'
 
 
-def test_enu2ecef_1():
+def test_enu2ecef_1() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, 0, 0])
     ecef = enu2ecef(enu[0], enu[1], enu[2], llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([1, 0, 0]))
 
 
-def test_enu2ecef_2():
+def test_enu2ecef_2() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, 90, 0])
     ecef = enu2ecef(enu[0], enu[1], enu[2], llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 1, 0]))
 
 
-def test_enu2ecef_3():
+def test_enu2ecef_3() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, -90, 0])
     ecef = enu2ecef(enu[0], enu[1], enu[2], llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, -1, 0]))
 
 
-def test_enu2ecef_4():
+def test_enu2ecef_4() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([90, 0, 0])
     ecef = enu2ecef(enu[0], enu[1], enu[2], llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 0, 1]))
 
 
-def test_enu2ecef_5():
+def test_enu2ecef_5() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([-90, 0, 0])
     ecef = enu2ecef(enu[0], enu[1], enu[2], llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 0, -1]))
 
 
-def test_enu2ecef_6():
+def test_enu2ecef_6() -> None:
     enu = np.array([0, 1, 0])
     llh = np.array([0, 0, 0])
     ecef = enu2ecef(enu[0], enu[1], enu[2], llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 0, 1]))
 
 
-def test_ecef2enu_1():
+def test_ecef2enu_1() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, 0, 0])
     enu = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(enu, np.array([0, 1, 0]))
 
 
-def test_ecef2enu_2():
+def test_ecef2enu_2() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, 90, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 1, 0]))
 
 
-def test_ecef2enu_3():
+def test_ecef2enu_3() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, -90, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 1, 0]))
 
 
-def test_ecef2enu_4():
+def test_ecef2enu_4() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([90, 0, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 0, 1]))
 
 
-def test_ecef2enu_5():
+def test_ecef2enu_5() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([-90, 0, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 0, -1]))
 
 
-def test_ecef2enu_6():
+def test_ecef2enu_6() -> None:
     enu = np.array([0, 0, -1])
     llh = np.array([0, -180, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, -1, 0]))
 
 
-def test_ecef2enu_7():
+def test_ecef2enu_7() -> None:
     enu = np.array([0, 0, 1])
     llh = np.array([0, -180, 1000])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([0, 1, 0]))
 
 
-def test_ecef2enu_8():
+def test_ecef2enu_8() -> None:
     enu = np.array([1, 1, 0])
     llh = np.array([0, 0, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([1, 0, 1]))
 
 
-def test_ecef2enu_9():
+def test_ecef2enu_9() -> None:
     enu = np.array([1, 1, 0])
     llh = np.array([0, 180, 0])
     ecef = ecef2enu(enu, llh[0], llh[1], llh[2])
     assert np.allclose(ecef, np.array([-1, 0, -1]))
 
 
-def test_transform_bbox_1():
+def test_transform_bbox_1() -> None:
     wesn = [-77.0, -76.0, 34.0, 35.0]
     snwe = wesn[2:] + wesn[:2]
 
     assert transform_bbox(snwe, src_crs=4326, dest_crs=4326) == snwe
 
 
-def test_transform_bbox_2():
+def test_transform_bbox_2() -> None:
     snwe_in = [34.0, 35.0, -77.0, -76.0]
 
     expected_snwe = [
@@ -556,7 +556,7 @@ def test_transform_bbox_2():
     assert snwe == pytest.approx(expected_snwe, rel=1e-2)  # Increased tolerance of 0.01
 
 
-def test_clip_bbox():
+def test_clip_bbox() -> None:
     wesn = [-77.0, -76.0, 34.0, 35.0]
     snwe = [34.0, 35.01, -77.0, -76.0]
     snwe_in = [34.005, 35.0006, -76.999, -76.0]
@@ -564,41 +564,41 @@ def test_clip_bbox():
     assert clip_bbox(snwe_in, 0.01) == snwe
 
 
-def test_get_nearest_wmtimes():
+def test_get_nearest_wmtimes() -> None:
     t0 = datetime.datetime(2020, 1, 1, 11, 35, 0)
     test_out = get_nearest_wmtimes(t0, 3)
     true_out = [datetime.datetime(2020, 1, 1, 9, 0), datetime.datetime(2020, 1, 1, 12, 0)]
     assert [t == t0 for t, t0 in zip(test_out, true_out)]
 
 
-def test_get_nearest_wmtimes_2():
+def test_get_nearest_wmtimes_2() -> None:
     t0 = datetime.datetime(2020, 1, 1, 11, 3, 0)
     test_out = get_nearest_wmtimes(t0, 1)
     true_out = [datetime.datetime(2020, 1, 1, 11, 0)]
     assert [t == t0 for t, t0 in zip(test_out, true_out)]
 
 
-def test_get_nearest_wmtimes_3():
+def test_get_nearest_wmtimes_3() -> None:
     t0 = datetime.datetime(2020, 1, 1, 11, 57, 0)
     test_out = get_nearest_wmtimes(t0, 3)
     true_out = [datetime.datetime(2020, 1, 1, 12, 0)]
     assert [t == t0 for t, t0 in zip(test_out, true_out)]
 
 
-def test_get_nearest_wmtimes_4():
+def test_get_nearest_wmtimes_4() -> None:
     t0 = datetime.datetime(2020, 1, 1, 11, 25, 0)
     test_out = get_nearest_wmtimes(t0, 1)
     true_out = [datetime.datetime(2020, 1, 1, 11, 0), datetime.datetime(2020, 1, 1, 12, 0)]
     assert [t == t0 for t, t0 in zip(test_out, true_out)]
 
 
-def test_rio():
+def test_rio() -> None:
     geotif = SCENARIO0_DIR / 'small_dem.tif'
     profile = rio_profile(geotif)
     assert profile['crs'] is not None
 
 
-def test_rio_2():
+def test_rio_2() -> None:
     geotif = SCENARIO0_DIR / 'small_dem.tif'
     prof = rio_profile(geotif)
     del prof['transform']
@@ -606,13 +606,13 @@ def test_rio_2():
         rio_extents(prof)
 
 
-def test_rio_3():
+def test_rio_3() -> None:
     geotif = SCENARIO0_DIR / 'small_dem.tif'
     data, _ = rio_open(geotif, userNDV=None, band=1)
     assert data.shape == (569, 558)
 
 
-def test_rio_4():
+def test_rio_4() -> None:
     SCENARIO_DIR = TEST_DIR / 'scenario_4'
     los_path = SCENARIO_DIR / 'los.rdr'
     los, _ = rio_open(los_path)
@@ -621,30 +621,30 @@ def test_rio_4():
     assert len(hd.shape) == 2
 
 
-def test_robs():
+def test_robs() -> None:
     assert np.nanmin([1, 2, 3, np.nan]) == 1
     assert np.nanmin([1, 2, 3]) == 1
     assert np.nanmax([1, 2, 3, np.nan]) == 3
     assert np.nanmax([1, 2, 3]) == 3
 
 
-def test_floorish1():
+def test_floorish1() -> None:
     assert np.isclose(floorish(5.6, 0.2), 5.4)
 
 
-def test_floorish2():
+def test_floorish2() -> None:
     assert np.isclose(floorish(5.71, 0.2), 5.6)
 
 
-def test_floorish3():
+def test_floorish3() -> None:
     assert np.isclose(floorish(5.71, 1), 5)
 
 
-def test_projectDelays1():
+def test_projectDelays1() -> None:
     assert np.allclose(projectDelays(10, 45), 14.1421312)
 
 
-def test_padLower():
+def test_padLower() -> None:
     test = np.random.randn(2, 3, 4)
     val = test[1, 2, 1]
     test[1, 2, 0] = np.nan
@@ -652,11 +652,11 @@ def test_padLower():
     assert out[1, 2, 0] == val
 
 
-def test_convertLons():
+def test_convertLons() -> None:
     assert np.allclose(convertLons(np.array([0, 10, -10, 190, 360])), np.array([0, 10, -10, -170, 0]))
 
 
-def test_projectDelays_zero_inc():
+def test_projectDelays_zero_inc() -> None:
     """Tests projectDelays with zero inclination."""
     delay = 10.0
     inc = 90.0
@@ -665,7 +665,7 @@ def test_projectDelays_zero_inc():
         projectDelays(delay, inc)
 
 
-def test_projectDelays_positive():
+def test_projectDelays_positive() -> None:
     """Tests projectDelays with positive delay and inclination."""
     delay = 10.0
     inc = 30.0
@@ -673,7 +673,7 @@ def test_projectDelays_positive():
     assert projectDelays(delay, inc) == expected_result
 
 
-def test_projectDelays_negative():
+def test_projectDelays_negative() -> None:
     """Tests projectDelays with negative delay and inclination."""
     delay = -5.0
     inc = -45.0
@@ -681,7 +681,7 @@ def test_projectDelays_negative():
     assert projectDelays(delay, inc) == expected_result
 
 
-def test_floorish_round_down():
+def test_floorish_round_down() -> None:
     """Tests floorish to round a value down to nearest integer."""
     val = 12.34
     frac = 1.0
@@ -689,7 +689,7 @@ def test_floorish_round_down():
     assert floorish(val, frac) == expected_result
 
 
-def test_floorish_round_up_edgecase():
+def test_floorish_round_up_edgecase() -> None:
     """Tests floorish to round up at a specific edge case."""
     val = 9.99
     frac = 0.1
@@ -697,56 +697,56 @@ def test_floorish_round_up_edgecase():
     assert floorish(val, frac) == expected_result
 
 
-def test_floorish_no_change():
+def test_floorish_no_change() -> None:
     """Tests floorish with value already an integer."""
     val = 10
     frac = 1.0
     assert floorish(val, frac) == val
 
 
-def test_sind_zero():
+def test_sind_zero() -> None:
     """Tests sind with zero input."""
     x = 0.0
     expected_result = np.sin(np.radians(x))
     assert sind(x) == expected_result
 
 
-def test_sind_positive():
+def test_sind_positive() -> None:
     """Tests sind with positive input."""
     x = 30.0
     expected_result = np.sin(np.radians(x))
     assert sind(x) == expected_result
 
 
-def test_sind_negative():
+def test_sind_negative() -> None:
     """Tests sind with negative input."""
     x = -45.0
     expected_result = np.sin(np.radians(x))
     assert sind(x) == expected_result
 
 
-def test_cosd_zero():
+def test_cosd_zero() -> None:
     """Tests cosd with zero input."""
     x = 0.0
     expected_result = np.cos(np.radians(x))
     assert cosd(x) == expected_result
 
 
-def test_cosd_positive():
+def test_cosd_positive() -> None:
     """Tests cosd with positive input."""
     x = 60.0
     expected_result = np.cos(np.radians(x))
     assert cosd(x) == expected_result
 
 
-def test_cosd_negative():
+def test_cosd_negative() -> None:
     """Tests cosd with negative input."""
     x = -90.0
     expected_result = np.cos(np.radians(x))
     assert cosd(x) == expected_result
 
 
-def test_round_date_up_second():
+def test_round_date_up_second() -> None:
     """Tests round_date to round up to nearest second."""
     date = datetime.datetime(2024, 6, 25, 12, 30, 59)
     precision = datetime.timedelta(seconds=1)
@@ -754,7 +754,7 @@ def test_round_date_up_second():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_down_second():
+def test_round_date_down_second() -> None:
     """Tests round_date to round down to nearest second."""
     date = datetime.datetime(2024, 6, 25, 12, 30, 0)
     precision = datetime.timedelta(seconds=1)
@@ -762,7 +762,7 @@ def test_round_date_down_second():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_up_minute():
+def test_round_date_up_minute() -> None:
     """Tests round_date to round up to nearest minute."""
     date = datetime.datetime(2024, 6, 25, 12, 30, 59)
     precision = datetime.timedelta(minutes=1)
@@ -770,7 +770,7 @@ def test_round_date_up_minute():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_down_minute():
+def test_round_date_down_minute() -> None:
     """Tests round_date to round down to nearest minute."""
     date = datetime.datetime(2024, 6, 25, 13, 31, 10)
     precision = datetime.timedelta(minutes=1)
@@ -778,7 +778,7 @@ def test_round_date_down_minute():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_up_hour():
+def test_round_date_up_hour() -> None:
     """Tests round_date down to nearest hour."""
     date = datetime.datetime(2024, 6, 25, 23, 30)
     precision = datetime.timedelta(hours=1)
@@ -786,7 +786,7 @@ def test_round_date_up_hour():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_down_hour():
+def test_round_date_down_hour() -> None:
     """Tests round_date to round up to nearest hour."""
     date = datetime.datetime(2024, 6, 24, 23, 45)
     precision = datetime.timedelta(hours=1)
@@ -794,7 +794,7 @@ def test_round_date_down_hour():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_edge_case_beginning_of_day():
+def test_round_date_edge_case_beginning_of_day() -> None:
     """Tests round_date on edge case: beginning of day."""
     date = datetime.datetime(2024, 6, 25, 0, 0, 0)
     precision = datetime.timedelta(hours=1)
@@ -802,7 +802,7 @@ def test_round_date_edge_case_beginning_of_day():
     assert round_date(date, precision) == expected_result
 
 
-def test_round_date_edge_case_end_of_day():
+def test_round_date_edge_case_end_of_day() -> None:
     """Tests round_date on edge case: end of day."""
     date = datetime.datetime(2024, 6, 25, 23, 59, 59)
     precision = datetime.timedelta(hours=1)
@@ -827,7 +827,7 @@ def mock_raster_profile():
 
 
 @patch('rasterio.open')
-def test_rio_profile_vrt_file(mock_rasterio_open, tmp_path, mock_raster_profile):
+def test_rio_profile_vrt_file(mock_rasterio_open, tmp_path, mock_raster_profile) -> None:
     """Test for a path with a .vrt file."""
     raster_file = tmp_path / 'test_file.tif'
     vrt_file = tmp_path / 'test_file.tif.vrt'
@@ -843,7 +843,7 @@ def test_rio_profile_vrt_file(mock_rasterio_open, tmp_path, mock_raster_profile)
 
 
 @patch('rasterio.open')
-def test_rio_profile_s1_gunw(mock_rasterio_open, tmp_path, mock_raster_profile):
+def test_rio_profile_s1_gunw(mock_rasterio_open, tmp_path, mock_raster_profile) -> None:
     """Test for an S1-GUNW path."""
     raster_file = tmp_path / 'S1-GUNW_example.nc'
 
@@ -859,7 +859,7 @@ def test_rio_profile_s1_gunw(mock_rasterio_open, tmp_path, mock_raster_profile):
 
 
 @patch('rasterio.open')
-def test_rio_profile_normal_file(mock_rasterio_open, tmp_path, mock_raster_profile):
+def test_rio_profile_normal_file(mock_rasterio_open, tmp_path, mock_raster_profile) -> None:
     """Test for a normal raster file."""
     raster_file = tmp_path / 'test_file.tif'
 
@@ -873,7 +873,7 @@ def test_rio_profile_normal_file(mock_rasterio_open, tmp_path, mock_raster_profi
 
 
 # Test unproject
-def test_unproject_northern_hemisphere():
+def test_unproject_northern_hemisphere() -> None:
     """Test the unproject function for a zone in the northern hemisphere."""
     # Example input for the northern hemisphere
     zone = 33
@@ -887,7 +887,7 @@ def test_unproject_northern_hemisphere():
     assert isinstance(lat, float)
 
 
-def test_unproject_southern_hemisphere():
+def test_unproject_southern_hemisphere() -> None:
     """Test the unproject function for a zone in the southern hemisphere."""
     # Example input for the southern hemisphere
     zone = 33
@@ -903,7 +903,7 @@ def test_unproject_southern_hemisphere():
     assert lat < 0  # Ensure latitude is negative for the southern hemisphere
 
 
-def test_unproject_invalid_zone():
+def test_unproject_invalid_zone() -> None:
     """Test the unproject function with an invalid zone."""
     zone = 99  # Invalid UTM zone
     letter = 'N'
@@ -914,7 +914,7 @@ def test_unproject_invalid_zone():
 
 
 # Test UTM_to_WGS84
-def test_UTM_to_WGS84_single_point():
+def test_UTM_to_WGS84_single_point() -> None:
     """Test UTM_to_WGS84 with a single UTM coordinate."""
     z = np.array([33])
     ltr = np.array(['N'])
@@ -929,7 +929,7 @@ def test_UTM_to_WGS84_single_point():
     assert isinstance(lat[0], float)
 
 
-def test_UTM_to_WGS84_multiple_points():
+def test_UTM_to_WGS84_multiple_points() -> None:
     """Test UTM_to_WGS84 with multiple UTM coordinates."""
     z = np.array([33, 34])
     ltr = np.array(['N', 'K'])
@@ -945,7 +945,7 @@ def test_UTM_to_WGS84_multiple_points():
     assert lat[1] < 0  # Southern hemisphere latitude should be negative
 
 
-def test_UTM_to_WGS84_invalid_input_shapes():
+def test_UTM_to_WGS84_invalid_input_shapes() -> None:
     """Test UTM_to_WGS84 with mismatched input shapes."""
     z = np.array([33, 34])
     ltr = np.array(['N'])
@@ -956,7 +956,7 @@ def test_UTM_to_WGS84_invalid_input_shapes():
         UTM_to_WGS84(z, ltr, x, y)
 
 
-def test_UTM_to_WGS84_edge_case():
+def test_UTM_to_WGS84_edge_case() -> None:
     """Test UTM_to_WGS84 with edge case inputs."""
     z = np.array([1])
     ltr = np.array(['M'])
@@ -971,7 +971,7 @@ def test_UTM_to_WGS84_edge_case():
     assert isinstance(lat[0], float)
 
 
-def test_UTM_to_WGS84_empty_input():
+def test_UTM_to_WGS84_empty_input() -> None:
     """Test UTM_to_WGS84 with empty arrays."""
     z = np.array([])
     ltr = np.array([])
@@ -987,7 +987,7 @@ def test_UTM_to_WGS84_empty_input():
 
 
 # Test writeWeatherVarsXarray
-def test_writeWeatherVarsXarray(tmp_path):
+def test_writeWeatherVarsXarray(tmp_path) -> None:
     """Test writing weather variables to an xarray dataset and NetCDF file."""
     # Mock inputs
     lat = np.random.rand(91, 144) * 180 - 90  # Random latitudes between -90 and 90
@@ -1038,7 +1038,7 @@ def test_writeWeatherVarsXarray(tmp_path):
 
 
 # Test read_NCMR_loginInfo
-def test_read_NCMR_loginInfo_valid_file():
+def test_read_NCMR_loginInfo_valid_file() -> None:
     # Mock content of the login file
     mock_file_content = """url: http://example.com
 username: user123
@@ -1055,13 +1055,13 @@ password: pass456
     assert password == 'pass456'
 
 
-def test_read_NCMR_loginInfo_missing_file():
+def test_read_NCMR_loginInfo_missing_file() -> None:
     with patch('builtins.open', side_effect=FileNotFoundError):
         with pytest.raises(FileNotFoundError):
             read_NCMR_loginInfo('/non/existent/path/.ncmrlogin')
 
 
-def test_read_NCMR_loginInfo_incorrect_format():
+def test_read_NCMR_loginInfo_incorrect_format() -> None:
     # Mock a file with incorrect format
     mock_file_content = """url: http://example.com
 username: user123
@@ -1072,7 +1072,7 @@ username: user123
             read_NCMR_loginInfo('/mock/path/.ncmrlogin')
 
 
-def test_read_NCMR_loginInfo_malformed_lines():
+def test_read_NCMR_loginInfo_malformed_lines() -> None:
     # Mock a file with malformed lines
     mock_file_content = """url: http://example.com
 username: user123
@@ -1085,7 +1085,7 @@ password:
 
 
 # Test read_EarthData_loginInfo
-def test_read_EarthData_loginInfo_valid():
+def test_read_EarthData_loginInfo_valid() -> None:
     # Mock the behavior of netrc to return a fake username and password
     mock_netrc = {'urs.earthdata.nasa.gov': ('test_username', None, 'test_password')}
 
@@ -1101,7 +1101,7 @@ def test_read_EarthData_loginInfo_valid():
         assert password == 'test_password'
 
 
-def test_read_EarthData_loginInfo_no_entry():
+def test_read_EarthData_loginInfo_no_entry() -> None:
     # Mock netrc object with an empty hosts dictionary
     mock_netrc = MagicMock()
     mock_netrc.hosts = {}  # Simulate no entry for 'urs.earthdata.nasa.gov'
@@ -1112,7 +1112,7 @@ def test_read_EarthData_loginInfo_no_entry():
             read_EarthData_loginInfo()
 
 
-def test_read_EarthData_loginInfo_invalid_format():
+def test_read_EarthData_loginInfo_invalid_format() -> None:
     # Mock netrc with an invalid entry (None as username and password)
     mock_netrc = MagicMock()
     mock_netrc.hosts = {'urs.earthdata.nasa.gov': (None, None, None)}
@@ -1124,7 +1124,7 @@ def test_read_EarthData_loginInfo_invalid_format():
 
 # Test show_progress
 @pytest.fixture(autouse=True)
-def reset_global_pbar():
+def reset_global_pbar() -> None:
     """Reset the global variable for this test."""
     global pbar
     pbar = None
@@ -1136,7 +1136,7 @@ def mock_progressbar():
         yield mock_progressbar
 
 
-def test_show_progress_initial(mock_progressbar):
+def test_show_progress_initial(mock_progressbar) -> None:
     # Mock the ProgressBar class and its methods
     mock_pbar_instance = MagicMock()
     mock_progressbar.return_value = mock_pbar_instance
@@ -1165,7 +1165,7 @@ def mock_mp():
         yield mock_mp
 
 
-def test_getChunkSize(mock_mp):
+def test_getChunkSize(mock_mp) -> None:
     # Mock the number of CPU cores
     mock_mp.cpu_count.return_value = 4  # Assume the system has 4 CPUs
 
@@ -1191,7 +1191,7 @@ def test_getChunkSize(mock_mp):
     assert chunk_size == expected_chunk_size
 
 
-def test_getChunkSize_with_min_chunk_size(mock_mp):
+def test_getChunkSize_with_min_chunk_size(mock_mp) -> None:
     # Mock the number of CPU cores
     mock_mp.cpu_count.return_value = 4
 
@@ -1208,7 +1208,7 @@ def test_getChunkSize_with_min_chunk_size(mock_mp):
     assert chunk_size == expected_chunk_size
 
 
-def test_getChunkSize_with_max_chunk_size(mock_mp):
+def test_getChunkSize_with_max_chunk_size(mock_mp) -> None:
     # Mock the number of CPU cores
     mock_mp.cpu_count.return_value = 4
 
@@ -1221,7 +1221,7 @@ def test_getChunkSize_with_max_chunk_size(mock_mp):
     assert chunk_size == expected_chunk_size
 
 
-def test_getChunkSize_no_multiprocessing():
+def test_getChunkSize_no_multiprocessing() -> None:
     # Simulate the absence of the multiprocessing module by patching `mp` to None
     with patch('RAiDER.utilFcns.mp', None):
         with pytest.raises(ImportError, match='multiprocessing is not available'):

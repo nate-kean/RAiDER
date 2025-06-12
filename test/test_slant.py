@@ -12,7 +12,7 @@ from test import ORB_DIR, TEST_DIR, WM_DIR, make_delay_name
 
 
 @pytest.mark.parametrize('weather_model_name', ['ERA5'])
-def test_slant_proj(weather_model_name):
+def test_slant_proj(weather_model_name) -> None:
     SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_3')
     os.makedirs(SCENARIO_DIR, exist_ok=True)
 
@@ -61,7 +61,7 @@ def test_slant_proj(weather_model_name):
 
 
 @pytest.mark.parametrize('weather_model_name', ['ERA5'])
-def test_ray_tracing(weather_model_name):
+def test_ray_tracing(weather_model_name) -> None:
     SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_3')
     os.makedirs(SCENARIO_DIR, exist_ok=True)
 

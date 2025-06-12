@@ -18,7 +18,7 @@ SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_4')
 
 
 @pytest.mark.long
-def test_aoi_without_xpts(tmp_path):
+def test_aoi_without_xpts(tmp_path) -> None:
     with pushd(tmp_path):
         los = Zenith()
         latfile = os.path.join(SCENARIO_DIR, 'lat.rdr')
@@ -40,7 +40,7 @@ def test_aoi_without_xpts(tmp_path):
 
 
 @pytest.mark.long
-def test_get_delays_on_cube(tmp_path):
+def test_get_delays_on_cube(tmp_path) -> None:
     with pushd(tmp_path):
         los = Zenith()
         latfile = os.path.join(SCENARIO_DIR, 'lat.rdr')

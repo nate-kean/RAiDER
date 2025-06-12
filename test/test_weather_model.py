@@ -365,7 +365,7 @@ def test_hrrrak(hrrrak: HRRRAK) -> None:
 
 
 def test_ncmr(ncmr: NCMR) -> None:
-    """Test NCMR"""
+    """Test NCMR."""
     wm = ncmr
     assert wm._humidityType == 'q'
     assert wm._Name == 'NCMR'
@@ -444,7 +444,7 @@ def test_get_bounds_indices_2b() -> None:
 
 
 def test_get_bounds_indices_3() -> None:
-    """Test bounds indices"""
+    """Test bounds indices."""
     snwe = [-10, 10, -10, 10]
     l = np.arange(-20, 20)
     l2 = ((np.arange(160, 200) + 180) % 360) - 180

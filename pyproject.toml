@@ -1,35 +1,35 @@
 [build-system]
-requires =[
+requires = [
     "setuptools>=61.0",
     "setuptools_scm[toml]>=6.2",
     "wheel",
     "numpy",
     "cython",
-    "pybind11>=2.5.0"
+    "pybind11>=2.5.0",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "RAiDER"
 authors = [
-    {name="David Bekaert", email="david.bekaert@jpl.nasa.gov"},
-    {name="Jeremy Maurer", email="maurer.jeremy@gmail.com"},
-    {name="Piyush Agram", email="piyush@descarteslabs.com"},
-   {name="Simran Sangha", email="simran.s.sangha@jpl.nasa.gov"},
-   {name="Brett Buzzanga", email="buzzanga@jpl.nasa.gov"},
+    { name = "David Bekaert", email = "david.bekaert@jpl.nasa.gov" },
+    { name = "Jeremy Maurer", email = "maurer.jeremy@gmail.com" },
+    { name = "Piyush Agram", email = "piyush@descarteslabs.com" },
+    { name = "Simran Sangha", email = "simran.s.sangha@jpl.nasa.gov" },
+    { name = "Brett Buzzanga", email = "buzzanga@jpl.nasa.gov" },
 ]
 description = "Raytracing Atmospheric Delay Estimation for RADAR"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "Apache License 2.0"}
-classifiers=[
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: Apache Software License",
-        "Natural Language :: English",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+license = { text = "Apache License 2.0" }
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 # dependencies = []
 dynamic = ["version"]
@@ -83,7 +83,7 @@ extend-select = [
     "ANN", # annotations: https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
     "PTH", # use-pathlib-pth: https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
 ]
-ignore = ["ANN101", "D200", "D205", "D212"]
+ignore = ["ANN101", "ANN204", "D200", "D205", "D212"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

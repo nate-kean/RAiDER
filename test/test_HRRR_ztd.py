@@ -5,7 +5,7 @@ from RAiDER.cli.raider import calcDelays
 from test import TEST_DIR, pushd
 
 
-def test_scenario_1(tmp_path, data_for_hrrr_ztd, mocker):
+def test_scenario_1(tmp_path, data_for_hrrr_ztd, mocker) -> None:
     SCENARIO_DIR = TEST_DIR / 'scenario_1'
     test_path = SCENARIO_DIR / 'raider_example_1.yaml'
     mocker.patch('RAiDER.processWM.prepareWeatherModel', side_effect=[str(data_for_hrrr_ztd)])

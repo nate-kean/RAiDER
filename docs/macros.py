@@ -3,8 +3,8 @@ import requests
 import RAiDER
 
 
-def define_env(env):
-    """Macros Hook"""
+def define_env(env) -> None:
+    """Macros Hook."""
 
     @env.macro
     def raider_version():

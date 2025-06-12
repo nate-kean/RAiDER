@@ -54,7 +54,7 @@ def make_json_data_path():
 
 
 # Patch aws.get_s3_file to produce None then check for the correct error message
-def test_missing_product_file(mocker, iargs):
+def test_missing_product_file(mocker, iargs) -> None:
     side_effect = [
         None,  # GUNW product file
         # program should fail
@@ -66,7 +66,7 @@ def test_missing_product_file(mocker, iargs):
 
 
 # Patch aws.get_s3_file to produce None then check for the correct error message
-def test_missing_metadata_file(mocker, iargs):
+def test_missing_metadata_file(mocker, iargs) -> None:
     with make_gunw_path() as gunw_path:
         side_effect = [
             gunw_path,  # GUNW product file
@@ -79,7 +79,7 @@ def test_missing_metadata_file(mocker, iargs):
         assert 'GUNW metadata file could not be found' in str(excinfo.value)
 
 
-def test_missing_browse_image(mocker, iargs):
+def test_missing_browse_image(mocker, iargs) -> None:
     with make_gunw_path() as gunw_path, make_json_data_path() as json_data_path:
         side_effect = [
             gunw_path,  # GUNW product file

@@ -7,7 +7,7 @@ from RAiDER.utilFcns import write_yaml
 from test import TEST_DIR, WM, pushd
 
 
-def test_datelist(tmp_path):
+def test_datelist(tmp_path) -> None:
     SCENARIO_DIR = os.path.join(TEST_DIR, 'datelist')
     if os.path.exists(SCENARIO_DIR):
         shutil.rmtree(SCENARIO_DIR)
@@ -36,7 +36,7 @@ def test_datelist(tmp_path):
         assert param_dict.date_group.date_list == true_dates
 
 
-def test_datestep(tmp_path):
+def test_datestep(tmp_path) -> None:
     SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_5')
     st, en, step = '20200124', '20200130', 3
     true_dates = [

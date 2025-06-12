@@ -16,8 +16,8 @@ wm = 'ERA5' if WM == 'ERA-5' else WM
 
 
 @pytest.mark.long
-def test_cube_timemean():
-    """Test the mean interpolation by computing cube delays at 1:30PM vs mean of 12 PM / 3PM for GMAO"""
+def test_cube_timemean() -> None:
+    """Test the mean interpolation by computing cube delays at 1:30PM vs mean of 12 PM / 3PM for GMAO."""
     SCENARIO_DIR = os.path.join(TEST_DIR, 'INTERP_TIME')
     os.makedirs(SCENARIO_DIR, exist_ok=True)
     # make the lat lon grid
@@ -78,8 +78,8 @@ def test_cube_timemean():
 
 
 @pytest.mark.long
-def test_cube_weighting():
-    """Test the weighting by comparing a small crop with numpy directly"""
+def test_cube_weighting() -> None:
+    """Test the weighting by comparing a small crop with numpy directly."""
     from datetime import datetime
 
     SCENARIO_DIR = os.path.join(TEST_DIR, 'INTERP_TIME')

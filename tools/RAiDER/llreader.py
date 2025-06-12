@@ -43,7 +43,7 @@ class AOI:
         self._geotransform = None
         self._cube_spacing_m = cube_spacing_in_m
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'AOI: {self.__class__.__name__}({self._bounding_box}, {self._type})'
 
     def type(self):

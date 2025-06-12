@@ -66,12 +66,12 @@ def args1():
     return args
 
 
-def test_enforce_wm():
+def test_enforce_wm() -> None:
     with pytest.raises(NotImplementedError):
         parse_weather_model('notamodel', 'fakeaoi')
 
 
-def test_get_los_ray(args1):
+def test_get_los_ray(args1) -> None:
     args = args1
     los_group_unparsed = LOSGroupUnparsed(**args)
     los = get_los(los_group_unparsed)
@@ -79,7 +79,7 @@ def test_get_los_ray(args1):
     assert los.is_Projected()
 
 
-def test_date_type():
+def test_date_type() -> None:
     assert coerce_into_date('2020-10-1') == date(2020, 10, 1)
     assert coerce_into_date('2020101') == date(2020, 10, 1)
 
@@ -105,16 +105,16 @@ def test_date_type():
     ),
 )
 @pytest.mark.parametrize('timezone', ('', 'z', '+0000'))
-def test_time_type(input, timezone, expected):
+def test_time_type(input, timezone, expected) -> None:
     assert TimeGroup.coerce_into_time(input + timezone) == expected
 
 
-def test_time_type_error():
+def test_time_type_error() -> None:
     with pytest.raises(ValueError):
         TimeGroup.coerce_into_time('foobar')
 
 
-def test_date_list_action():
+def test_date_list_action() -> None:
     date_group_unparsed = DateGroupUnparsed(
         date_start='20200101',
     )
@@ -130,7 +130,7 @@ def test_date_list_action():
     assert parse_dates(date_group_unparsed).date_list == [date(2020, 1, 1), date(2020, 1, 6), date(2020, 1, 11)]
 
 
-def test_bbox_action():
+def test_bbox_action() -> None:
     bbox_str = '45 46 -72 -70'
     assert len(parse_bbox(bbox_str)) == 4
 
@@ -144,38 +144,38 @@ def test_bbox_action():
         parse_bbox('10 30 40 190')
 
 
-def test_ll1(llsimple):
+def test_ll1(llsimple) -> None:
     lats, lons = llsimple
     assert np.allclose(getBufferedExtent(lats, lons), np.array([10, 12, -74, -72]))
 
 
-def test_ll2(latwrong):
+def test_ll2(latwrong) -> None:
     lats, lons = latwrong
     assert np.allclose(getBufferedExtent(lats, lons), np.array([10, 12, -74, -72]))
 
 
-def test_ll3(lonwrong):
+def test_ll3(lonwrong) -> None:
     lats, lons = lonwrong
     assert np.allclose(getBufferedExtent(lats, lons), np.array([10, 12, -74, -72]))
 
 
-def test_ll4(llarray):
+def test_ll4(llarray) -> None:
     lats, lons = llarray
     assert np.allclose(getBufferedExtent(lats, lons), np.array([10, 12, -74, -72]))
 
 
-def test_isOutside1(llsimple):
+def test_isOutside1(llsimple) -> None:
     extent1 = getBufferedExtent(*llsimple)
     extent2 = extent1[0] + 1, extent1[1] + 1, extent1[2] + 1, extent1[3] + 1
     assert isOutside(extent1, extent2)
 
 
-def test_isOutside2(llsimple):
+def test_isOutside2(llsimple) -> None:
     extent = getBufferedExtent(*llsimple)
     assert not isOutside(extent, extent)
 
 
-def test_isInside(llsimple):
+def test_isInside(llsimple) -> None:
     extent1 = getBufferedExtent(*llsimple)
     extent2 = extent1[0] + 1, extent1[1] + 1, extent1[2] + 1, extent1[3] + 1
     assert isInside(extent1, extent1)

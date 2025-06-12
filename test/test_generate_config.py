@@ -38,7 +38,7 @@ def cd_to_temp_dir():
         ),
     ],
 )
-def test_generate_config(name, data_files):
+def test_generate_config(name, data_files) -> None:
     with cd_to_temp_dir():
         subprocess.run(['raider.py', '--generate_config', name])
         assert os.path.exists(f'{name}.yaml')
@@ -46,7 +46,7 @@ def test_generate_config(name, data_files):
             assert os.path.exists(data_file_name)
 
 
-def test_confirm_overwrite_yes():
+def test_confirm_overwrite_yes() -> None:
     with cd_to_temp_dir():
         with open('template.yaml', 'w') as f:
             f.write('overwrite me')
@@ -62,7 +62,7 @@ def test_confirm_overwrite_yes():
             assert f.read() != 'overwrite me'
 
 
-def test_confirm_overwrite_no():
+def test_confirm_overwrite_no() -> None:
     with cd_to_temp_dir():
         with open('template.yaml', 'w') as f:
             f.write("don't overwrite me")

@@ -105,7 +105,7 @@ def svs():
     return [T, x, y, z, vx, vy, vz]
 
 
-def test_read_ESA_Orbit_file(svs):
+def test_read_ESA_Orbit_file(svs) -> None:
     true_svs = svs
     filename = os.path.join(ORB_DIR, 'S1_orbit_example.EOF')
     svs = read_ESA_Orbit_file(filename)
@@ -124,7 +124,7 @@ def test_read_ESA_Orbit_file(svs):
     ]
 
 
-def test_read_txt_file(svs):
+def test_read_txt_file(svs) -> None:
     true_svs = svs
     filename = os.path.join(ORB_DIR, 'S1_sv_file.txt')
     svs = read_txt_file(filename)
@@ -143,7 +143,7 @@ def test_read_txt_file(svs):
     ]
 
 
-def test_get_sv_1(svs, mocker):
+def test_get_sv_1(svs, mocker) -> None:
     true_svs = svs
     filename = os.path.join(ORB_DIR, 'S1_orbit_example.EOF')
     # Ensures non-stardard file-name for orbit xml is not filtered out
@@ -165,7 +165,7 @@ def test_get_sv_1(svs, mocker):
     assert RAiDER.losreader.filter_ESA_orbit_file.call_count == 1
 
 
-def test_get_sv_2(svs):
+def test_get_sv_2(svs) -> None:
     true_svs = svs
     filename = os.path.join(ORB_DIR, 'S1_sv_file.txt')
     svs = get_sv(filename, true_svs[0][0], pad=3 * 60)
@@ -184,138 +184,138 @@ def test_get_sv_2(svs):
     ]
 
 
-def test_get_sv_3(svs):
+def test_get_sv_3(svs) -> None:
     true_svs = svs
     filename = os.path.join(ORB_DIR, 'incorrect_file.txt')
     with pytest.raises(ValueError):
         get_sv(filename, true_svs[0][0], pad=3 * 60)
 
 
-def test_get_sv_4(svs):
+def test_get_sv_4(svs) -> None:
     true_svs = svs
     filename = os.path.join(ORB_DIR, 'no_exist.txt')
     with pytest.raises(ValueError):
         get_sv(filename, true_svs[0][0], pad=3 * 60)
 
 
-def test_cut_times(svs):
+def test_cut_times(svs) -> None:
     true_svs = svs
     assert all(cut_times(true_svs[0], true_svs[0][0], pad=3600 * 3))
 
 
-def test_cut_times_2(svs):
+def test_cut_times_2(svs) -> None:
     true_svs = svs
     assert sum(cut_times(true_svs[0], true_svs[0][0], pad=5)) == 1
 
 
-def test_cut_times_3(svs):
+def test_cut_times_3(svs) -> None:
     true_svs = svs
     assert np.sum(cut_times(true_svs[0], true_svs[0][4], pad=15)) == 3
 
 
-def test_cut_times_4(svs):
+def test_cut_times_4(svs) -> None:
     true_svs = svs
 
     assert np.sum(cut_times(true_svs[0], true_svs[0][0], pad=400)) == len(true_svs[0])
 
 
-def test_los_to_lv():
+def test_los_to_lv() -> None:
     with pytest.raises(ValueError):
         inc_hd_to_enu(-10, 0)
 
 
-def test_los_to_lv_2():
+def test_los_to_lv_2() -> None:
     assert np.allclose(
         inc_hd_to_enu(0, 0),
         np.array([0, 0, 1]),
     )
 
 
-def test_los_to_lv_3():
+def test_los_to_lv_3() -> None:
     assert np.allclose(
         inc_hd_to_enu(0, -180),
         np.array([0, 0, 1]),
     )
 
 
-def test_los_to_lv_3b():
+def test_los_to_lv_3b() -> None:
     assert np.allclose(
         inc_hd_to_enu(0, 18),
         np.array([0, 0, 1]),
     )
 
 
-def test_los_to_lv_3c():
+def test_los_to_lv_3c() -> None:
     assert np.allclose(
         inc_hd_to_enu(0, -18),
         np.array([0, 0, 1]),
     )
 
 
-def test_los_to_lv_4():
+def test_los_to_lv_4() -> None:
     assert np.allclose(
         inc_hd_to_enu(35, 0),
         np.array([0, np.sin(np.radians(35)), np.cos(np.radians(35))]),
     )
 
 
-def test_los_to_lv_5():
+def test_los_to_lv_5() -> None:
     assert np.allclose(
         inc_hd_to_enu(35, 180),
         np.array([0, -np.sin(np.radians(35)), np.cos(np.radians(35))]),
     )
 
 
-def test_los_to_lv_6():
+def test_los_to_lv_6() -> None:
     assert np.allclose(
         inc_hd_to_enu(35, 90),
         np.array([-np.sin(np.radians(35)), 0, np.cos(np.radians(35))]),
     )
 
 
-def test_zenith_1():
+def test_zenith_1() -> None:
     assert np.allclose(
         getZenithLookVecs(np.array([0]), np.array([0]), np.array([0])),
         np.array([1, 0, 0]),
     )
 
 
-def test_zenith_2():
+def test_zenith_2() -> None:
     assert np.allclose(
         getZenithLookVecs(np.array([90]), np.array([0]), np.array([0])),
         np.array([0, 0, 1]),
     )
 
 
-def test_zenith_3():
+def test_zenith_3() -> None:
     assert np.allclose(
         getZenithLookVecs(np.array([-90]), np.array([0]), np.array([0])),
         np.array([0, 0, -1]),
     )
 
 
-def test_zenith_4():
+def test_zenith_4() -> None:
     assert np.allclose(
         getZenithLookVecs(np.array([0]), np.array([180]), np.array([0])),
         np.array([-1, 0, 0]),
     )
 
 
-def test_zenith_5():
+def test_zenith_5() -> None:
     assert np.allclose(
         getZenithLookVecs(np.array([0]), np.array([90]), np.array([0])),
         np.array([0, 1, 0]),
     )
 
 
-def test_zenith_6():
+def test_zenith_6() -> None:
     assert np.allclose(
         getZenithLookVecs(np.array([0]), np.array([0]), np.array([1000])),
         np.array([1, 0, 0]),
     )
 
 
-def test_Zenith():
+def test_Zenith() -> None:
     lats = np.array([-90, 0, 0, 90])
     lons = np.array([-90, 0, 90, 180])
     hgts = np.array([-10, 0, 10, 1000])
@@ -336,7 +336,7 @@ def test_Zenith():
     assert np.allclose(output, unit_vecs)
 
 
-def test_Conventional():
+def test_Conventional() -> None:
     lats = np.array([-90, 0, 0, 90])
     lons = np.array([-90, 0, 90, 180])
     hgts = np.array([-10, 0, 10, 1000])

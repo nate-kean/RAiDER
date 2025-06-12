@@ -3,7 +3,7 @@ import sqlite3
 import sys
 
 
-def main(file, replacement):
+def main(file, replacement) -> None:
     conn = sqlite3.connect(file)
     cur = conn.cursor()
     cur.execute('select path, id from file')
