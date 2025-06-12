@@ -4,7 +4,7 @@ import importlib
 import re
 import sys
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, Type, Union
 
 import numpy as np
 import pandas as pd
@@ -266,7 +266,7 @@ def coerce_into_date(val: Union[int, str]) -> dt.date:
     raise ValueError(f'Unable to coerce {val} to a date. Try %Y-%m-%d')
 
 
-def get_wm_by_name(model_name: str) -> tuple[str, WeatherModel]:
+def get_wm_by_name(model_name: str) -> tuple[str, Type[WeatherModel]]:
     """
     Turn an arbitrary string into a module name.
 
@@ -278,7 +278,7 @@ def get_wm_by_name(model_name: str) -> tuple[str, WeatherModel]:
        model_name  - Name of an allowed weather model (e.g., 'era-5')
     Outputs:
        module_name - Name of the module
-       wmObject    - callable, weather model object.
+       Model       - Weather model class
     """
     module_name = 'RAiDER.models.' + model_name.lower().replace('-', '')
     module = importlib.import_module(module_name)
