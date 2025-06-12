@@ -17,12 +17,14 @@ from RAiDER.types import BB, LookDir, TimeInterpolationMethod
 
 LOSConvention = Literal['isce', 'hyp3']
 
+
 @dataclasses.dataclass
 class DateGroupUnparsed:
     date_start: Optional[Union[int, str]] = None
     date_end: Optional[Union[int, str]] = None
     date_step: Optional[Union[int, str]] = None
     date_list: Optional[Union[int, str]] = None
+
 
 @dataclasses.dataclass
 class DateGroup:
@@ -33,6 +35,7 @@ class DateGroup:
 
 class TimeGroup:
     """Parse an input time (required to be ISO 8601)."""
+
     _DEFAULT_ACQUISITION_WINDOW_SEC = 30
     TIME_FORMATS = (
         '',
@@ -92,7 +95,7 @@ class TimeGroup:
                     f'Provided start time {self.time} is later than end time {self.end_time} '
                     f'(with default window of {TimeGroup._DEFAULT_ACQUISITION_WINDOW_SEC} seconds)'
                 )
-    
+
     @staticmethod
     def coerce_into_time(val: Union[int, str]) -> dt.time:
         val = str(val)
@@ -104,6 +107,7 @@ class TimeGroup:
                 pass
         raise ValueError(f'Unable to coerce "{val}" to a time. Try T%H:%M:%S')
 
+
 @dataclasses.dataclass
 class AOIGroupUnparsed:
     bounding_box: Optional[Union[str, list[Union[float, int]], BB.SNWE]] = None
@@ -112,6 +116,7 @@ class AOIGroupUnparsed:
     lon_file: Optional[str] = None
     station_file: Optional[str] = None
     geo_cube: Optional[str] = None
+
 
 @dataclasses.dataclass
 class AOIGroup:
@@ -126,6 +131,7 @@ class HeightGroupUnparsed:
     use_dem_latlon: bool = False
     height_file_rdr: Optional[str] = None
     height_levels: Optional[Union[str, list[Union[float, int]]]] = None
+
 
 @dataclasses.dataclass
 class HeightGroup:
@@ -144,6 +150,7 @@ class LOSGroupUnparsed:
     orbit_file: Optional[str] = None
     zref: Optional[np.float64] = None
 
+
 @dataclasses.dataclass
 class LOSGroup:
     los: LOS
@@ -153,6 +160,7 @@ class LOSGroup:
     los_cube: Optional[str] = None
     orbit_file: Optional[str] = None
     zref: Optional[np.float64] = None
+
 
 class RuntimeGroup:
     raster_format: str

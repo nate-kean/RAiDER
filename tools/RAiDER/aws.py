@@ -29,9 +29,9 @@ def upload_file_to_s3(path_to_file: Union[str, Path], bucket: str, prefix: str =
         'TagSet': [
             {
                 'Key': 'file_type',
-                'Value': 'product'
-            }
-        ]
+                'Value': 'product',
+            },
+        ],
     }
 
     S3_CLIENT.put_object_tagging(Bucket=bucket, Key=key, Tagging=tag_set)

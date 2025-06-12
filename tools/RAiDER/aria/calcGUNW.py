@@ -86,7 +86,7 @@ def compute_delays_slc(cube_paths: list[Path], wavelength: float) -> xr.Dataset:
     # no data (fill value?) chunk size?
     for name in TROPO_NAMES:
         for k, key in enumerate(['reference', 'secondary']):
-            descrip = f"Delay due to {name.lstrip('troposphere')} component of troposphere"
+            descrip = f'Delay due to {name.lstrip("troposphere")} component of troposphere'
             da_attrs = {
                 **attrs,
                 'description': descrip,
@@ -108,7 +108,6 @@ def compute_delays_slc(cube_paths: list[Path], wavelength: float) -> xr.Dataset:
     return ds_slc.rename(z=DIM_NAMES[0], y=DIM_NAMES[1], x=DIM_NAMES[2])
 
     # first need to delete the variable; only can seem to with h5
-
 
 
 def update_gunw_slc(path_gunw: Path, ds_slc: xr.Dataset) -> None:

@@ -17,11 +17,11 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 def combineDelayFiles(
     out_path: Path,
-    loc: Path=Path.cwd(),
-    source: str='model',
-    ext: str='.csv',
-    ref: Optional[Path]=None,
-    col_name: str='ZTD'
+    loc: Path = Path.cwd(),
+    source: str = 'model',
+    ext: str = '.csv',
+    ref: Optional[Path] = None,
+    col_name: str = 'ZTD',
 ) -> None:
     file_paths = list(loc.glob('*' + ext))
 
@@ -33,6 +33,7 @@ def combineDelayFiles(
     if len(file_paths) == 1:
         if source == 'model':
             import shutil
+
             shutil.copy(file_paths[0], out_path)
         else:
             file_paths = readZTDFile(file_paths[0], col_name=col_name)
@@ -45,12 +46,24 @@ def combineDelayFiles(
 
     print(f'Combining {source} delay files')
     try:
-        concatDelayFiles(file_paths, sort_list=['ID', 'Datetime'], outName=out_path, source=source)
+        concatDelayFiles(
+            file_paths,
+            sort_list=['ID', 'Datetime'],
+            outName=out_path,
+            source=source,
+        )
     except:
-        concatDelayFiles(file_paths, sort_list=['ID', 'Date'], outName=out_path, source=source, ref=ref, col_name=col_name)
+        concatDelayFiles(
+            file_paths,
+            sort_list=['ID', 'Date'],
+            outName=out_path,
+            source=source,
+            ref=ref,
+            col_name=col_name,
+        )
 
 
-def addDateTimeToFiles(file_paths: list[Path], force: bool=False, verbose: bool=False) -> None:
+def addDateTimeToFiles(file_paths: list[Path], force: bool = False, verbose: bool = False) -> None:
     """Run through a list of files and add the datetime of each file as a column."""
     print('Adding Datetime to delay files')
 
@@ -106,11 +119,11 @@ def update_time(row, localTime_hrs):
     return localTime_estimate + dt.timedelta(seconds=row['Localtime'] * 3600) + time_shift
 
 
-def pass_common_obs(reference, target, localtime=None):
+def pass_common_obs(reference: pd.DataFrame, target: pd.DataFrame, localtime=None):
     """Pass only observations in target spatiotemporally common to reference."""
     if isinstance(target['Datetime'].iloc[0], str):
         target['Datetime'] = target['Datetime'].apply(
-            lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
+            lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S'),
         )
     if localtime:
         return target[
@@ -119,14 +132,22 @@ def pass_common_obs(reference, target, localtime=None):
             & target[localtime].isin(reference[localtime])
         ]
     else:
+        # fmt: off
         return target[
-            target['Datetime'].dt.date.isin(reference['Datetime'].dt.date) &
-            target['ID'].isin(reference['ID'])
+            target['Datetime'].dt.date.isin(reference['Datetime'].dt.date)
+            & target['ID'].isin(reference['ID'])
         ]
+        # fmt: on
 
 
 def concatDelayFiles(
-    fileList, sort_list=['ID', 'Datetime'], return_df=False, outName=None, source='model', ref=None, col_name='ZTD'
+    fileList,
+    sort_list=['ID', 'Datetime'],
+    return_df=False,
+    outName=None,
+    source='model',
+    ref=None,
+    col_name='ZTD',
 ):
     """
     Read a list of .csv files containing the same columns and append them
@@ -227,13 +248,14 @@ def readZTDFile(filename, col_name='ZTD'):
 def file_choices(p: argparse.ArgumentParser, choices: tuple[str], s: str) -> Path:
     path = Path(s)
     if path.suffix not in choices:
-       p.error(f"File must end with one of {choices}")
+        p.error(f'File must end with one of {choices}')
     return path
+
 
 def parse_dir(p: argparse.ArgumentParser, s: str) -> Path:
     path = Path(s)
     if not path.is_dir():
-        p.error("Path must be a directory")
+        p.error('Path must be a directory')
     return path
 
 
@@ -260,7 +282,7 @@ def create_parser() -> argparse.ArgumentParser:
             delay files.
             """),
         required=True,
-        type=lambda s: file_choices(p, ('csv','.csv'), s),
+        type=lambda s: file_choices(p, ('csv', '.csv'), s),
     )
     p.add_argument(
         '--raiderDir',
@@ -294,7 +316,7 @@ def create_parser() -> argparse.ArgumentParser:
             Optional .csv file containing GPS Zenith Delays. Should contain columns "ID", "ZTD", and "Datetime"
             """),
         default=None,
-        type=lambda s: file_choices(p, ('csv','.csv'), s),
+        type=lambda s: file_choices(p, ('csv', '.csv'), s),
     )
 
     p.add_argument(
@@ -348,10 +370,10 @@ def create_parser() -> argparse.ArgumentParser:
 def main(
     raider_file: Path,
     ztd_file: Path,
-    col_name: str='ZTD',
-    raider_delay: str='totalDelay',
-    out_path: Optional[Path]=None,
-    local_time=None
+    col_name: str = 'ZTD',
+    raider_delay: str = 'totalDelay',
+    out_path: Optional[Path] = None,
+    local_time=None,
 ):
     """Merge a combined RAiDER delays file with a GPS ZTD delay file."""
     print(f'Merging delay files {raider_file} and {ztd_file}')
@@ -369,7 +391,7 @@ def main(
 
     # Handle datetime conversion for the GNSS files that use time in seconds
     if 'Datetime' not in dfz.keys():
-        if "Date" in dfz.keys():
+        if 'Date' in dfz.keys():
             date = dfz['Date'].apply(lambda x: x.strftime('%Y-%m-%d'))
             if 'times' in dfz.keys():
                 tm = dfz['times'].apply(lambda x: dt.timedelta(seconds=x))
@@ -429,7 +451,7 @@ def main(
     # estimate residual
     dfc['ZTD_minus_RAiDER'] = dfc['ZTD'] - dfc[raider_delay]
 
-    print('Total number of rows in the concatenated file: ' f'{dfc.shape[0]}')
+    print(f'Total number of rows in the concatenated file: {dfc.shape[0]}')
     print(f'Total number of rows containing NaNs: {dfc[dfc.isna().any(axis=1)].shape[0]}')
     print('Merge finished')
 

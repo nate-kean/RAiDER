@@ -7,7 +7,7 @@ from RAiDER.models.weatherModel import WeatherModel
 from test import TEST_DIR
 
 
-SCENARIO_DIR = Path(TEST_DIR) / "scenario_1"
+SCENARIO_DIR = Path(TEST_DIR) / 'scenario_1'
 
 
 @pytest.fixture
@@ -30,7 +30,7 @@ def test_checkContainment(getWM) -> None:  # noqa: ANN001
     if Path.exists(wm.files[0]):
         ll_bounds = (10, 20, -100, -100)
         containment = wm.checkContainment(ll_bounds)
-        assert(~containment)
+        assert ~containment
 
 
 def test_checkContainment2(getWM) -> None:  # noqa: ANN001
@@ -39,7 +39,7 @@ def test_checkContainment2(getWM) -> None:  # noqa: ANN001
     if Path.exists(wm.files[0]):
         ll_bounds = (17, 18, -100, -100)
         containment = wm.checkContainment(ll_bounds)
-        assert(containment)
+        assert containment
 
 
 def test_checkContainment3() -> None:  # noqa: ANN001
@@ -55,12 +55,10 @@ def test_checkContainment4() -> None:  # noqa: ANN001
     ll_bounds = (1, 89, -179, 179)
     assert wm.checkContainment(ll_bounds)
 
+
 def test_checkContainment5() -> None:  # noqa: ANN001
     """Test whether a weather model contains a bbox."""
     wm = ERA5()
     wm._bbox = [-180, 0, 180, 90]
     ll_bounds = (0, 90, -180, 180)
     assert wm.checkContainment(ll_bounds)
-
-
-

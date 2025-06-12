@@ -49,7 +49,10 @@ def _get_acq_time_from_gunw_id(gunw_id: str, reference_or_secondary: str) -> dt.
     return cen_acq_time
 
 
-def check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id: str, weather_model_name: str='hrrr') -> bool:
+def check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(
+    gunw_id: str,
+    weather_model_name: str = 'hrrr',
+) -> bool:
     """
     Determine if all the times for azimuth interpolation are available using
     Herbie. Note that not all 1 hour times are available within the said date
@@ -64,17 +67,21 @@ def check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id: st
     bool
 
     Example:
-    check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0)
+    check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation('S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0')
     should return True
     """
     ref_acq_time = _get_acq_time_from_gunw_id(gunw_id, 'reference')
     sec_acq_time = _get_acq_time_from_gunw_id(gunw_id, 'secondary')
 
-    model_step_hours = [1 if weather_model_name == 'hrrr' else 3][0]
+    model_step_hours = 1 if weather_model_name == 'hrrr' else 3
     ref_times_for_interp = get_times_for_azimuth_interpolation(ref_acq_time, model_step_hours)
     sec_times_for_interp = get_times_for_azimuth_interpolation(sec_acq_time, model_step_hours)
-    ref_dataset_availability = list(map(check_hrrr_dataset_availability, ref_times_for_interp, [weather_model_name]*len(ref_times_for_interp)))
-    sec_dataset_availability = list(map(check_hrrr_dataset_availability, sec_times_for_interp, [weather_model_name]*len(sec_times_for_interp)))
+    ref_dataset_availability = [
+        check_hrrr_dataset_availability(ref_time, weather_model_name) for ref_time in ref_times_for_interp
+    ]
+    sec_dataset_availability = [
+        check_hrrr_dataset_availability(sec_time, weather_model_name) for sec_time in sec_times_for_interp
+    ]
 
     return all(ref_dataset_availability) and all(sec_dataset_availability)
 
@@ -232,13 +239,14 @@ class GUNW:
                         if st > dt.datetime(1989, 3, 1):
                             stdiff = np.abs((st_tmp - st).days)
                             endiff = np.abs((en_tmp - en).days)
-                            assert stdiff < 2 and endiff < 2, 'SLCs granules are too far apart in time. Incorrect metadata'
+                            assert stdiff < 2 and endiff < 2, (
+                                'SLCs granules are too far apart in time. Incorrect metadata'
+                            )
 
                         st = st_tmp if st_tmp > st else st
                         en = en_tmp if en_tmp > en else en
 
-                assert st > dt.datetime(1989, 3, 1), \
-                    f'Missing {key} SLC metadata in GUNW: {self.f}'
+                assert st > dt.datetime(1989, 3, 1), f'Missing {key} SLC metadata in GUNW: {self.f}'
 
             lst_sten.append((st, en))
 
@@ -349,6 +357,7 @@ class GUNW:
         logger.info('Wrote cube to: %s', str(dst_cube))
         return dst_cube
 
+
 def main(args: CalcDelaysArgs) -> tuple[Path, float]:
     """Read parameters needed for RAiDER from ARIA Standard Products (GUNW)."""
     # Check if WEATHER MODEL API credentials hidden file exists, if not create it or raise ERROR
@@ -399,8 +408,8 @@ def identify_which_hrrr(gunw_path: Path) -> str:
             )
     except FileNotFoundError:
         raise NoWeatherModelData(
-            f'''GUNW {gunw_path} does not exist or is not a valid HRRR file.
+            f"""GUNW {gunw_path} does not exist or is not a valid HRRR file.
             Please check the file path.
-            '''
+            """
         )
     return weather_model_name

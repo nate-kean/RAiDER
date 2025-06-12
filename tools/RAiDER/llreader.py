@@ -36,13 +36,12 @@ class AOI:
        _type            - Type of AOI
     """
 
-    def __init__(self, cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(self, cube_spacing_in_m: Optional[float] = None) -> None:
         self._output_directory = os.getcwd()
         self._bounding_box = None
         self._proj = CRS.from_epsg(4326)
         self._geotransform = None
         self._cube_spacing_m = cube_spacing_in_m
-    
 
     def __repr__(self):
         return f'AOI: {self.__class__.__name__}({self._bounding_box}, {self._type})'
@@ -65,7 +64,7 @@ class AOI:
         if not isinstance(crs, CRS):
             crs = CRS.from_epsg(crs)
 
-        ## convert it to meters users wants a projected coordinate system
+        # convert it to meters users wants a projected coordinate system
         if all(axis_info.unit_name == 'degree' for axis_info in crs.axis_info):
             output_spacing = output_spacing_deg
         else:
@@ -112,13 +111,13 @@ class AOI:
         """
         from RAiDER.utilFcns import clip_bbox
 
-        ## add an extra buffer around the user specified region
+        # add an extra buffer around the user specified region
         S, N, W, E = self.bounds()
         buffer = 1.5 * ll_res
         S, N = np.max([S - buffer, -90]), np.min([N + buffer, 90])
         W, E = W - buffer, E + buffer  # TODO: handle dateline crossings
 
-        ## clip the buffered region to a multiple of the spacing
+        # clip the buffered region to a multiple of the spacing
         self.set_output_spacing(ll_res)
         S, N, W, E = clip_bbox([S, N, W, E], self._output_spacing)
 
@@ -126,7 +125,6 @@ class AOI:
             logger.warning('Bounds extend past +/- 180. Results may be incorrect.')
 
         self._bounding_box = [np.round(a, digits) for a in (S, N, W, E)]
-
 
     def calc_buffer_ray(self, direction, lookDir='right', incAngle=30, maxZ=80, digits=2):
         """
@@ -170,7 +168,7 @@ class AOI:
     def set_output_directory(self, output_directory) -> None:
         self._output_directory = output_directory
 
-    def set_output_xygrid(self, dst_crs: Union[int, str]=4326) -> None:
+    def set_output_xygrid(self, dst_crs: Union[int, str] = 4326) -> None:
         """Define the locations where the delays will be returned."""
         from RAiDER.utilFcns import transform_bbox
 
@@ -194,7 +192,7 @@ class AOI:
 class StationFile(AOI):
     """Use a .csv file containing at least Lat, Lon, and optionally Hgt_m columns."""
 
-    def __init__(self, station_file, demFile=None, cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(self, station_file, demFile=None, cube_spacing_in_m: Optional[float] = None) -> None:
         super().__init__(cube_spacing_in_m)
         self._filename = station_file
         self._demfile = demFile
@@ -228,7 +226,7 @@ class StationFile(AOI):
                 dem_path=Path(demFile),
             )
 
-            ## interpolate the DEM to the query points
+            # interpolate the DEM to the query points
             z_out0 = interpolateDEM(demFile, self.readLL())
             if np.isnan(z_out0).all():
                 raise Exception('DEM interpolation failed. Check DEM bounds and station coords.')
@@ -244,7 +242,15 @@ class StationFile(AOI):
 class RasterRDR(AOI):
     """Use a 2-band raster file containing lat/lon coordinates."""
 
-    def __init__(self, lat_file, lon_file=None, hgt_file=None, dem_file=None, convention='isce', cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(
+        self,
+        lat_file,
+        lon_file=None,
+        hgt_file=None,
+        dem_file=None,
+        convention='isce',
+        cube_spacing_in_m: Optional[float] = None,
+    ) -> None:
         super().__init__(cube_spacing_in_m)
         self._type = 'radar_rasters'
         self._latfile = lat_file
@@ -270,6 +276,7 @@ class RasterRDR(AOI):
     def readLL(self) -> tuple[np.ndarray, Optional[np.ndarray]]:
         # allow for 2-band lat/lon raster
         from RAiDER.utilFcns import rio_open
+
         lats, _ = rio_open(Path(self._latfile))
 
         if self._lonfile is None:
@@ -281,6 +288,7 @@ class RasterRDR(AOI):
     def readZ(self) -> np.ndarray:
         """Read the heights from the raster file, or download a DEM if not present."""
         from RAiDER.utilFcns import rio_open
+
         if self._hgtfile is not None and os.path.exists(self._hgtfile):
             logger.info('Using existing heights at: %s', self._hgtfile)
             hgts, _ = rio_open(self._hgtfile)
@@ -310,7 +318,7 @@ class RasterRDR(AOI):
 class BoundingBox(AOI):
     """Parse a bounding box AOI."""
 
-    def __init__(self, bbox, cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(self, bbox, cube_spacing_in_m: Optional[float] = None) -> None:
         super().__init__(cube_spacing_in_m)
         self._bounding_box = bbox
         self._type = 'bounding_box'
@@ -323,7 +331,7 @@ class GeocodedFile(AOI):
     _bounding_box: BB.SNWE
     _is_dem: bool
 
-    def __init__(self, path: Path, is_dem=False, cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(self, path: Path, is_dem=False, cube_spacing_in_m: Optional[float] = None) -> None:
         super().__init__(cube_spacing_in_m)
 
         from RAiDER.utilFcns import rio_extents, rio_profile, rio_stats
@@ -366,8 +374,9 @@ class GeocodedFile(AOI):
 class Geocube(AOI):
     """Pull lat/lon/height from a georeferenced data cube."""
 
-    def __init__(self, path_cube, cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(self, path_cube, cube_spacing_in_m: Optional[float] = None) -> None:
         from RAiDER.utilFcns import rio_stats
+
         super().__init__(cube_spacing_in_m)
         self.path = path_cube
         self._type = 'Geocube'
@@ -380,7 +389,7 @@ class Geocube(AOI):
             W, E = ds.longitude.min().item(), ds.longitude.max().item()
         return [S, N, W, E]
 
-    ## untested
+    # untested
     def readLL(self) -> tuple[np.ndarray, np.ndarray]:
         with xr.open_dataset(self.path) as ds:
             lats = ds.latitutde.data()
@@ -410,8 +419,7 @@ def bounds_from_latlon_rasters(lat_filestr: str, lon_filestr: str) -> tuple[BB.S
     assert lat_gt == lon_gt, 'Affine transform for Latitude and Longitude files does not match'
 
     # TODO - handle dateline crossing here
-    snwe = (lat_stats.min, lat_stats.max,
-            lon_stats.min, lon_stats.max)
+    snwe = (lat_stats.min, lat_stats.max, lon_stats.min, lon_stats.max)
 
     if lat_proj is None:
         logger.debug('Assuming lat/lon files are in EPSG:4326')
@@ -426,5 +434,10 @@ def bounds_from_csv(station_file):
     and "Lon" columns, which should be EPSG: 4326 projection (i.e WGS84).
     """
     stats = pd.read_csv(station_file).drop_duplicates(subset=['Lat', 'Lon'])
-    snwe = [stats['Lat'].min(), stats['Lat'].max(), stats['Lon'].min(), stats['Lon'].max()]
+    snwe = [
+        stats['Lat'].min(),
+        stats['Lat'].max(),
+        stats['Lon'].min(),
+        stats['Lon'].max(),
+    ]
     return snwe

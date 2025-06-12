@@ -20,7 +20,11 @@ from scipy.interpolate import RegularGridInterpolator as Interpolator
 from RAiDER.logger import logger
 
 
-def getInterpolators(wm_file: Union[xr.Dataset, Path, str], kind: str='pointwise', shared: bool=False) -> tuple[Interpolator, Interpolator]:
+def getInterpolators(
+    wm_file: Union[xr.Dataset, Path, str],
+    kind: str = 'pointwise',
+    shared: bool = False,
+) -> tuple[Interpolator, Interpolator]:
     """
     Read 3D gridded data from a processed weather model file and wrap it with
     the scipy RegularGridInterpolator.
@@ -58,7 +62,7 @@ def getInterpolators(wm_file: Union[xr.Dataset, Path, str], kind: str='pointwise
     return ifWet, ifHydro
 
 
-def make_shared_raw(inarr:np.ndarray) -> np.ndarray:
+def make_shared_raw(inarr: np.ndarray) -> np.ndarray:
     """Make numpy view array of mp.Array."""
     # Create flat shared array
     if mp is None:

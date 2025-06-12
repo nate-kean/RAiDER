@@ -6,6 +6,7 @@ Program should raise an error if the GUNW product file, metadata file,
 or browse image is missing that clearly explains what went wrong, as opposed to
 a generic error message resulting from a side effect of the error.
 """
+
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
@@ -14,28 +15,36 @@ from typing import List
 
 import pytest
 
-import RAiDER.aws
 import RAiDER.cli.raider
 from test import TEST_DIR
 
 
-EXAMPLE_GUNW_PATH = Path(TEST_DIR) / 'gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc'
-EXAMPLE_JSON_DATA_PATH = Path(TEST_DIR) / 'gunw_test_data/S1-GUNW-A-R-064-tops-20210723_20210711-015001-35393N_33512N-PP-6267-v2_0_4.json'
+EXAMPLE_GUNW_PATH = (
+    Path(TEST_DIR) / 'gunw_test_data/S1-GUNW-D-R-059-tops-20230320_20220418-180300-00179W_00051N-PP-c92e-v2_0_6.nc'
+)
+EXAMPLE_JSON_DATA_PATH = (
+    Path(TEST_DIR) / 'gunw_test_data/S1-GUNW-A-R-064-tops-20210723_20210711-015001-35393N_33512N-PP-6267-v2_0_4.json'
+)
 
 
 @pytest.fixture
 def iargs() -> List[str]:
     return [
-        '--bucket', 'dummy-bucket',
-        '--input-bucket-prefix', 'dummy-input-prefix',
-        '--weather-model', 'ERA5',
+        '--bucket',
+        'dummy-bucket',
+        '--input-bucket-prefix',
+        'dummy-input-prefix',
+        '--weather-model',
+        'ERA5',
     ]
+
 
 @contextmanager
 def make_gunw_path():
     with TemporaryDirectory() as tempdir:
         shutil.copy(EXAMPLE_GUNW_PATH, tempdir)
         yield Path(tempdir) / Path(EXAMPLE_GUNW_PATH).name
+
 
 @contextmanager
 def make_json_data_path():
@@ -53,7 +62,7 @@ def test_missing_product_file(mocker, iargs):
     mocker.patch('RAiDER.aws.get_s3_file', side_effect=side_effect)
     with pytest.raises(ValueError) as excinfo:
         RAiDER.cli.raider.calcDelaysGUNW(iargs)
-    assert "GUNW product file could not be found" in str(excinfo.value)
+    assert 'GUNW product file could not be found' in str(excinfo.value)
 
 
 # Patch aws.get_s3_file to produce None then check for the correct error message
@@ -67,7 +76,7 @@ def test_missing_metadata_file(mocker, iargs):
         mocker.patch('RAiDER.aws.get_s3_file', side_effect=side_effect)
         with pytest.raises(ValueError) as excinfo:
             RAiDER.cli.raider.calcDelaysGUNW(iargs)
-        assert "GUNW metadata file could not be found" in str(excinfo.value)
+        assert 'GUNW metadata file could not be found' in str(excinfo.value)
 
 
 def test_missing_browse_image(mocker, iargs):
@@ -81,4 +90,4 @@ def test_missing_browse_image(mocker, iargs):
         mocker.patch('RAiDER.aws.get_s3_file', side_effect=side_effect)
         with pytest.raises(ValueError) as excinfo:
             RAiDER.cli.raider.calcDelaysGUNW(iargs)
-        assert "GUNW browse image could not be found" in str(excinfo.value)
+        assert 'GUNW browse image could not be found' in str(excinfo.value)

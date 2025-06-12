@@ -12,7 +12,7 @@ from RAiDER.utilFcns import rio_open
 from test import TEST_DIR, pushd
 
 
-SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_1")
+SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_1')
 _RTOL = 1e-2
 
 
@@ -22,7 +22,7 @@ def test_tropo_delay_ERAI(tmp_path):
     Scenario:
     1: Small area, ERAI, Zenith delay
     """
-    core_test_tropo_delay(tmp_path, modelName="ERAI")
+    core_test_tropo_delay(tmp_path, modelName='ERAI')
 
 
 @pytest.mark.long
@@ -31,7 +31,7 @@ def test_tropo_delay_ERA5(tmp_path):
     Scenario:
     1: Small area, ERA5, Zenith delay
     """
-    core_test_tropo_delay(tmp_path, modelName="ERA5")
+    core_test_tropo_delay(tmp_path, modelName='ERA5')
 
 
 @pytest.mark.long
@@ -40,7 +40,7 @@ def test_tropo_delay_ERA5T(tmp_path):
     Scenario:
     1: Small area, ERA5T, Zenith delay
     """
-    core_test_tropo_delay(tmp_path, modelName="ERA5T")
+    core_test_tropo_delay(tmp_path, modelName='ERA5T')
 
 
 @pytest.mark.long
@@ -49,16 +49,16 @@ def test_tropo_delay_MERRA2(tmp_path):
     Scenario:
     1: Small area, MERRA2, Zenith delay
     """
-    core_test_tropo_delay(tmp_path, modelName="MERRA2")
+    core_test_tropo_delay(tmp_path, modelName='MERRA2')
 
 
-@pytest.mark.skip(reason="NCMR keeps hanging")
+@pytest.mark.skip(reason='NCMR keeps hanging')
 def test_tropo_delay_NCMR(tmp_path):
     """
     Scenario:
     1: Small area, NCMR, Zenith delay
     """
-    core_test_tropo_delay(tmp_path, modelName="NCMR")
+    core_test_tropo_delay(tmp_path, modelName='NCMR')
 
 
 @pytest.mark.long
@@ -67,7 +67,7 @@ def test_tropo_delay_GMAO(tmp_path):
     Scenario:
     1: Small area, GMAO, Zenith delay
     """
-    core_test_tropo_delay(tmp_path, modelName="GMAO")
+    core_test_tropo_delay(tmp_path, modelName='GMAO')
 
 
 def core_test_tropo_delay(tmp_path, modelName):
@@ -75,12 +75,8 @@ def core_test_tropo_delay(tmp_path, modelName):
     Scenario:
     1: Small area, Zenith delay
     """
-    lats = rio_open(os.path.join(
-        SCENARIO_DIR, 'geom', 'lat.dat'
-    ))
-    lons = rio_open(os.path.join(
-        SCENARIO_DIR, 'geom', 'lon.dat'
-    ))
+    lats = rio_open(os.path.join(SCENARIO_DIR, 'geom', 'lat.dat'))
+    lons = rio_open(os.path.join(SCENARIO_DIR, 'geom', 'lon.dat'))
 
     if modelName == 'ERAI':
         time = datetime.datetime(2018, 1, 3, 23, 0)
@@ -94,9 +90,7 @@ def core_test_tropo_delay(tmp_path, modelName):
         os.mkdir(wmLoc)
 
     _, model_obj = get_wm_by_name(modelName)
-    wet_file, hydro_file = makeDelayFileNames(
-        time, Zenith, "envi", modelName, tmp_path
-    )
+    wet_file, hydro_file = makeDelayFileNames(time, Zenith, 'envi', modelName, tmp_path)
 
     with pushd(tmp_path):
         # packing the dictionairy
@@ -105,13 +99,13 @@ def core_test_tropo_delay(tmp_path, modelName):
         args['lats'] = lats
         args['lons'] = lons
         args['ll_bounds'] = (15.75, 18.25, -103.24, -99.75)
-        args['heights'] = ("dem", os.path.join(TEST_DIR, "test_geom", "warpedDEM.dem"))
+        args['heights'] = ('dem', os.path.join(TEST_DIR, 'test_geom', 'warpedDEM.dem'))
         args['pnts_file'] = 'lat_query_points.h5'
-        args['flag'] = "files"
-        args['weather_model'] = {"type": model_obj(), "files": None, "name": modelName}
+        args['flag'] = 'files'
+        args['weather_model'] = {'type': model_obj(), 'files': None, 'name': modelName}
         args['wmLoc'] = wmLoc
-        args['zref'] = 20000.
-        args['outformat'] = "envi"
+        args['zref'] = 20000.0
+        args['outformat'] = 'envi'
         args['times'] = time
         args['out'] = tmp_path
         args['download_only'] = False
@@ -124,20 +118,8 @@ def core_test_tropo_delay(tmp_path, modelName):
         # get the results
         wet = rio_open(wet_file)
         hydro = rio_open(hydro_file)
-        true_wet = rio_open(
-            os.path.join(
-                SCENARIO_DIR,
-                modelName + "/wet.envi"
-            ),
-            userNDV=0.
-        )
-        true_hydro = rio_open(
-            os.path.join(
-                SCENARIO_DIR,
-                modelName + "/hydro.envi"
-            ),
-            userNDV=0.
-        )
+        true_wet = rio_open(os.path.join(SCENARIO_DIR, modelName + '/wet.envi'), userNDV=0.0)
+        true_hydro = rio_open(os.path.join(SCENARIO_DIR, modelName + '/hydro.envi'), userNDV=0.0)
 
         # get the true delay from the weather model
         assert np.nanmax(np.abs((wet - true_wet) / true_wet)) < _RTOL

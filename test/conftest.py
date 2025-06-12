@@ -9,20 +9,18 @@ TEST_DIR = test_dir.resolve()
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--skip-isce3", action="store_true", default=False, help="skip tests which require ISCE3"
-    )
+    parser.addoption('--skip-isce3', action='store_true', default=False, help='skip tests which require ISCE3')
 
 
 def pytest_configure(config):
-    config.addinivalue_line("markers", "isce3: mark test as requiring ISCE3 to run")
+    config.addinivalue_line('markers', 'isce3: mark test as requiring ISCE3 to run')
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption("--skip-isce3"):
-        skip_isce3 = pytest.mark.skip(reason="--skip-isce3 option given")
+    if config.getoption('--skip-isce3'):
+        skip_isce3 = pytest.mark.skip(reason='--skip-isce3 option given')
         for item in items:
-            if "isce3" in item.keywords:
+            if 'isce3' in item.keywords:
                 item.add_marker(skip_isce3)
 
 
@@ -43,6 +41,7 @@ def test_gunw_path_factory() -> Callable:
         else:
             raise NotImplementedError
         return TEST_DIR / 'gunw_test_data' / file_name
+
     return factory
 
 
@@ -66,48 +65,61 @@ def gunw_azimuth_test():
 @pytest.fixture(scope='session')
 def orbit_dict_for_azimuth_time_test():
     test_data = TEST_DIR / 'gunw_azimuth_test_data'
-    return {'reference': test_data / 'S1B_OPER_AUX_POEORB_OPOD_20210812T111941_V20210722T225942_20210724T005942.EOF',
-            'secondary': test_data / 'S1B_OPER_AUX_POEORB_OPOD_20210731T111940_V20210710T225942_20210712T005942.EOF'}
+    return {
+        'reference': test_data / 'S1B_OPER_AUX_POEORB_OPOD_20210812T111941_V20210722T225942_20210724T005942.EOF',
+        'secondary': test_data / 'S1B_OPER_AUX_POEORB_OPOD_20210731T111940_V20210710T225942_20210712T005942.EOF',
+    }
 
 
 @pytest.fixture(scope='session')
 def slc_id_dict_for_azimuth_time_test():
     test_data = TEST_DIR / 'gunw_azimuth_test_data'
-    return {'reference': [test_data / 'S1B_IW_SLC__1SDV_20210723T014947_20210723T015014_027915_0354B4_B3A9'],
-            'secondary': [test_data / 'S1B_IW_SLC__1SDV_20210711T014922_20210711T014949_027740_034F80_859D',
-                          test_data / 'S1B_IW_SLC__1SDV_20210711T015011_20210711T015038_027740_034F80_376C']}
+    return {
+        'reference': [test_data / 'S1B_IW_SLC__1SDV_20210723T014947_20210723T015014_027915_0354B4_B3A9'],
+        'secondary': [
+            test_data / 'S1B_IW_SLC__1SDV_20210711T014922_20210711T014949_027740_034F80_859D',
+            test_data / 'S1B_IW_SLC__1SDV_20210711T015011_20210711T015038_027740_034F80_376C',
+        ],
+    }
 
 
 @pytest.fixture(scope='session')
 def weather_model_dict_for_azimuth_time_test():
     """The order is important; will be closest to InSAR acq time so goes 2, 1, 3 AM."""
     test_data = TEST_DIR / 'gunw_azimuth_test_data' / 'weather_files'
-    return {'HRRR': [test_data / 'HRRR_2021_07_23_T02_00_00_33N_36N_120W_115W.nc',
-                     test_data / 'HRRR_2021_07_23_T01_00_00_33N_36N_120W_115W.nc',
-                     test_data / 'HRRR_2021_07_11_T02_00_00_33N_36N_120W_115W.nc',
-                     test_data / 'HRRR_2021_07_11_T01_00_00_33N_36N_120W_115W.nc',
-                     ]}
+    return {
+        'HRRR': [
+            test_data / 'HRRR_2021_07_23_T02_00_00_33N_36N_120W_115W.nc',
+            test_data / 'HRRR_2021_07_23_T01_00_00_33N_36N_120W_115W.nc',
+            test_data / 'HRRR_2021_07_11_T02_00_00_33N_36N_120W_115W.nc',
+            test_data / 'HRRR_2021_07_11_T01_00_00_33N_36N_120W_115W.nc',
+        ]
+    }
 
 
 @pytest.fixture(scope='session')
 def weather_model_dict_for_center_time_test():
     """Order is important here; will be in chronological order with respect to closest date times"""
     test_data = TEST_DIR / 'gunw_azimuth_test_data' / 'weather_files'
-    return {'HRRR': [test_data / 'HRRR_2021_07_23_T01_00_00_33N_36N_120W_115W.nc',
-                     test_data / 'HRRR_2021_07_23_T02_00_00_33N_36N_120W_115W.nc',
-                     test_data / 'HRRR_2021_07_11_T01_00_00_33N_36N_120W_115W.nc',
-                     test_data / 'HRRR_2021_07_11_T02_00_00_33N_36N_120W_115W.nc',
-                     ]
-            }
+    return {
+        'HRRR': [
+            test_data / 'HRRR_2021_07_23_T01_00_00_33N_36N_120W_115W.nc',
+            test_data / 'HRRR_2021_07_23_T02_00_00_33N_36N_120W_115W.nc',
+            test_data / 'HRRR_2021_07_11_T01_00_00_33N_36N_120W_115W.nc',
+            test_data / 'HRRR_2021_07_11_T02_00_00_33N_36N_120W_115W.nc',
+        ]
+    }
 
 
 @pytest.fixture(scope='session')
 def orbit_paths_for_duplicate_orbit_xml_test():
     test_data = TEST_DIR / 'data_for_overlapping_orbits'
-    orbit_file_names = ['S1A_OPER_AUX_POEORB_OPOD_20230413T080643_V20230323T225942_20230325T005942.EOF',
-                        'S1A_OPER_AUX_POEORB_OPOD_20230413T080643_V20230323T225942_20230325T005942.EOF',
-                        'S1A_OPER_AUX_POEORB_OPOD_20230413T080643_V20230323T225942_20230325T005942.EOF',
-                        'S1A_OPER_AUX_POEORB_OPOD_20230412T080821_V20230322T225942_20230324T005942.EOF']
+    orbit_file_names = [
+        'S1A_OPER_AUX_POEORB_OPOD_20230413T080643_V20230323T225942_20230325T005942.EOF',
+        'S1A_OPER_AUX_POEORB_OPOD_20230413T080643_V20230323T225942_20230325T005942.EOF',
+        'S1A_OPER_AUX_POEORB_OPOD_20230413T080643_V20230323T225942_20230325T005942.EOF',
+        'S1A_OPER_AUX_POEORB_OPOD_20230412T080821_V20230322T225942_20230324T005942.EOF',
+    ]
     return [test_data / fn for fn in orbit_file_names]
 
 
@@ -131,11 +143,15 @@ def weather_model_dict_for_gunw_integration_test():
     ```
     """
     test_data = TEST_DIR / 'gunw_test_data' / 'weather_files'
-    return {'GMAO': [test_data / 'GMAO_2020_01_30_T12_00_00_32N_36N_121W_114W.nc',
-                     test_data / 'GMAO_2020_01_30_T15_00_00_32N_36N_121W_114W.nc',
-                     test_data / 'GMAO_2020_01_24_T12_00_00_32N_36N_121W_114W.nc',
-                     test_data / 'GMAO_2020_01_24_T15_00_00_32N_36N_121W_114W.nc']
-           }
+    return {
+        'GMAO': [
+            test_data / 'GMAO_2020_01_30_T12_00_00_32N_36N_121W_114W.nc',
+            test_data / 'GMAO_2020_01_30_T15_00_00_32N_36N_121W_114W.nc',
+            test_data / 'GMAO_2020_01_24_T12_00_00_32N_36N_121W_114W.nc',
+            test_data / 'GMAO_2020_01_24_T15_00_00_32N_36N_121W_114W.nc',
+        ]
+    }
+
 
 @pytest.fixture(scope='session')
 def data_for_hrrr_ztd():

@@ -121,10 +121,12 @@ def enu2ecef(
     return np.stack((u, v, w), axis=-1)
 
 
-def ecef2enu(xyz: Union[float, np.array], 
-             lat: Union[float, np.array], 
-             lon: Union[float, np.array], 
-             height: Union[float, np.array]) -> np.array:
+def ecef2enu(
+    xyz: Union[float, np.array],
+    lat: Union[float, np.array],
+    lon: Union[float, np.array],
+    height: Union[float, np.array],
+) -> np.array:
     """Convert ECEF xyz to ENU."""
     """height is not used here, needs looked at"""
     x, y, z = xyz[..., 0], xyz[..., 1], xyz[..., 2]
@@ -163,8 +165,8 @@ def rio_extents(profile: RIO.Profile) -> BB.SNWE:
 
 def rio_open(
     path: Union[Path, str],
-    userNDV: Optional[float]=None,
-    band: Optional[int]=None
+    userNDV: Optional[float] = None,
+    band: Optional[int] = None,
 ) -> tuple[np.ndarray, RIO.Profile]:
     """Reads a rasterio-compatible raster file and returns the data and profile."""
     path = Path(path)
@@ -210,7 +212,7 @@ def nodataToNan(inarr: np.ndarray, vals: list[Optional[float]]) -> None:
             inarr[inarr == val] = np.nan
 
 
-def rio_stats(path: Path, band: int=1) -> tuple[RIO.Statistics, Optional[CRS], RIO.GDAL]:
+def rio_stats(path: Path, band: int = 1) -> tuple[RIO.Statistics, Optional[CRS], RIO.GDAL]:
     """Read a rasterio-compatible file and pull the metadata.
 
     Args:
@@ -257,10 +259,10 @@ def get_file_and_band(filestr: str) -> tuple[Path, int]:
 def writeArrayToRaster(
     array: np.ndarray,
     path: Path,
-    noDataValue: float=0.0,
-    fmt: str='ENVI',
-    proj: Optional[CRS]=None,
-    gt: Optional[RIO.GDAL]=None
+    noDataValue: float = 0.0,
+    fmt: str = 'ENVI',
+    proj: Optional[CRS] = None,
+    gt: Optional[RIO.GDAL] = None,
 ) -> None:
     """Write a numpy array to a GDAL-readable raster."""
     array_shp = np.shape(array)
@@ -396,7 +398,7 @@ def geo_to_ht(lats: ndarray, hts: ndarray) -> ndarray:
             latitude of points of interest
         hts: ndarray
             geopotential height at points of interest
-    
+
 
     Returns:
         ndarray: geometric heights. These are approximate ellipsoidal heights referenced to WGS84
@@ -416,7 +418,7 @@ def padLower(invar: np.array) -> np.array:
     return np.concatenate((new_var[:, :, np.newaxis], invar), axis=2)
 
 
-def round_time(datetime: dt.datetime, roundTo: int=60) -> dt.datetime:
+def round_time(datetime: dt.datetime, roundTo: int = 60) -> dt.datetime:
     """Round a datetime object to any time lapse in seconds."""
     """
     datetime: dt.datetime object
@@ -433,9 +435,9 @@ def writeDelays(
     wetDelay: ndarray,
     hydroDelay: ndarray,
     wet_path: Path,
-    hydro_path: Optional[Path]=None,
-    outformat: str=None,
-    ndv: float=0.0
+    hydro_path: Optional[Path] = None,
+    outformat: str = None,
+    ndv: float = 0.0,
 ) -> None:
     """Write the delay numpy arrays to files in the format specified."""
     if pd is None:
@@ -498,7 +500,7 @@ def letter(coordinates: Union[list, tuple, np.array]) -> str:
     return 'CDEFGHJKLMNPQRSTUVWXX'[int((coordinates[1] + 80) / 8)]
 
 
-def project(coordinates: Union[list, tuple, np.array], z: int=None, ltr: str=None) -> tuple[int, str, float, float]:
+def project(coordinates: Union[list, tuple, np.array], z: int = None, ltr: str = None) -> tuple[int, str, float, float]:
     """Returns zone UTM coordinate."""
     if z is None:
         z = zone(coordinates)
@@ -522,7 +524,7 @@ def unproject(z: int, ltr: str, x: float, y: float) -> tuple[Union[float, np.arr
     return (lng, lat)
 
 
-def WGS84_to_UTM(lon: float, lat: float, common_center: bool=False) -> tuple[np.array]:
+def WGS84_to_UTM(lon: float, lat: float, common_center: bool = False) -> tuple[np.array]:
     """Converts WGS84 to UTM."""
     shp = lat.shape
     lon = np.ravel(lon)
@@ -556,34 +558,34 @@ def UTM_to_WGS84(z: np.array, ltr: np.array, x: np.array, y: np.array) -> tuple[
     ltr = np.ravel(ltr)
     x = np.ravel(x)
     y = np.ravel(y)
-    
+
     # Validate that all input arrays have the same length
     if not (len(z) == len(ltr) == len(x) == len(y)):
-        raise ValueError("All input arrays must have the same length.")
-    
+        raise ValueError('All input arrays must have the same length.')
+
     # Initialize arrays for lat and lon
     lat = np.empty_like(x, dtype=float)
     lon = np.empty_like(x, dtype=float)
-    
+
     # Iterate over all coordinates
     for ind in range(len(z)):
         zz = z[ind]
         ll = ltr[ind]
         xx = x[ind]
         yy = y[ind]
-        
+
         # Perform the transformation
         coordinates = unproject(zz, ll, xx, yy)
-        
+
         # Assign the results to lat and lon
         lon[ind] = coordinates[0]
         lat[ind] = coordinates[1]
-    
+
     # Reshape and return the results
     return np.reshape(lon, x.shape), np.reshape(lat, x.shape)
 
 
-def transform_bbox(snwe_in: list, dest_crs: int=4326, src_crs: int=4326, buffer: float=100.0) -> Tuple[np.array]:
+def transform_bbox(snwe_in: list, dest_crs: int = 4326, src_crs: int = 4326, buffer: float = 100.0) -> Tuple[np.array]:
     """Transform bbox to lat/lon or another CRS for use with rest of workflow."""
     """
     Returns: SNWE
@@ -630,7 +632,7 @@ def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> 
     ]
 
 
-def requests_retry_session(retries: int=10, session=None):  # noqa: ANN001, ANN201
+def requests_retry_session(retries: int = 10, session=None):  # noqa: ANN001, ANN201
     """https://www.peterbe.com/plog/best-practice-with-retries-with-requests."""
     import requests
     from requests.adapters import HTTPAdapter
@@ -647,7 +649,19 @@ def requests_retry_session(retries: int=10, session=None):  # noqa: ANN001, ANN2
     return session
 
 
-def writeWeatherVarsXarray(lat: float, lon: float, h: float, q: float, p: float, t: float, datetime: dt.datetime, crs: float, outName: str=None, NoDataValue: int=-9999, chunk: list=(1, 91, 144)) -> None:
+def writeWeatherVarsXarray(
+    lat: float,
+    lon: float,
+    h: float,
+    q: float,
+    p: float,
+    t: float,
+    datetime: dt.datetime,
+    crs: float,
+    outName: str = None,
+    NoDataValue: int = -9999,
+    chunk: list = (1, 91, 144),
+) -> None:
     """Does not return anything."""
     # I added datetime as an input to the function and just copied these two lines from merra2 for the attrs_dict
     attrs_dict = {
@@ -715,7 +729,7 @@ def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
         lines = f.readlines()
 
     if len(lines) < 3:
-        raise ValueError("The login file must have at least three lines")
+        raise ValueError('The login file must have at least three lines')
 
     def parse_line(line, expected_key):  # noqa: ANN001, ANN202
         parts = line.strip().split(': ')
@@ -723,9 +737,9 @@ def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
             raise ValueError(f"Improperly formatted login file: Expected '{expected_key}: <value>'")
         return parts[1]
 
-    url = parse_line(lines[0], "url")
-    username = parse_line(lines[1], "username")
-    password = parse_line(lines[2], "password")
+    url = parse_line(lines[0], 'url')
+    username = parse_line(lines[1], 'username')
+    password = parse_line(lines[2], 'password')
 
     return url, username, password
 
@@ -738,10 +752,10 @@ def read_EarthData_loginInfo(filepath: str = None) -> Tuple[str, str]:
     try:
         urs_usr, _, urs_pwd = nrc.hosts['urs.earthdata.nasa.gov']
         if not urs_usr or not urs_pwd:
-            raise ValueError("Invalid login information in netrc")
+            raise ValueError('Invalid login information in netrc')
         return urs_usr, urs_pwd
     except KeyError:
-        raise KeyError("No entry for urs.earthdata.nasa.gov in netrc")
+        raise KeyError('No entry for urs.earthdata.nasa.gov in netrc')
 
 
 def show_progress(block_num: Union[int, float], block_size: Union[int, float], total_size: Union[int, float]) -> None:
@@ -751,7 +765,7 @@ def show_progress(block_num: Union[int, float], block_size: Union[int, float], t
         pbar
     except NameError:
         pbar = None
-    
+
     if pbar is None:
         try:
             pbar = progressbar.ProgressBar(maxval=total_size)
@@ -778,7 +792,16 @@ def getChunkSize(in_shape: ndarray) -> Tuple:
     return chunkSize
 
 
-def calcgeoh(lnsp: ndarray, t: ndarray, q: ndarray, z: ndarray, a: ndarray, b: ndarray, R_d: float, num_levels: int) -> Tuple[np.ndarray]:
+def calcgeoh(
+    lnsp: ndarray,
+    t: ndarray,
+    q: ndarray,
+    z: ndarray,
+    a: ndarray,
+    b: ndarray,
+    R_d: float,
+    num_levels: int,
+) -> Tuple[np.ndarray]:
     """
     Calculate pressure, geopotential, and geopotential height
     from the surface pressure and model levels provided by a weather model.
@@ -928,18 +951,13 @@ def get_dt(t1: dt.datetime, t2: dt.datetime) -> float:
 # Tell PyYAML how to serialize pathlib Paths
 yaml.add_representer(
     pathlib.PosixPath,
-    lambda dumper, data: dumper.represent_scalar(
-        'tag:yaml.org,2002:str',
-        str(data)
-    )
+    lambda dumper, data: dumper.represent_scalar('tag:yaml.org,2002:str', str(data)),
 )
 yaml.add_representer(
     tuple,
-    lambda dumper, data: dumper.represent_sequence(
-        'tag:yaml.org,2002:seq',
-        data
-    )
+    lambda dumper, data: dumper.represent_sequence('tag:yaml.org,2002:seq', data),
 )
+
 
 def write_yaml(content: dict[str, Any], dst: Union[str, Path]) -> Path:
     """Write a new yaml file from a dictionary with template.yaml as a base.

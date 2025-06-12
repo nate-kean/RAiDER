@@ -16,6 +16,7 @@ class CalcDelaysArgsUnparsed(argparse.Namespace):
     interpolate_time: TimeInterpolationMethod
     output_directory: Path
 
+
 class CalcDelaysArgs(argparse.Namespace):
     bucket: Optional[str]
     bucket_prefix: Optional[str]

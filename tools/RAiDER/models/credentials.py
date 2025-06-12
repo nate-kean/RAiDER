@@ -28,6 +28,7 @@ RC_FILENAMES: Dict[str, Optional[str]] = {
     'HRRR': None,
 }
 
+# fmt: off
 APIS = {
     'cdsapirc': {
         'template': (
@@ -58,6 +59,7 @@ APIS = {
         'default_host': 'urs.earthdata.nasa.gov',
     },
 }
+# fmt: on
 
 
 # Get the environment variables for a given weather model API

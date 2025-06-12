@@ -14,7 +14,7 @@ from setuptools import Extension, setup
 
 # Cythonize should be imported after setuptools. See:
 # https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#configuring-the-c-build
-from Cython.Build import cythonize  # isort:skip
+from Cython.Build.Dependencies import cythonize  # isort:skip
 
 # Parameter defs
 UTIL_DIR = Path('tools') / 'bindings' / 'utils'
@@ -24,7 +24,7 @@ pybind_extensions = [
         'RAiDER.interpolate',
         [
             'tools/bindings/interpolate/src/module.cpp',
-            'tools/bindings/interpolate/src/interpolate.cpp'
+            'tools/bindings/interpolate/src/interpolate.cpp',
         ],
     ),
 ]
@@ -32,16 +32,18 @@ pybind_extensions = [
 cython_extensions = cythonize(
     [
         Extension(
-            name="RAiDER.makePoints",
-            sources=[str(f) for f in UTIL_DIR.glob("*.pyx")],
-            include_dirs=[np.get_include()]
+            name='RAiDER.makePoints',
+            sources=[str(f) for f in UTIL_DIR.glob('*.pyx')],
+            include_dirs=[
+                np.get_include(),
+            ],
         ),
     ],
     quiet=True,
-    compiler_directives={'language_level': 3}
+    compiler_directives={'language_level': 3},
 )
 
 setup(
     ext_modules=cython_extensions + pybind_extensions,
-    cmdclass={"build_ext": build_ext},
+    cmdclass={'build_ext': build_ext},
 )

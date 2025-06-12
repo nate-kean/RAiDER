@@ -19,9 +19,9 @@ from RAiDER.utilFcns import rio_open
 from test import GEOM_DIR, TEST_DIR
 
 
-SCENARIO0_DIR = TEST_DIR / "scenario_0"
-SCENARIO1_DIR = TEST_DIR / "scenario_1/geom"
-SCENARIO2_DIR = TEST_DIR / "scenario_2"
+SCENARIO0_DIR = TEST_DIR / 'scenario_0'
+SCENARIO1_DIR = TEST_DIR / 'scenario_1/geom'
+SCENARIO2_DIR = TEST_DIR / 'scenario_2'
 
 
 @pytest.fixture
@@ -101,6 +101,7 @@ def test_badllfiles(station_file):
     with pytest.raises(ValueError):
         RasterRDR(lat_file=station_file, lon_file=lonfile)
 
+
 def test_read_bbox():
     bbox = [20, 27, -115, -104]
     query = BoundingBox(bbox)
@@ -112,7 +113,7 @@ def test_read_bbox():
 def test_read_station_file(station_file):
     query = StationFile(station_file)
     lats, lons = query.readLL()
-    stats = pd.read_csv(station_file).drop_duplicates(subset=["Lat", "Lon"])
+    stats = pd.read_csv(station_file).drop_duplicates(subset=['Lat', 'Lon'])
 
     assert np.allclose(lats, stats['Lat'].values)
     assert np.allclose(lons, stats['Lon'].values)
@@ -129,7 +130,7 @@ def test_bounds_from_latlon_rasters():
     lon_path = Path(GEOM_DIR) / 'lon.rdr'
     snwe, _, _ = bounds_from_latlon_rasters(str(lat_path), str(lon_path))
 
-    bounds_true =[15.7637, 21.4936, -101.6384, -98.2418]
+    bounds_true = [15.7637, 21.4936, -101.6384, -98.2418]
     assert all([np.allclose(b, t, rtol=1e-4) for b, t in zip(snwe, bounds_true)])
 
 
@@ -141,12 +142,12 @@ def test_bounds_from_csv(station_file):
 
 def test_readZ_sf(station_file):
     aoi = StationFile(station_file)
-    assert np.allclose(aoi.readZ(), .1)
+    assert np.allclose(aoi.readZ(), 0.1)
 
 
 def test_GeocodedFile():
     aoi = GeocodedFile(SCENARIO0_DIR / 'small_dem.tif', is_dem=True)
     z = aoi.readZ()
-    x,y = aoi.readLL()
-    assert z.shape == (569,558)
+    x, y = aoi.readLL()
+    assert z.shape == (569, 558)
     assert x.shape == z.shape

@@ -172,7 +172,7 @@ class WeatherModel(ABC):
         """Returns the time of the weather model."""
         return self._time
 
-    def setTime(self, time: Union[dt.datetime, str], fmt: str='%Y-%m-%dT%H:%M:%S') -> None:
+    def setTime(self, time: Union[dt.datetime, str], fmt: str = '%Y-%m-%dT%H:%M:%S') -> None:
         """Set the time for a weather model."""
         if isinstance(time, str):
             self._time = dt.datetime.strptime(time, fmt)
@@ -187,7 +187,12 @@ class WeatherModel(ABC):
         """Returns the bounds of the weather model."""
         return self._ll_bounds
 
-    def set_latlon_bounds(self, ll_bounds: Union[list, np.ndarray], Nextra: int=2, output_spacing: float=None) -> None:
+    def set_latlon_bounds(
+        self,
+        ll_bounds: Union[list, np.ndarray],
+        Nextra: int = 2,
+        output_spacing: float = None,
+    ) -> None:
         """
         Need to correct lat/lon bounds because not all of the weather models have valid
         data exactly bounded by -90/90 (lats) and -180/180 (lons); for GMAO and MERRA2,
@@ -231,8 +236,7 @@ class WeatherModel(ABC):
         """Set the path to the directory with the weather model files."""
         self._wmLoc = weather_model_directory
 
-
-    def load(self, *args: tuple, _zlevels: Union[np.ndarray, list]=None, **kwargs: dict) -> None:
+    def load(self, *args: tuple, _zlevels: Union[np.ndarray, list] = None, **kwargs: dict) -> None:
         """
         Calls the load_weather method. Each model class should define a load_weather
         method appropriate for that class. 'args' should be one or more filenames.
@@ -265,7 +269,7 @@ class WeatherModel(ABC):
         """Placeholder method. Should be implemented in each weather model type class."""
         pass
 
-    def plot(self, plotType: str='pqt', savefig: bool=True) -> str:
+    def plot(self, plotType: str = 'pqt', savefig: bool = True) -> str:
         """Plotting method. Valid plot types are 'pqt'."""
         if plotType == 'pqt':
             plot = plots.plot_pqt(self, savefig)
@@ -323,7 +327,7 @@ class WeatherModel(ABC):
         """Convert pressure in millibars to Pascals."""
         return 100 * pres
 
-    def _get_heights(self, lats: np.ndarray, geo_hgt: np.ndarray, geo_ht_fill: np.ndarray=np.nan) -> None:
+    def _get_heights(self, lats: np.ndarray, geo_hgt: np.ndarray, geo_ht_fill: np.ndarray = np.nan) -> None:
         """Transform geo heights to WGS84 ellipsoidal heights."""
         geo_ht_fix = np.where(geo_hgt != geo_ht_fill, geo_hgt, np.nan)
         lats_full = np.broadcast_to(lats[..., np.newaxis], geo_ht_fix.shape)
@@ -368,7 +372,7 @@ class WeatherModel(ABC):
         """Returns the data cube of hydrostatic refractivity."""
         return self._hydrostatic_refractivity
 
-    def _adjust_grid(self, ll_bounds: Union[list, tuple, np.ndarray]=None) -> None:
+    def _adjust_grid(self, ll_bounds: Union[list, tuple, np.ndarray] = None) -> None:
         """This function pads the weather grid with a level at self._zmin, if it does not already go that low."""
         """
         <<The functionality below has been removed.>>
@@ -466,13 +470,13 @@ class WeatherModel(ABC):
         """
         S, N, W, E = ll_bounds
         if not box(W, S, E, N).intersects(self._valid_bounds):
-            #check the longitude wrapping
-            if not box(360+W, S, 360+E, N).intersects(self._valid_bounds):
+            # check the longitude wrapping
+            if not box(360 + W, S, 360 + E, N).intersects(self._valid_bounds):
                 raise ValueError(f'The requested location is unavailable for {self._Name}')
 
-    def checkContainment(self, ll_bounds: Union[List, Tuple,np.ndarray], buffer_deg: float = 1e-5) -> bool:
+    def checkContainment(self, ll_bounds: Union[List, Tuple, np.ndarray], buffer_deg: float = 1e-5) -> bool:
         """
-        Checks containment of weather model bbox. 
+        Checks containment of weather model bbox.
 
         Args:
         ----------
@@ -497,15 +501,15 @@ class WeatherModel(ABC):
         input_box = box(xmin_input, ymin_input, xmax_input, ymax_input)
         xmin, ymin, xmax, ymax = self.bbox
         weather_model_box = box(xmin, ymin, xmax, ymax)
-        
+
         # Logger
         input_box_str = [f'{x:1.2f}' for x in [xmin_input, ymin_input, xmax_input, ymax_input]]
         input_box_str = ', '.join(input_box_str)
         weath_box_str = [f'{x:1.2f}' for x in [xmin, ymin, xmax, ymax]]
         weath_box_str = ', '.join(weath_box_str)
-        
-        logger.info(f'Extent of the weather model is (xmin, ymin, xmax, ymax):' f'{weath_box_str}')
-        logger.info(f'Extent of the input is (xmin, ymin, xmax, ymax): ' f'{input_box_str}')
+
+        logger.info(f'Extent of the weather model is (xmin, ymin, xmax, ymax):{weath_box_str}')
+        logger.info(f'Extent of the input is (xmin, ymin, xmax, ymax): {input_box_str}')
 
         # If the bounding box goes beyond the normal world extents
         # Look at two x-translates, buffer them, and take their union.
@@ -519,17 +523,16 @@ class WeatherModel(ABC):
                 translate(weather_model_box, xoff=-360).buffer(buffer_deg),
             ]
             weather_model_box = unary_union(translates)
-        
+
         if weather_model_box.contains(world_box):
             # Handle the case where the whole world is requested
             self.bbox = (-180, -90, 180, 90)
-            return True 
+            return True
         else:
             if weather_model_box.contains(input_box):
                 return True
             else:
                 return False
-
 
     def _isOutside(self, extent1: list, extent2: list) -> bool:
         """
@@ -600,7 +603,7 @@ class WeatherModel(ABC):
         """Returns something."""
         return self._xs.copy(), self._ys.copy(), self._zs.copy()
 
-    def _uniform_in_z(self, _zlevels: Union[np.ndarray, list]=None) -> None:
+    def _uniform_in_z(self, _zlevels: Union[np.ndarray, list] = None) -> None:
         """Interpolate all variables to a regular grid in z."""
         nx, ny = self._p.shape[:2]
 
@@ -637,7 +640,7 @@ class WeatherModel(ABC):
         )
         return os.path.join(outLoc, f)
 
-    def filename(self, time: dt.datetime=None, outLoc: str='weather_files') -> str:
+    def filename(self, time: dt.datetime = None, outLoc: str = 'weather_files') -> str:
         """Create a filename to store the weather model."""
         Path.mkdir(outLoc, exist_ok=True)
 
@@ -779,6 +782,7 @@ def find_svp(t: np.ndarray) -> np.ndarray:
     svp = svp * 100
     return svp.astype(np.float32)
 
+
 def get_mapping(proj: CRS) -> CRS:
     """Get CF-complient projection information from a proj."""
     # In case of WGS-84 lat/lon, keep it simple
@@ -789,10 +793,10 @@ def get_mapping(proj: CRS) -> CRS:
 
 
 def checkContainment_raw(
-        path_wm_raw: Path, 
-        ll_bounds: Union[List, Tuple,np.ndarray], 
-        buffer_deg: float = 1e-5
-    ) -> bool:
+    path_wm_raw: Path,
+    ll_bounds: Union[List, Tuple, np.ndarray],
+    buffer_deg: float = 1e-5,
+) -> bool:
     """
     Checks if existing raw weather model contains
     requested ll_bounds.

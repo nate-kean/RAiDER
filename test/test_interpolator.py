@@ -31,16 +31,16 @@ def nanArr():
 
 
 def test_interpVector():
+    # fmt: off
+    vec = np.array([
+        0,   1,          2,          3,           4,          5,
+        0,   0.84147098, 0.90929743, 0.14112001, -0.7568025, -0.95892427,
+        0.5, 1.5,        2.5,        3.5,         4.5,
+    ]),
+    # fmt: on
     assert np.allclose(
-        interpVector(
-            np.array([
-                0, 1, 2, 3, 4, 5,
-                0, 0.84147098, 0.90929743, 0.14112001, -0.7568025, -0.95892427,
-                0.5, 1.5, 2.5, 3.5, 4.5
-            ]),
-            6
-        ),
-        np.array([0.42073549, 0.87538421, 0.52520872, -0.30784124, -0.85786338])
+        interpVector(vec, 6),
+        np.array([0.42073549, 0.87538421, 0.52520872, -0.30784124, -0.85786338]),
     )
 
 
@@ -53,10 +53,12 @@ def test_interp_along_axis():
     z2 = np.tile(np.arange(100)[..., np.newaxis], (5, 1, 5)).swapaxes(1, 2)
     zvals = 0.3 * z2 - 12.75
 
+    # fmt: off
     newz = np.tile(
         np.array([1.5, 9.9, 15, 23.278, 39.99, 50.1])[..., np.newaxis],
         (5, 1, 5)
     ).swapaxes(1, 2)
+    # fmt: on
     corz = 0.3 * newz - 12.75
 
     assert np.allclose(interp_along_axis(z2, newz, zvals, axis=2), corz)
@@ -100,14 +102,9 @@ def test_interpolate_along_axis():
 
     # Rejects bad interp_points shape
     with pytest.raises(TypeError):
-        interpolate_along_axis(
-            np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((3, 2))
-        )
+        interpolate_along_axis(np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((3, 2)))
     with pytest.raises(TypeError):
-        interpolate_along_axis(
-            np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((2, 3)),
-            axis=0, max_threads=1
-        )
+        interpolate_along_axis(np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((2, 3)), axis=0, max_threads=1)
 
 
 def test_interp_along_axis_1d():
@@ -119,14 +116,8 @@ def test_interp_along_axis_1d():
 
     points = np.array([1.5, 3.1])
 
-    assert np.allclose(
-        interp_along_axis(xs, points, ys, axis=0),
-        2 * points
-    )
-    assert np.allclose(
-        interpolate_along_axis(xs, ys, points, axis=0, max_threads=1),
-        2 * points
-    )
+    assert np.allclose(interp_along_axis(xs, points, ys, axis=0), f(points))
+    assert np.allclose(interpolate_along_axis(xs, ys, points, axis=0, max_threads=1), f(points))
 
 
 def test_interp_along_axis_1d_out_of_bounds():
@@ -138,16 +129,11 @@ def test_interp_along_axis_1d_out_of_bounds():
 
     points = np.array([0, 5])
 
+    assert np.allclose(interp_along_axis(xs, points, ys, axis=0), np.array([np.nan, np.nan]), equal_nan=True)
     assert np.allclose(
-        interp_along_axis(xs, points, ys, axis=0),
+        interpolate_along_axis(xs, ys, points, axis=0, max_threads=1, fill_value=np.nan),
         np.array([np.nan, np.nan]),
-        equal_nan=True
-    )
-    assert np.allclose(
-        interpolate_along_axis(xs, ys, points, axis=0,
-                               max_threads=1, fill_value=np.nan),
-        np.array([np.nan, np.nan]),
-        equal_nan=True
+        equal_nan=True,
     )
 
 
@@ -155,6 +141,7 @@ def test_interp_along_axis_2d():
     def f(x):
         return 2 * x
 
+    # fmt: off
     xs = np.array([
         [1, 2, 3, 4],
         [3, 4, 5, 6]
@@ -168,12 +155,13 @@ def test_interp_along_axis_2d():
 
     assert np.allclose(
         interp_along_axis(xs, points, ys, axis=1),
-        2 * points
+        f(points),
     )
     assert np.allclose(
         interpolate_along_axis(xs, ys, points, axis=1),
-        2 * points
+        f(points),
     )
+    # fmt: on
 
 
 def test_interp_along_axis_2d_threads_edge_case():
@@ -182,38 +170,41 @@ def test_interp_along_axis_2d_threads_edge_case():
 
     # Max of 4 threads but 5 rows to interpolate over. Each thread will get 2
     # rows which means only 3 threads will be used
+    # fmt: off
     max_threads = 4
     xs = np.array([
-        [1, 2, 3, 4],
-        [3, 4, 5, 6],
-        [7, 8, 9, 10],
+        [ 1,  2,  3,  4],
+        [ 3,  4,  5,  6],
+        [ 7,  8,  9, 10],
         [11, 12, 13, 14],
         [15, 16, 17, 18]
     ])
     ys = f(xs)
 
     points = np.array([
-        [1.5, 3.1, 3.6],
-        [3.5, 5.1, 5.2],
-        [7.5, 9.1, 9.9],
+        [ 1.5,  3.1,  3.6],
+        [ 3.5,  5.1,  5.2],
+        [ 7.5,  9.1,  9.9],
         [11.1, 12.2, 13.3],
         [15.1, 16.2, 17.3]
     ])
 
     assert np.allclose(
         interp_along_axis(xs, points, ys, axis=1),
-        2 * points
+        f(points)
     )
     assert np.allclose(
         interpolate_along_axis(xs, ys, points, axis=1, max_threads=max_threads),
-        2 * points
+        f(points)
     )
+    # fmt: on
 
 
 def test_interp_along_axis_3d():
     def f(x):
         return 2 * x
 
+    # fmt: off
     xs = np.array([
         [[1, 2, 3, 4],
          [3, 4, 5, 6]],
@@ -233,18 +224,20 @@ def test_interp_along_axis_3d():
 
     assert np.allclose(
         interp_along_axis(xs, points, ys, axis=2),
-        2 * points
+        f(points)
     )
     assert np.allclose(
         interpolate_along_axis(xs, ys, points, axis=2),
-        2 * points
+        f(points)
     )
+    # fmt: on
 
 
 def test_interp_along_axis_3d_axis1():
     def f(x):
         return 2 * x
 
+    # fmt: off
     xs = np.array([
         [[1, 2],
          [3, 4]],
@@ -259,20 +252,21 @@ def test_interp_along_axis_3d_axis1():
          [2.5, 2.1]],
 
         [[10.3, 12.9],
-         [15, 17]]
+         [15,   17]]
     ])
 
     assert np.allclose(
         interp_along_axis(xs, points, ys, axis=1),
-        2 * points
+        f(points)
     )
     assert np.allclose(
         interpolate_along_axis(xs, ys, points, axis=1),
-        2 * points
+        f(points)
     )
+    # fmt: on
 
 
-@pytest.mark.parametrize("num_points", (7, 200, 500))
+@pytest.mark.parametrize('num_points', (7, 200, 500))
 def test_interp_along_axis_3d_large(num_points):
     def f(x):
         return 2 * x
@@ -287,13 +281,11 @@ def test_interp_along_axis_3d_large(num_points):
     points = np.array([np.linspace(0, 99, num=num_points)]).repeat(100, axis=0)
     points = np.repeat(np.array([points]), 100, axis=0) * scale
 
-    ans = 2 * points
+    ans = f(points)
 
     assert np.allclose(interp_along_axis(xs, points, ys, axis=2), ans)
     assert np.allclose(interpolate_along_axis(xs, ys, points, axis=2), ans)
-    assert np.allclose(
-        interpolate_along_axis(xs, ys, points, axis=2, assume_sorted=True), ans
-    )
+    assert np.allclose(interpolate_along_axis(xs, ys, points, axis=2, assume_sorted=True), ans)
 
 
 def test_interp_along_axis_3d_large_unsorted():
@@ -311,7 +303,7 @@ def test_interp_along_axis_3d_large_unsorted():
     points = np.repeat(np.array([points]), 100, axis=0) * scale
     points = shuffle_along_axis(points, 2)
 
-    ans = 2 * points
+    ans = f(points)
 
     assert np.allclose(interp_along_axis(xs, points, ys, axis=2), ans)
     assert np.allclose(interpolate_along_axis(xs, ys, points, axis=2), ans)
@@ -322,7 +314,7 @@ def test_grid_dim_mismatch():
         interpolate(
             points=(np.zeros((10,)), np.zeros((5,))),
             values=np.zeros((1,)),
-            interp_points=np.zeros((1,))
+            interp_points=np.zeros((1,)),
         )
 
 
@@ -332,7 +324,7 @@ def test_basic():
         values=np.array([0, 1]),
         interp_points=np.array([[0.5]]),
         max_threads=1,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     assert ans == np.array([0.5])
@@ -344,7 +336,7 @@ def test_1d_out_of_bounds():
         values=np.array([0, 1]),
         interp_points=np.array([[100]]),
         max_threads=1,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     # Output is extrapolated
@@ -358,7 +350,7 @@ def test_1d_fill_value():
         interp_points=np.array([[100]]),
         max_threads=1,
         fill_value=np.nan,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     assert np.all(np.isnan(ans))
@@ -368,7 +360,7 @@ def test_small():
     ans = interpolate(
         points=(np.array([1, 2, 3, 4, 5, 6]),),
         values=np.array([10, 9, 30, 10, 6, 1]),
-        interp_points=np.array([1.25, 2.9, 3.01, 5.7]).reshape(-1, 1)
+        interp_points=np.array([1.25, 2.9, 3.01, 5.7]).reshape(-1, 1),
     )
 
     assert ans.shape == (4,)
@@ -390,7 +382,7 @@ def test_exact_points():
     ans = interpolate(
         points=(np.array([1, 2, 3, 4, 5, 6]),),
         values=np.array([10, 9, 30, 10, 6, 1]),
-        interp_points=np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1)
+        interp_points=np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1),
     )
 
     assert ans.shape == (6,)
@@ -401,14 +393,12 @@ def test_2d_basic():
     xs = np.array([0, 1])
     ys = np.array([0, 1])
 
-    values = (lambda x, y: x + y)(
-        *np.meshgrid(xs, ys, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
-        interp_points=np.array([[0.5, 0.5]])
+        interp_points=np.array([[0.5, 0.5]]),
     )
 
     assert ans == np.array([1])
@@ -418,14 +408,12 @@ def test_2d_out_of_bounds():
     xs = np.array([0, 1])
     ys = np.array([0, 1])
 
-    values = (lambda x, y: x + y)(
-        *np.meshgrid(xs, ys, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
-        interp_points=np.array([[100, 100]])
+        interp_points=np.array([[100, 100]]),
     )
 
     # Output is extrapolated
@@ -436,15 +424,13 @@ def test_2d_fill_value():
     xs = np.array([0, 1])
     ys = np.array([0, 1])
 
-    values = (lambda x, y: x + y)(
-        *np.meshgrid(xs, ys, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
         interp_points=np.array([[100, 100]]),
-        fill_value=np.nan
+        fill_value=np.nan,
     )
 
     assert np.all(np.isnan(ans))
@@ -452,22 +438,22 @@ def test_2d_fill_value():
 
 def test_2d_square_small():
     def f(x, y):
-        return x ** 2 + 3 * y
+        return x**2 + 3 * y
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
+    points = np.stack(
+        (np.linspace(10, 990, 5), np.linspace(10, 890, 5)),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys), values)
@@ -478,22 +464,22 @@ def test_2d_square_small():
 
 def test_2d_rectangle_small():
     def f(x, y):
-        return x ** 2 + 3 * y
+        return x**2 + 3 * y
 
     xs = np.linspace(0, 2000, 200)
     ys = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
+    points = np.stack(
+        (np.linspace(10, 990, 5), np.linspace(10, 890, 5)),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys), values)
@@ -504,22 +490,22 @@ def test_2d_rectangle_small():
 
 def test_2d_rectangle_small_2():
     def f(x, y):
-        return x ** 2 + 3 * y
+        return x**2 + 3 * y
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 2000, 200)
 
-    values = f(*np.meshgrid(xs, ys, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
+    points = np.stack(
+        (np.linspace(10, 990, 5), np.linspace(10, 890, 5)),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys), values)
@@ -530,23 +516,23 @@ def test_2d_rectangle_small_2():
 
 def test_2d_square_large():
     def f(x, y):
-        return x ** 2 + 3 * y
+        return x**2 + 3 * y
 
     xs = np.linspace(-10_000, 10_000, num=1_000)
     ys = np.linspace(0, 20_000, num=1_000)
 
-    values = f(*np.meshgrid(xs, ys, indexing="ij", sparse=True))
+    values = f(*np.meshgrid(xs, ys, indexing='ij', sparse=True))
     num_points = 2_000_000
-    points = np.stack((
-        np.linspace(10, 990, num_points),
-        np.linspace(10, 890, num_points)
-    ), axis=-1)
+    points = np.stack(
+        (np.linspace(10, 990, num_points), np.linspace(10, 890, num_points)),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys), values)
@@ -560,15 +546,13 @@ def test_3d_basic():
     ys = np.array([0, 1])
     zs = np.array([0, 1])
 
-    values = (lambda x, y, z: x + y + z)(
-        *np.meshgrid(xs, ys, zs, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=np.array([[0.5, 0.5, 0.5]]),
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     assert ans == np.array([1.5])
@@ -579,15 +563,13 @@ def test_3d_out_of_bounds():
     ys = np.array([0, 1])
     zs = np.array([0, 1])
 
-    values = (lambda x, y, z: x + y + z)(
-        *np.meshgrid(xs, ys, zs, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=np.array([[100, 100, 100]]),
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     # Output is extrapolated
@@ -599,16 +581,14 @@ def test_3d_fill_value():
     ys = np.array([0, 1])
     zs = np.array([0, 1])
 
-    values = (lambda x, y, z: x + y + z)(
-        *np.meshgrid(xs, ys, zs, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=np.array([[100, 100, 100]]),
         fill_value=np.nan,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     assert np.all(np.isnan(ans))
@@ -616,24 +596,27 @@ def test_3d_fill_value():
 
 def test_3d_cube_small():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5),
-        np.linspace(10, 780, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
+    points = np.stack(
+        (
+            np.linspace(10, 990, 5),
+            np.linspace(10, 890, 5),
+            np.linspace(10, 780, 5),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys, zs), values)
@@ -644,18 +627,21 @@ def test_3d_cube_small():
 
 def test_3d_cube_small_not_sorted():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
-    points = np.stack((
-        np.random.uniform(10, 990, 10),
-        np.random.uniform(10, 890, 10),
-        np.random.uniform(10, 780, 10)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
+    points = np.stack(
+        (
+            np.random.uniform(10, 990, 10),
+            np.random.uniform(10, 890, 10),
+            np.random.uniform(10, 780, 10),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs),
@@ -671,24 +657,27 @@ def test_3d_cube_small_not_sorted():
 
 def test_3d_prism_small():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 2000, 200)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 50)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5),
-        np.linspace(10, 780, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
+    points = np.stack(
+        (
+            np.linspace(10, 990, 5),
+            np.linspace(10, 890, 5),
+            np.linspace(10, 780, 5),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys, zs), values)
@@ -699,24 +688,27 @@ def test_3d_prism_small():
 
 def test_3d_prism_small_2():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 2000, 100)
     ys = np.linspace(0, 1000, 200)
     zs = np.linspace(0, 1000, 50)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5),
-        np.linspace(10, 780, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
+    points = np.stack(
+        (
+            np.linspace(10, 990, 5),
+            np.linspace(10, 890, 5),
+            np.linspace(10, 780, 5),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys, zs), values)
@@ -727,24 +719,27 @@ def test_3d_prism_small_2():
 
 def test_3d_prism_small_3():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 2000, 50)
     ys = np.linspace(0, 1000, 200)
     zs = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5),
-        np.linspace(10, 780, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
+    points = np.stack(
+        (
+            np.linspace(10, 990, 5),
+            np.linspace(10, 890, 5),
+            np.linspace(10, 780, 5),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys, zs), values)
@@ -755,25 +750,28 @@ def test_3d_prism_small_3():
 
 def test_3d_cube_large():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
     num_points = 2_000_000
-    points = np.stack((
-        np.linspace(10, 990, num_points),
-        np.linspace(10, 890, num_points),
-        np.linspace(10, 780, num_points)
-    ), axis=-1)
+    points = np.stack(
+        (
+            np.linspace(10, 990, num_points),
+            np.linspace(10, 890, num_points),
+            np.linspace(10, 780, num_points),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys, zs), values)
@@ -788,14 +786,12 @@ def test_4d_basic():
     zs = np.array([0, 1])
     ws = np.array([0, 1])
 
-    values = (lambda x, y, z, w: x + y + z + w)(
-        *np.meshgrid(xs, ys, zs, ws, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, zs, ws, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys, zs, ws),
         values=values,
-        interp_points=np.array([[0.5, 0.5, 0.5, 0.5]])
+        interp_points=np.array([[0.5, 0.5, 0.5, 0.5]]),
     )
 
     assert ans == np.array([2])
@@ -807,14 +803,12 @@ def test_4d_out_of_bounds():
     zs = np.array([0, 1])
     ws = np.array([0, 1])
 
-    values = (lambda x, y, z, w: x + y + z + w)(
-        *np.meshgrid(xs, ys, zs, ws, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, zs, ws, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys, zs, ws),
         values=values,
-        interp_points=np.array([[100, 100, 100, 100]])
+        interp_points=np.array([[100, 100, 100, 100]]),
     )
 
     # Output is extrapolated
@@ -827,15 +821,13 @@ def test_4d_fill_value():
     zs = np.array([0, 1])
     ws = np.array([0, 1])
 
-    values = (lambda x, y, z, w: x + y + z + w)(
-        *np.meshgrid(xs, ys, zs, ws, indexing="ij", sparse=True)
-    )
+    values = sum(*np.meshgrid(xs, ys, zs, ws, indexing='ij', sparse=True))
 
     ans = interpolate(
         points=(xs, ys, zs, ws),
         values=values,
         interp_points=np.array([[100, 100, 100, 100]]),
-        fill_value=np.nan
+        fill_value=np.nan,
     )
 
     assert np.all(np.isnan(ans))
@@ -843,26 +835,29 @@ def test_4d_fill_value():
 
 def test_4d_cube_small():
     def f(x, y, z, w):
-        return x ** 2 + 3 * y - z * w
+        return x**2 + 3 * y - z * w
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 100)
     ws = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, ws, indexing="ij", sparse=True))
-    points = np.stack((
-        np.linspace(10, 990, 5),
-        np.linspace(10, 890, 5),
-        np.linspace(10, 780, 5),
-        np.linspace(10, 670, 5)
-    ), axis=-1)
+    values = f(*np.meshgrid(xs, ys, zs, ws, indexing='ij', sparse=True))
+    points = np.stack(
+        (
+            np.linspace(10, 990, 5),
+            np.linspace(10, 890, 5),
+            np.linspace(10, 780, 5),
+            np.linspace(10, 670, 5),
+        ),
+        axis=-1,
+    )
 
     ans = interpolate(
         points=(xs, ys, zs, ws),
         values=values,
         interp_points=points,
-        assume_sorted=True
+        assume_sorted=True,
     )
 
     rgi = RegularGridInterpolator((xs, ys, zs, ws), values)
@@ -873,21 +868,17 @@ def test_4d_cube_small():
 
 def test_interpolate_wrapper():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
     points_x = np.linspace(10, 1090, 5)
     points_y = np.linspace(10, 890, 5)
     points_z = np.linspace(10, 890, 5)
-    points = np.stack((
-        points_x,
-        points_y,
-        points_z
-    ), axis=-1)
+    points = np.stack((points_x, points_y, points_z), axis=-1)
 
     interp = Interpolator((xs, ys, zs), values, fill_value=np.nan)
     ans = interp(points)
@@ -901,24 +892,20 @@ def test_interpolate_wrapper():
 
 def test_interpolate_wrapper2():
     def f(x, y, z):
-        return x ** 2 + 3 * y - z
+        return x**2 + 3 * y - z
 
     xs = np.linspace(0, 1000, 100)
     ys = np.linspace(0, 1000, 100)
     zs = np.linspace(0, 1000, 100)
 
-    values = f(*np.meshgrid(xs, ys, zs, indexing="ij", sparse=True))
+    values = f(*np.meshgrid(xs, ys, zs, indexing='ij', sparse=True))
     nanInds = np.random.randint(0, 99, size=(100, 3))
     values[nanInds[:, 0], nanInds[:, 1], nanInds[:, 2]] = np.nan
 
     points_x = np.linspace(10, 1090, 5)
     points_y = np.linspace(10, 890, 5)
     points_z = np.linspace(10, 890, 5)
-    points = np.stack((
-        points_x,
-        points_y,
-        points_z
-    ), axis=-1)
+    points = np.stack((points_x, points_y, points_z), axis=-1)
 
     interp = Interpolator((xs, ys, zs), values, fill_value=np.nan)
     ans = interp(points)
@@ -937,8 +924,11 @@ def test_interpolateDEM():
     x = np.arange(s)
     dem = np.outer(x, x)
     metadata = {
-        'driver': 'GTiff', 'dtype': 'float32',
-        'width': s, 'height': s, 'count': 1,
+        'driver': 'GTiff',
+        'dtype': 'float32',
+        'width': s,
+        'height': s,
+        'count': 1,
         'transform': Affine.from_gdal(0, 1, 0, 10, 0, -1),
         'crs': rio.crs.CRS.from_epsg(4326),
     }
@@ -948,23 +938,27 @@ def test_interpolateDEM():
         ds.write(dem, 1)
         ds.update_tags(AREA_OR_POINT='Point')
 
-    ## random points to interpolate to
-    lons =  np.array([4.5, 8.5])
+    # random points to interpolate to
+    lons = np.array([4.5, 8.5])
     lats = np.array([2.5, 8.5])
-    out  = interpolateDEM(dem_file, (lats, lons))
-    gold = np.array([[4., 8.], [28., 56.]], dtype=float)
+    out = interpolateDEM(dem_file, (lats, lons))
+    gold = np.array([[4.0, 8.0], [28.0, 56.0]], dtype=float)
     assert np.allclose(out, gold)
     dem_file.unlink()
 
 
 def test_interpolateDEM_2():
     from affine import Affine
+
     s = 10
     x = np.arange(s)
     dem = np.outer(x, x)
     metadata = {
-        'driver': 'GTiff', 'dtype': 'float32',
-        'width': s, 'height': s, 'count': 1,
+        'driver': 'GTiff',
+        'dtype': 'float32',
+        'width': s,
+        'height': s,
+        'count': 1,
         'transform': Affine.from_gdal(0, 1, 0, 10, 0, -1),
         'crs': rio.crs.CRS.from_epsg(4326),
     }
@@ -974,13 +968,14 @@ def test_interpolateDEM_2():
         ds.write(dem, 1)
         ds.update_tags(AREA_OR_POINT='Point')
 
-    ## random points to interpolate to
+    # random points to interpolate to
     lons = np.array([[4.5, 8.5], [4.5, 8.5]])
     lats = np.array([[8.5, 2.5], [8.5, 2.5]]).T
-    out  = interpolateDEM(dem_file, (lats, lons))
-    gold = np.array([[4., 8.], [28., 56.]], dtype=float)
+    out = interpolateDEM(dem_file, (lats, lons))
+    gold = np.array([[4.0, 8.0], [28.0, 56.0]], dtype=float)
     assert np.allclose(out, gold)
     dem_file.unlink()
+
 
 # TODO: implement an interpolator test that is similar to test_scenario_1.
 # Currently the scipy and C++ interpolators differ on that case.

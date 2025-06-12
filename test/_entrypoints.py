@@ -1,5 +1,3 @@
-
-
 def test_raider__main__2(script_runner):
     ret = script_runner.run('generateGACOSVRT.py')
     assert ret.success

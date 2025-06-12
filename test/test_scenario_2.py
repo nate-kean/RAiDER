@@ -1,7 +1,4 @@
-
-
-
-#TODO: include GNSS station test
+# TODO: include GNSS station test
 # @pytest.mark.long
 # def test_scenario_2():
 #     test_path = os.path.join(TEST_DIR, "scenario_2", 'raider_example_2.yaml')

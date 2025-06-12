@@ -6,6 +6,7 @@ corresponding data files.
 If such a file already exists, the script should prompt the user to
 confirm overwriting the file.
 """
+
 import os
 import subprocess
 import tempfile
@@ -24,14 +25,18 @@ def cd_to_temp_dir():
     finally:
         os.chdir(old_pwd)
 
+
 @pytest.mark.parametrize(
     'name,data_files',
     [
         ('template', []),
         ('example_LA_bbox', []),
         ('example_LA_GNSS', ['example_LA_GNSS.csv']),
-        ('example_UK_isce', ['example_UK_isce-S1B_OPER_AUX_POEORB_OPOD_20211122T112354_V20211101T225942_20211103T005942.EOF']),
-    ]
+        (
+            'example_UK_isce',
+            ['example_UK_isce-S1B_OPER_AUX_POEORB_OPOD_20211122T112354_V20211101T225942_20211103T005942.EOF'],
+        ),
+    ],
 )
 def test_generate_config(name, data_files):
     with cd_to_temp_dir():

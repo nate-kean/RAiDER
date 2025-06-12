@@ -6,7 +6,6 @@ import shutil
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from textwrap import dedent
 from typing import Any, Optional, cast
 
 import numpy as np
@@ -137,7 +136,7 @@ def read_run_config_file(path: Path) -> RunConfig:
         ),
         los_group=LOSGroup(
             los=get_los(LOSGroupUnparsed(**yaml_data['los_group'])),
-            **yaml_data['los_group']
+            **yaml_data['los_group'],
         ),
         runtime_group=runtime_group,
     )
@@ -156,7 +155,7 @@ def drop_nans(d: dict[str, Any]) -> dict[str, Any]:
     return d
 
 
-def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
+def calcDelays(iargs: Optional[Sequence[str]] = None) -> list[Path]:
     """Parse command line arguments using argparse."""
     import RAiDER
     import RAiDER.processWM
@@ -164,21 +163,23 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
     from RAiDER.delay import tropo_delay
     from RAiDER.utilFcns import get_nearest_wmtimes, writeDelays
 
-    examples = 'Examples of use:' \
-        '\n\t raider.py run_config_file.yaml' \
-        '\n\t raider.py --generate_config template'
+    # fmt: off
+    examples = (
+        'Examples of use:\n'
+        '\traider.py run_config_file.yaml\n'
+        '\traider.py --generate_config template'
+    )
+    # fmt: on
 
     p = argparse.ArgumentParser(
-        description=HELP_MESSAGE,
-        epilog=examples,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description=HELP_MESSAGE, epilog=examples, formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     p.add_argument(
         '--download_only',
         action='store_true',
         default=False,
-        help='only download a weather model.'
+        help='only download a weather model.',
     )
 
     # Generate an example configuration file, OR
@@ -202,7 +203,7 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
         'run_config_file',
         nargs='?',
         type=lambda s: Path(s).absolute(),
-        help='a YAML file with arguments to RAiDER'
+        help='a YAML file with arguments to RAiDER',
     )
 
     # if not None, will replace first argument (run_config_file)
@@ -309,7 +310,7 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
                     model,
                     tt,
                     aoi.bounds(),
-                    makePlots=run_config.runtime_group.verbose
+                    makePlots=run_config.runtime_group.verbose,
                 )
                 wfiles.append(Path(wfile))
 
@@ -322,7 +323,7 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
             # log when something else happens and then continue with the next time
             except Exception as e:
                 S, N, W, E = wm_bounds
-                logger.info('Weather model point bounds are ' f'{S:.2f}/{N:.2f}/{W:.2f}/{E:.2f}')
+                logger.info(f'Weather model point bounds are {S:.2f}/{N:.2f}/{W:.2f}/{E:.2f}')
                 logger.info(f'Query datetime: {tt}')
                 logger.error(e)
                 logger.error(f'Weather model files are: {wfiles}')
@@ -336,7 +337,7 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
         if len(wfiles) == 0:
             logger.error('No weather model data was successfully processed.')
             raise NoWeatherModelData('Weather model processing failed for all times')
-        
+
         # Get the weather model file
         weather_model_file = getWeatherFile(wfiles, times, t, model._Name, interp_method)
         if weather_model_file is None:
@@ -395,7 +396,14 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
                 out_path = out_path.with_suffix('.csv')
 
             if aoi.type() in ('station_file', 'radar_rasters', 'geocoded_file'):
-                writeDelays(aoi, wet_delay, hydro_delay, out_path, hydro_path, outformat=run_config.runtime_group.raster_format)
+                writeDelays(
+                    aoi,
+                    wet_delay,
+                    hydro_delay,
+                    out_path,
+                    hydro_path,
+                    outformat=run_config.runtime_group.raster_format,
+                )
 
         wet_paths.append(out_path)
 
@@ -410,39 +418,41 @@ def downloadGNSS() -> None:
     p = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=""" \
-    Check for and download tropospheric zenith delays for a set of GNSS stations from UNR
+    Check for and download tropospheric zenith delays for a set of GNSS stations from UNR.
 
     Example call to virtually access and append zenith delay information to a CSV table in specified output
-    directory, across specified range of time (in YYMMDD YYMMDD) and all available times of day, and confined to specified
-    geographic bounding box :
+    directory, across specified range of time (in YYMMDD YYMMDD) and all available times of day, and confined to
+    specified geographic bounding box:
     downloadGNSSdelay.py --out products -y 20100101 20141231 -b '39 40 -79 -78'
 
     Example call to virtually access and append zenith delay information to a CSV table in specified output
-    directory, across specified range of time (in YYMMDD YYMMDD) and specified time of day, and distributed globally :
+    directory, across specified range of time (in YYMMDD YYMMDD) and specified time of day, and distributed globally:
     downloadGNSSdelay.py --out products -y 20100101 20141231 --returntime '00:00:00'
 
 
-    Example call to virtually access and append zenith delay information to a CSV table in specified output
-    directory, across specified range of time in 12 day steps (in YYMMDD YYMMDD days) and specified time of day, and distributed globally :
+    Example call to virtually access and append zenith delay information to a CSV table in specified output directory,
+    across specified range of time in 12 day steps (in YYMMDD YYMMDD days) and specified time of day, and distributed
+    globally:
     downloadGNSSdelay.py --out products -y 20100101 20141231 12 --returntime '00:00:00'
 
     Example call to virtually access and append zenith delay information to a CSV table in specified output
-    directory, across specified range of time (in YYMMDD YYMMDD) and specified time of day, and distributed globally but restricted
-    to list of stations specified in input textfile :
+    directory, across specified range of time (in YYMMDD YYMMDD) and specified time of day, and distributed globally but
+    restricted to list of stations specified in input textfile:
     downloadGNSSdelay.py --out products -y 20100101 20141231 --returntime '00:00:00' -f station_list.txt
 
     NOTE, following example call to physically download zenith delay information not recommended as it is not
     necessary for most applications.
     Example call to physically download and append zenith delay information to a CSV table in specified output
     directory, across specified range of time (in YYMMDD YYMMDD) and specified time of day, and confined to specified
-    geographic bounding box :
+    geographic bounding box:
     downloadGNSSdelay.py --download --out products -y 20100101 20141231 --returntime '00:00:00' -b '39 40 -79 -78'
     """,
     )
 
     # Stations to check/download
     area = p.add_argument_group(
-        'Stations to check/download. Can be a lat/lon bounding box or file, or will run the whole world if not specified'
+        'Stations to check/download. '
+        'Can be a lat/lon bounding box or file, or will run the whole world if not specified'
     )
     area.add_argument(
         '--station_file',
@@ -473,15 +483,16 @@ def downloadGNSS() -> None:
     misc.add_argument(
         '--date',
         dest='dateList',
-        help=dedent("""\
-            Date to calculate delay.
-            Can be a single date, a list of two dates (earlier, later) with 1-day interval, or a list of two dates and interval in days (earlier, later, interval).
-            Example accepted formats:
-               YYYYMMDD or
-               YYYYMMDD YYYYMMDD
-               YYYYMMDD YYYYMMDD N
-        """),
-        nargs="+",
+        help=(
+            'Date to calculate delay.\n'
+            'Can be a single date, a list of two dates (earlier, later) with 1-day interval, '
+            'or a list of two dates and interval in days (earlier, later, interval).\n'
+            'Example accepted formats:\n'
+            '\tYYYYMMDD or\n'
+            '\tYYYYMMDD YYYYMMDD\n'
+            '\tYYYYMMDD YYYYMMDD N\n'
+        ),
+        nargs='+',
         action=DateListAction,
         type=date_type,
         required=True,
@@ -490,13 +501,19 @@ def downloadGNSS() -> None:
     misc.add_argument(
         '--returntime',
         dest='returnTime',
-        help="Return delays closest to this specified time. If not specified, the GPS delays for all times will be returned. Input in 'HH:MM:SS', e.g. '16:00:00'",
+        help=(
+            'Return delays closest to this specified time. '
+            "If not specified, the GPS delays for all times will be returned. Input in 'HH:MM:SS', e.g. '16:00:00'"
+        ),
         default=None,
     )
 
     misc.add_argument(
         '--download',
-        help='Physically download data. Note this option is not necessary to proceed with statistical analyses, as data can be handled virtually in the program.',
+        help=(
+            'Physically download data. Note this option is not necessary to proceed with statistical analyses, '
+            'as data can be handled virtually in the program.'
+        ),
         action='store_true',
         dest='download',
         default=False,
@@ -548,7 +565,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         '--weather-model',
         default='HRRR',
         choices=['None'] + ALLOWED_MODELS,
-        help='Weather model.'
+        help='Weather model.',
     )
 
     p.add_argument(
@@ -562,7 +579,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         '-key',
         '--api_key',
         default=None,
-        help='Weather model API KEY [key, password], depending on model.'
+        help='Weather model API KEY [key, password], depending on model.',
     )
 
     p.add_argument(
@@ -572,7 +589,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         choices=TIME_INTERPOLATION_METHODS,
         help=(
             'How to interpolate across model time steps. Possible options are: '
-            f"{TIME_INTERPOLATION_METHODS} "
+            f'{TIME_INTERPOLATION_METHODS} '
             'None: means nearest model time; center_time: linearly across center time; '
             'Azimuth_time_grid: means every pixel is weighted with respect to azimuth time of S1'
         ),
@@ -583,7 +600,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         '--output-directory',
         default=Path.cwd(),
         type=lambda s: Path(s).absolute(),
-        help='Directory to store results.'
+        help='Directory to store results.',
     )
 
     args: CalcDelaysArgsUnparsed = p.parse_args(iargs, namespace=CalcDelaysArgsUnparsed())
@@ -599,14 +616,13 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         print('Nothing to do!')
         return
 
-    if (
-        args.file is not None and
-        args.weather_model == 'HRRR' and
-        args.interpolate_time == 'azimuth_time_grid'
-    ):
+    if args.file is not None and args.weather_model == 'HRRR' and args.interpolate_time == 'azimuth_time_grid':
         gunw_id = args.file.name.replace('.nc', '')
         weather_model_name = identify_which_hrrr(args.file)
-        if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id, weather_model_name):
+        if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(
+            gunw_id,
+            weather_model_name,
+        ):
             raise NoWeatherModelData('The required HRRR data for time-grid interpolation is not available')
 
     if args.file is None:
@@ -617,17 +633,16 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         args.file = aws.get_s3_file(
             args.bucket,
             cast(str, args.input_bucket_prefix),  # guaranteed not None at this point
-            '.nc'
+            '.nc',
         )
         if args.file is None:
-            raise ValueError(
-                'GUNW product file could not be found at' f's3://{args.bucket}/{args.input_bucket_prefix}'
-            )
+            raise ValueError(f'GUNW product file could not be found ats3://{args.bucket}/{args.input_bucket_prefix}')
         if args.weather_model == 'HRRR' and args.interpolate_time == 'azimuth_time_grid':
             gunw_id = args.file.name.replace('.nc', '')
             if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id):
                 print(
-                    'The required HRRR data for time-grid interpolation is not available; returning None and not modifying GUNW dataset'
+                    'The required HRRR data for time-grid interpolation is not available; '
+                    'returning None and not modifying GUNW dataset'
                 )
                 return
 
@@ -638,15 +653,9 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
             #       we include this within this portion of the control flow.
             print('Nothing to do because outside of weather model range')
             return
-        json_file_path = aws.get_s3_file(
-            args.bucket,
-            cast(str, args.input_bucket_prefix),
-            '.json'
-        )
+        json_file_path = aws.get_s3_file(args.bucket, cast(str, args.input_bucket_prefix), '.json')
         if json_file_path is None:
-            raise ValueError(
-                'GUNW metadata file could not be found at' f's3://{args.bucket}/{args.input_bucket_prefix}'
-            )
+            raise ValueError(f'GUNW metadata file could not be found ats3://{args.bucket}/{args.input_bucket_prefix}')
         with json_file_path.open() as f:
             json_data = json.load(f)
         json_data['metadata'].setdefault('weather_model', []).append(args.weather_model)
@@ -656,9 +665,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
         # also get browse image -- if RAiDER is running in its own HyP3 job, the browse image will be needed for ingest
         browse_file_path = aws.get_s3_file(args.bucket, args.input_bucket_prefix, '.png')
         if browse_file_path is None:
-            raise ValueError(
-                'GUNW browse image could not be found at' f's3://{args.bucket}/{args.input_bucket_prefix}'
-            )
+            raise ValueError(f'GUNW browse image could not be found ats3://{args.bucket}/{args.input_bucket_prefix}')
 
     args = cast(CalcDelaysArgs, args)
 
@@ -694,13 +701,13 @@ def combineZTDFiles() -> None:
     p = create_parser()
     args: RAiDERCombineArgs = p.parse_args(namespace=RAiDERCombineArgs())
     if args.verbose:
-        print(f"RAiDER file: {args.raider_file}")
-        print(f"GNSS folder: {args.gnss_folder}")
-        print(f"GNSS file: {args.gnss_file}")
-        print(f"Column name: {args.column_name}")
-        print(f"Raider column name: {args.raider_column_name}")
-        print(f"Output name: {args.out_name}")
-        print(f"Local time: {args.local_time}")
+        print(f'RAiDER file: {args.raider_file}')
+        print(f'GNSS folder: {args.gnss_folder}')
+        print(f'GNSS file: {args.gnss_file}')
+        print(f'Column name: {args.column_name}')
+        print(f'Raider column name: {args.raider_column_name}')
+        print(f'Output name: {args.out_name}')
+        print(f'Local time: {args.local_time}')
 
     if not args.raider_file.exists():
         combineDelayFiles(args.raider_file, loc=args.raider_folder)
@@ -728,7 +735,7 @@ def getWeatherFile(
     times: list,
     time: dt.datetime,
     model: str,
-    interp_method: TimeInterpolationMethod='none'
+    interp_method: TimeInterpolationMethod = 'none',
 ) -> Optional[Path]:
     """Time interpolation.
 
@@ -767,7 +774,7 @@ def getWeatherFile(
             weather_model_file = wfiles[0]
         elif Nfiles == 1:  # Case 5: one file does not download for some reason
             logger.warning(
-                'getWeatherFile: One datetime is not available to download, defaulting to nearest available date'
+                'getWeatherFile: One datetime is not available to download; defaulting to nearest available date'
             )
             weather_model_file = wfiles[0]
         else:
@@ -789,7 +796,12 @@ def getWeatherFile(
     return weather_model_file
 
 
-def combine_weather_files(wfiles: list[Path], time: dt.datetime, model: str, interp_method: TimeInterpolationMethod='center_time') -> Path:
+def combine_weather_files(
+    wfiles: list[Path],
+    time: dt.datetime,
+    model: str,
+    interp_method: TimeInterpolationMethod = 'center_time',
+) -> Path:
     """Interpolate downloaded weather files and save to a single file."""
     STYLE = {'center_time': '_timeInterp_', 'azimuth_time_grid': '_timeInterpAziGrid_'}
 

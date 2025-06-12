@@ -42,13 +42,14 @@ Perform basic statistical analyses concerning the spatiotemporal distribution of
 
 Specifically, make any of the following specified plot(s):
 scatterplot of station locations, total empirical and experimental variogram fits for data in each grid cell
-(and for each valid time-slice if -variogram_per_timeslice specified), and gridded heatmaps of data, station distribution,
-range and sill values associated with experimental variogram fits. The default is to generate all of these.
+(and for each valid time-slice if -variogram_per_timeslice specified), and gridded heatmaps of data, station
+distribution, range and sill values associated with experimental variogram fits.
+The default is to generate all of these.
 
-Example call to plot gridded station mean delay in a specific time interval :
+Example call to plot gridded station mean delay in a specific time interval:
 raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01'
 
-Example call to plot gridded station mean delay in a specific time interval with superimposed gridlines and station scatterplots :
+Example call to plot gridded station mean delay in a specific time interval with superimposed gridlines and station scatterplots:
 raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --drawgridlines --stationsongrids
 
 Example call to plot gridded station variogram in a specific time interval and through explicitly the summer seasons:
@@ -64,7 +65,10 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='fname',
         type=str,
         required=True,
-        help='Final output file generated from downloadGNSSDelays.py which contains GPS zenith delays for a specified time period and spatial footprint. ',
+        help=(
+            'Final output file generated from downloadGNSSDelays.py which contains GPS zenith delays for a specified '
+            'time period and spatial footprint.'
+        ),
     )
     userinps.add_argument(
         '-c',
@@ -80,7 +84,11 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='unit',
         type=str,
         default='m',
-        help='Specified output unit (as distance or time), by default m. Input unit assumed to be m following convention in downloadGNSSDelays.py. Refer to "convert_SI" for supported units. Note if you specify time unit here, you must specify input for "--obs_errlimit" to be in units of m',
+        help=(
+            'Specified output unit (as distance or time), by default m. Input unit assumed to be m following '
+            'convention in downloadGNSSDelays.py. Refer to "convert_SI" for supported units. Note if you specify time '
+            'unit here, you must specify input for "--obs_errlimit" to be in units of m'
+        ),
     )
     userinps.add_argument(
         '-w',
@@ -91,11 +99,7 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
     )
     add_cpus(userinps)
     userinps.add_argument(
-        '-verbose',
-        '--verbose',
-        action='store_true',
-        dest='verbose',
-        help='Run in verbose (debug) mode. Default False'
+        '-verbose', '--verbose', action='store_true', dest='verbose', help='Run in verbose (debug) mode. Default False'
     )
 
     # Spatiotemporal subset options
@@ -106,7 +110,7 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='bounding_box',
         type=str,
         default=None,
-        help="Provide either valid shapefile or Lat/Lon Bounding SNWE. -- Example : '19 20 -99.5 -98.5'",
+        help="Provide either valid shapefile or Lat/Lon Bounding SNWE. -- Example: '19 20 -99.5 -98.5'",
     )
     dtsubsets.add_argument(
         '-sp',
@@ -122,7 +126,10 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='timeinterval',
         type=str,
         default=None,
-        help="Subset in time by specifying earliest YYYY-MM-DD date followed by latest date YYYY-MM-DD. -- Example : '2016-01-01 2019-01-01'.",
+        help=(
+            'Subset in time by specifying earliest YYYY-MM-DD date followed by latest date YYYY-MM-DD. -- Example: '
+            "'2016-01-01 2019-01-01'."
+        ),
     )
     dtsubsets.add_argument(
         '-si',
@@ -130,7 +137,10 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='seasonalinterval',
         type=str,
         default=None,
-        help="Subset in by an specific interval for each year by specifying earliest MM-DD time followed by latest MM-DD time. -- Example : '03-21 06-21'.",
+        help=(
+            'Subset in by an specific interval for each year by specifying earliest MM-DD time followed by latest '
+            "MM-DD time. -- Example: '03-21 06-21'."
+        ),
     )
     dtsubsets.add_argument(
         '-oe',
@@ -149,7 +159,7 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='figdpi',
         type=int,
         default=100,
-        help='DPI to use for saving figures'
+        help='DPI to use for saving figures',
     )
     pltformat.add_argument(
         '-title',
@@ -157,7 +167,7 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='user_title',
         type=str,
         default=None,
-        help='Specify custom title for plots.'
+        help='Specify custom title for plots.',
     )
     pltformat.add_argument(
         '-fmt',
@@ -165,7 +175,7 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='plot_fmt',
         type=str,
         default='png',
-        help='Plot format to use for saving figures'
+        help='Plot format to use for saving figures',
     )
     pltformat.add_argument(
         '-cb',
@@ -185,7 +195,12 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         help='Set low and upper percentile for plot colorbars. By default 25%% and 95%%, respectively.',
     )
     pltformat.add_argument(
-        '-cm', '--colormap', dest='usr_colormap', type=str, default='hot_r', help='Specify matplotlib colorbar.'
+        '-cm',
+        '--colormap',
+        dest='usr_colormap',
+        type=str,
+        default='hot_r',
+        help='Specify matplotlib colorbar.',
     )
     pltformat.add_argument(
         '-dt',
@@ -193,7 +208,10 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         dest='densitythreshold',
         type=int,
         default='10',
-        help='For variogram plots, given grid-cell is only valid if it contains this specified threshold of stations. By default 10 stations.',
+        help=(
+            'For variogram plots, given grid-cell is only valid if it contains this specified threshold of stations. '
+            'By default 10 stations.'
+        ),
     )
     pltformat.add_argument(
         '-sg',
@@ -203,7 +221,11 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         help='In gridded plots, superimpose your gridded array with a scatterplot of station locations.',
     )
     pltformat.add_argument(
-        '-dg', '--drawgridlines', dest='drawgridlines', action='store_true', help='Draw gridlines on gridded plots.'
+        '-dg',
+        '--drawgridlines',
+        dest='drawgridlines',
+        action='store_true',
+        help='Draw gridlines on gridded plots.',
     )
     pltformat.add_argument(
         '-tl',
@@ -226,7 +248,10 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         type=float,
         default=[2, 0.6],
         nargs=2,
-        help='Minimum TS span (years) and minimum fractional observations in span (fraction) imposed for seasonal amplitude/phase analyses to be performed for a given station.',
+        help=(
+            'Minimum TS span (years) and minimum fractional observations in span (fraction) imposed for seasonal '
+            'amplitude/phase analyses to be performed for a given station.'
+        ),
     )
     pltformat.add_argument(
         '-period_limit',
@@ -370,7 +395,10 @@ raiderStats.py -f <filename> -grid_delay_mean -ti '2016-01-01 2018-01-01' --seas
         '--binnedvariogram',
         action='store_true',
         dest='binnedvariogram',
-        help='Apply experimental variogram fit to total binned empirical variograms for each time slice. Default is to pass total unbinned empiricial variogram.',
+        help=(
+            'Apply experimental variogram fit to total binned empirical variograms for each time slice. '
+            'Default is to pass total unbinned empiricial variogram.'
+        ),
     )
     pltvario.add_argument(
         '-variogram_per_timeslice',
@@ -406,7 +434,7 @@ def convert_SI(val, unit_in, unit_out):
         # e.g. sigZTD filter, already extracted datetime object
         try:
             datetime = val.apply(pd.to_datetime).dt
-            return getattr(datetime, unit_out).astype(float).astype("Int32")
+            return getattr(datetime, unit_out).astype(float).astype('Int32')
         except AttributeError:
             return val
 
@@ -658,7 +686,7 @@ class VariogramAnalysis:
 
         return np.array(hExp), np.array(expVario)
 
-    def _fit_vario(self, dists, vario, model=None, x0=None, Nparm=None, ub=None):
+    def _fit_vario(self, dists, vario, model=None, x0=None, Nparam=None, ub=None):
         """Fit a variogram model to data."""
         from scipy.optimize import least_squares
 
@@ -670,12 +698,12 @@ class VariogramAnalysis:
                 warnings.filterwarnings('ignore', message='All-NaN slice encountered')
                 ub = np.array([np.nanmax(dists) * 0.8, np.nanmax(vario) * 0.8, np.nanmax(vario) * 0.8])
 
-        if x0 is None and Nparm is None:
+        if x0 is None and Nparam is None:
             raise RuntimeError('Must specify either x0 or the number of model parameters')
         if x0 is not None:
             lb = np.zeros(len(x0))
-        if Nparm is not None:
-            lb = np.zeros(Nparm)
+        if Nparam is not None:
+            lb = np.zeros(Nparam)
             x0 = (ub - lb) / 2
         bounds = (lb, ub)
 
@@ -701,10 +729,10 @@ class VariogramAnalysis:
         return res_robust, d_test, v_test
 
     # this would be exponential plus nugget
-    def __exponential__(self, parms, h, nugget=False):
+    def __exponential__(self, params, h, nugget=False):
         """Return variogram model given a set of arguments and keyword arguments."""
         # a = range, b = sill, c = nugget model
-        a, b, c = parms
+        a, b, c = params
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='overflow encountered in true_divide')
             if nugget:
@@ -713,9 +741,9 @@ class VariogramAnalysis:
                 return b * (1 - np.exp(-h / a))
 
     # this would be gaussian plus nugget
-    def __gaussian__(self, parms, h):
+    def __gaussian__(self, params, h):
         """Returns a Gaussian variogram model."""
-        a, b, c = parms
+        a, b, c = params
         return b * (1 - np.exp(-np.square(h) / (a**2))) + c
 
     def _append_variogram(self, grid_ind, grid_subset):
@@ -748,7 +776,7 @@ class VariogramAnalysis:
                 dists_binned, vario_binned = self._binned_vario(dists, vario)
                 # fit experimental variogram for each time AND grid, model default is exponential
                 res_robust, d_test, v_test = self._fit_vario(
-                    dists_binned, vario_binned, model=self.__exponential__, x0=None, Nparm=3
+                    dists_binned, vario_binned, model=self.__exponential__, x0=None, Nparam=3
                 )
                 # Plot empirical + experimental variogram for this gridnode and timeslice
                 if not os.path.exists(os.path.join(self.workdir, f'variograms/grid{grid_ind}')):
@@ -800,7 +828,7 @@ class VariogramAnalysis:
                 # dists_binned_arr = dists_arr ; vario_binned_arr = vario_arr
                 dists_binned_arr, vario_binned_arr = self._binned_vario(dists_arr, vario_arr)
             TOT_res_robust, TOT_d_test, TOT_v_test = self._fit_vario(
-                dists_binned_arr, vario_binned_arr, model=self.__exponential__, x0=None, Nparm=3
+                dists_binned_arr, vario_binned_arr, model=self.__exponential__, x0=None, Nparam=3
             )
             tot_timetag = self.good_slices[0][1] + '–' + self.good_slices[-1][1]
             # Append TOT arrays

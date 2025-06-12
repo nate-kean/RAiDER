@@ -47,7 +47,7 @@ def test_old_api_url_warning(caplog: pytest.LogCaptureFixture, monkeypatch: pyte
         mp.setenv('CDSAPI_KEY', random_string())
         wm = ERA5()
         wm.set_latlon_bounds(np.array([10, 10.2, -72, -72]))
-        with caplog.at_level(logging.WARNING), pytest.raises(HTTPError, match="404"):
+        with caplog.at_level(logging.WARNING), pytest.raises(HTTPError, match='404'):
             wm.fetch(
                 TEST_DIR / 'test_geom/test_era5.nc',
                 dt.datetime(2020, 1, 1, 0, 0, 0).replace(tzinfo=dt.timezone(offset=dt.timedelta())),

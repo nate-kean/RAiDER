@@ -21,7 +21,7 @@ import requests
 from RAiDER.logger import logger
 
 
-def get_delays_UNR(stationFile: Path, filename: str, dateList: List, returnTime: str=None) -> None:
+def get_delays_UNR(stationFile: Path, filename: str, dateList: List, returnTime: str = None) -> None:
     """
     Parses and returns a dictionary containing either (1) all
     the GPS delays, if returnTime is None, or (2) only the delay
@@ -126,10 +126,7 @@ def get_delays_UNR(stationFile: Path, filename: str, dateList: List, returnTime:
         del f
         # Break iteration if file contains no data.
         if d == []:
-            logger.warning(
-                'file %s for station %s is empty, will continue reading next tarfile(s)',
-                j, j.split('.')[0]
-            )
+            logger.warning('file %s for station %s is empty, will continue reading next tarfile(s)', j, j.split('.')[0])
             continue
 
         # check for missing times
@@ -221,7 +218,7 @@ def get_station_data(inFile, dateList, gps_repo=None, numCPUs=8, outDir=None, re
         if gps_repo == 'UNR':
             for sf in stationFiles:
                 StationID = os.path.basename(sf).split('.')[0]
-                name = Path(pathbase) / f"{StationID}_ztd.csv"
+                name = Path(pathbase) / f'{StationID}_ztd.csv'
                 args.append((sf, name, dateList, returnTime))
                 outputfiles.append(name)
             # Parallelize remote querying of zenith delays

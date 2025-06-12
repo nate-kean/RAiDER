@@ -111,9 +111,9 @@ def download_hrrr_file(ll_bounds, DATE, out, model='hrrr', product='nat', fxx=0,
         ds_out[var].attrs['grid_mapping'] = 'proj'
 
     # pull the grid information
-    if model=='hrrr':
+    if model == 'hrrr':
         proj = CRS.from_cf(ds_out['proj'].attrs)
-    elif model=='hrrrak':
+    elif model == 'hrrrak':
         proj = HRRR_AK_PROJ
     else:
         raise ValueError('Model not recognized. Please use either hrrr or hrrrak')
@@ -295,7 +295,6 @@ class HRRR(WeatherModel):
             dt.datetime.now(dt.timezone.utc),
         )
         self.setLevelType('nat')
-        
 
     def load_weather(self, f=None, *args, **kwargs) -> None:
         """
@@ -427,4 +426,3 @@ class HRRRAK(WeatherModel):
         self._lats = _lats
         self._lons = _lons
         self._proj = proj
-

@@ -21,14 +21,15 @@ class RegularGridInterpolator:
     Provides a wrapper around RAiDER.interpolate.interpolate with a similar
     interface to scipy.interpolate.RegularGridInterpolator.
     """
+
     def __init__(
-            self,
-            grid: np.ndarray,
-            values: np.ndarray,
-            fill_value: Union[None,float,int]=None,
-            assume_sorted: bool=False,
-            max_threads: int=8,
-        ) -> None:
+        self,
+        grid: np.ndarray,
+        values: np.ndarray,
+        fill_value: Union[None, float, int] = None,
+        assume_sorted: bool = False,
+        max_threads: int = 8,
+    ) -> None:
         """
         Args:
             grid (np.ndarray): _description
@@ -147,7 +148,7 @@ def interpolateDEM(dem_path: Union[Path, str], outLL: Tuple[np.ndarray, np.ndarr
         assert isinstance(data, Dataset), 'DEM could not be opened as a rioxarray dataset'
         da_dem = data['band_1']
         z_out: np.ndarray = da_dem.interp(y=np.sort(lats)[::-1], x=lons).data
-    
+
     return z_out
 
 
@@ -174,9 +175,7 @@ def interpolate_elevation(dem_path: Union[Path, str], x: np.ndarray, y: np.ndarr
 
         # Extract elevation values
         row, col = np.round(row).astype(int), np.round(col).astype(int)
-        valid_indices = (
-            (row >= 0) & (row < src.height) & (col >= 0) & (col < src.width)
-        )
+        valid_indices = (row >= 0) & (row < src.height) & (col >= 0) & (col < src.width)
         elevations = src.read(1)[row[valid_indices], col[valid_indices]]
         output = np.full(x.shape, np.nan)
         output[valid_indices.reshape(x.shape)] = elevations
@@ -184,7 +183,7 @@ def interpolate_elevation(dem_path: Union[Path, str], x: np.ndarray, y: np.ndarr
     return output
 
 
-@contextmanager  
+@contextmanager
 def reproject_raster(in_path, crs):
     # reproject raster to project crs
     import rasterio
@@ -196,11 +195,14 @@ def reproject_raster(in_path, crs):
         transform, width, height = calculate_default_transform(src_crs, crs, src.width, src.height, *src.bounds)
         kwargs = src.meta.copy()
 
-        kwargs.update({
-            'crs': crs,
-            'transform': transform,
-            'width': width,
-            'height': height})
+        kwargs.update(
+            {
+                'crs': crs,
+                'transform': transform,
+                'width': width,
+                'height': height,
+            }
+        )
 
         with MemoryFile() as memfile:
             with memfile.open(**kwargs) as dst:
@@ -212,6 +214,7 @@ def reproject_raster(in_path, crs):
                         src_crs=src.crs,
                         dst_transform=transform,
                         dst_crs=crs,
-                        resampling=Resampling.nearest)
+                        resampling=Resampling.nearest,
+                    )
             with memfile.open() as dataset:  # Reopen as DatasetReader
                 yield dataset  # Note yield not return as we're a contextmanager

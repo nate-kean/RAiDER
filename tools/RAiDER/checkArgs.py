@@ -29,8 +29,7 @@ def checkArgs(run_config: RunConfig) -> RunConfig:
     ############################################################################
     # Date and Time parsing
     run_config.date_group.date_list = [
-        dt.datetime.combine(d, run_config.time_group.time)
-        for d in run_config.date_group.date_list
+        dt.datetime.combine(d, run_config.time_group.time) for d in run_config.date_group.date_list
     ]
     if len(run_config.date_group.date_list) > 1 and run_config.los_group.orbit_file is not None:
         logger.warning(
@@ -49,15 +48,14 @@ def checkArgs(run_config: RunConfig) -> RunConfig:
             # Handle the GNSS station file
             if isinstance(run_config.aoi_group.aoi, StationFile):
                 wetFilename = str(
-                    run_config.runtime_group.output_directory /
-                    f'{run_config.weather_model._dataset.upper()}_Delay_{d.strftime("%Y%m%dT%H%M%S")}_ztd.csv'
+                    run_config.runtime_group.output_directory
+                    / f'{run_config.weather_model._dataset.upper()}_Delay_{d.strftime("%Y%m%dT%H%M%S")}_ztd.csv'
                 )
 
                 hydroFilename = ''  # only the 'wetFilename' is used for the station_file
 
                 # copy the input station file to the output location for editing
-                indf = pd.read_csv(run_config.aoi_group.aoi._filename) \
-                    .drop_duplicates(subset=['Lat', 'Lon'])
+                indf = pd.read_csv(run_config.aoi_group.aoi._filename).drop_duplicates(subset=['Lat', 'Lon'])
                 indf.to_csv(wetFilename, index=False)
 
             else:
@@ -110,7 +108,13 @@ def get_raster_ext(fmt):
         raise ValueError(f'{fmt} is not a valid gdal/rasterio file format for rasters')
 
 
-def makeDelayFileNames(date: Optional[dt.date], los: Optional[LOS], outformat: str, weather_model_name: str, out: Path) -> tuple[str, str]:
+def makeDelayFileNames(
+    date: Optional[dt.date],
+    los: Optional[LOS],
+    outformat: str,
+    weather_model_name: str,
+    out: Path,
+) -> tuple[str, str]:
     """
     Return names for the wet and hydrostatic delays.
 

@@ -13,7 +13,7 @@ from RAiDER.losreader import Zenith
 from test import TEST_DIR, pushd
 
 
-SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_2")
+SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_2')
 _RTOL = 1e-2
 
 
@@ -32,14 +32,13 @@ def test_computeDelay(tmp_path):
 
     station_file = os.path.join(SCENARIO_DIR, 'stations.csv')
     copyfile(station_file, wetFile)
-    stats = pd.read_csv(station_file).drop_duplicates(subset=["Lat", "Lon"])
+    stats = pd.read_csv(station_file).drop_duplicates(subset=['Lat', 'Lon'])
     lats = stats['Lat'].values
     lons = stats['Lon'].values
 
     _, model_obj = get_wm_by_name('ERA5')
 
     with pushd(tmp_path):
-
         # packing the dictionairy
         args = {}
         args['los'] = Zenith
@@ -48,11 +47,11 @@ def test_computeDelay(tmp_path):
         args['ll_bounds'] = (33.746, 36.795, -118.312, -114.892)
         args['heights'] = ('merge', [wetFile])
         args['pnts_file'] = 'ERA5_true_GNSS_query_points.h5'
-        args['flag'] = "station_file"
-        args['weather_model'] = {"type": model_obj(), "files": None, "name": "ERA5"}
+        args['flag'] = 'station_file'
+        args['weather_model'] = {'type': model_obj(), 'files': None, 'name': 'ERA5'}
         args['wmLoc'] = None
-        args['zref'] = 20000.
-        args['outformat'] = "csv"
+        args['zref'] = 20000.0
+        args['outformat'] = 'csv'
         args['times'] = datetime(2020, 1, 3, 23, 0, 0)
         args['out'] = tmp_path
         args['download_only'] = False
@@ -63,9 +62,19 @@ def test_computeDelay(tmp_path):
         (_, _) = main(args)
 
     # get the results
-    est_delay = pd.read_csv(wetFile).drop_duplicates(subset=["Lat", "Lon"])
-    true_delay = pd.read_csv(true_delay).drop_duplicates(subset=["Lat", "Lon"])
+    est_delay = pd.read_csv(wetFile).drop_duplicates(subset=['Lat', 'Lon'])
+    true_delay = pd.read_csv(true_delay).drop_duplicates(subset=['Lat', 'Lon'])
 
     # get the true delay from the weather model
-    assert np.nanmax(np.abs((est_delay['wetDelay'].values - true_delay['wetDelay'].values) / true_delay['wetDelay'].values)) < _RTOL
-    assert np.nanmax(np.abs((est_delay['hydroDelay'].values - true_delay['hydroDelay'].values) / true_delay['hydroDelay'].values)) < _RTOL
+    assert (
+        np.nanmax(
+            np.abs((est_delay['wetDelay'].values - true_delay['wetDelay'].values) / true_delay['wetDelay'].values)
+        )
+        < _RTOL
+    )
+    assert (
+        np.nanmax(
+            np.abs((est_delay['hydroDelay'].values - true_delay['hydroDelay'].values) / true_delay['hydroDelay'].values)
+        )
+        < _RTOL
+    )

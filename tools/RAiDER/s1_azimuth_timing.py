@@ -21,7 +21,7 @@ def _asf_query(
     point: Point,
     start: dt.datetime,
     end: dt.datetime,
-    buffer_degrees: float = 2
+    buffer_degrees: float = 2,
 ) -> list[str]:
     """
     Using a buffer to get as many SLCs covering a given request as.
@@ -53,7 +53,7 @@ def get_slc_id_from_point_and_time(
     lat: float,
     datetime: dt.datetime,
     buffer_seconds: int = 600,
-    buffer_deg: float = 2
+    buffer_deg: float = 2,
 ) -> list:
     """
     Obtains a (non-unique) SLC id from the lon/lat and datetime of inputs. The buffere ensures that
@@ -90,7 +90,7 @@ def get_azimuth_time_grid(
     lon_mesh: np.ndarray,
     lat_mesh: np.ndarray,
     hgt_mesh: np.ndarray,
-    orb: 'isce.core.Orbit'
+    orb: 'isce.core.Orbit',
 ) -> np.ndarray:
     """
     Source: https://github.com/dbekaert/RAiDER/blob/dev/tools/RAiDER/losreader.py#L601C1-L674C22
@@ -152,7 +152,7 @@ def get_s1_azimuth_time_grid(
     lon: np.ndarray,
     lat: np.ndarray,
     hgt: np.ndarray,
-    datetime: dt.datetime
+    datetime: dt.datetime,
 ) -> np.ndarray:
     """Based on the lon, lat, hgt (3d cube) - obtains an associated s1 orbit
     file to calculate the azimuth timing across the cube. Requires datetime of acq
@@ -217,7 +217,7 @@ def get_s1_azimuth_time_grid(
 def get_n_closest_datetimes(
     ref_time: dt.datetime,
     n_target_times: int,
-    time_step_hours: int
+    time_step_hours: int,
 ) -> list[dt.datetime]:
     """
     Gets n closest times relative to the `round_to_hour_delta` and the
@@ -256,9 +256,7 @@ def get_n_closest_datetimes(
 
     if (24 % time_step_hours) != 0:
         raise ValueError(
-            'The time step does not evenly divide 24 hours;'
-            'Time step has period > 1 day and depends when model '
-            'starts'
+            'The time step does not evenly divide 24 hours; Time step has period > 1 day and depends when model starts'
         )
 
     ts = pd.Timestamp(ref_time)
@@ -281,7 +279,7 @@ def get_n_closest_datetimes(
 def get_times_for_azimuth_interpolation(
     ref_time: dt.datetime,
     time_step_hours: int,
-    buffer_in_seconds: int = 300
+    buffer_in_seconds: int = 300,
 ) -> list[dt.datetime]:
     """Obtains times needed for azimuth interpolation. Filters 3 closest dates from ref_time
     so that all returned dates are within `time_step_hours` + `buffer_in_seconds`.

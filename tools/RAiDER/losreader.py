@@ -590,12 +590,16 @@ def state_to_los(svs, llh_targets):
         raise RuntimeError('state_to_los: At least 4 state vectors are required for orbit interpolation')
 
     # Convert svs to isce3 orbit
-    orb = isce.core.Orbit([
-        isce.core.StateVector(
-            isce.core.DateTime(row[0]),
-            row[1:4], row[4:7]
-        ) for row in svs
-    ])
+    orb = isce.core.Orbit(
+        [
+            isce.core.StateVector(
+                isce.core.DateTime(row[0]),
+                row[1:4],
+                row[4:7],
+            )
+            for row in svs
+        ],
+    )
 
     # Flatten the input array for convenience
     in_shape = llh_targets[0].shape

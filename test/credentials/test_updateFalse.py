@@ -2,6 +2,7 @@
 When update_rc_file is False, the RC file should NOT be modified if it already
 exists.
 """
+
 from pathlib import Path
 from platform import system
 
@@ -13,7 +14,7 @@ from RAiDER.models import credentials
 @pytest.mark.parametrize('model_name', 'ERA5 ERA5T HRES GMAO MERRA2'.split())
 def test_updateFalse(model_name):
     # Get the rc file's path
-    hidden_ext = '_' if system() == "Windows" else '.'
+    hidden_ext = '_' if system() == 'Windows' else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]
     if rc_filename is None:
         return

@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 
-if sys.version_info >= (3,11):
+if sys.version_info >= (3, 11):
     from typing import Self
 else:
     Self = Any
@@ -40,9 +40,7 @@ def parse_weather_model(weather_model_name: str, aoi: AOI) -> WeatherModel:
     try:
         _, Model = get_wm_by_name(weather_model_name)
     except ModuleNotFoundError:
-        raise NotImplementedError(
-            f'Model {weather_model_name} is not yet fully implemented, please contribute!'
-        )
+        raise NotImplementedError(f'Model {weather_model_name} is not yet fully implemented, please contribute!')
 
     # Check that the user-requested bounding box is within the weather model domain
     model: WeatherModel = Model()
@@ -55,6 +53,7 @@ def get_los(los_group: LOSGroupUnparsed) -> LOS:
     if los_group.orbit_file is not None:
         if los_group.ray_trace:
             from RAiDER.losreader import Raytracing
+
             los = Raytracing(los_group.orbit_file)
         else:
             los = Conventional(los_group.orbit_file)
@@ -62,6 +61,7 @@ def get_los(los_group: LOSGroupUnparsed) -> LOS:
     elif los_group.los_file is not None:
         if los_group.ray_trace:
             from RAiDER.losreader import Raytracing
+
             los = Raytracing(los_group.los_file, los_group.los_convention)
         else:
             los = Conventional(los_group.los_file, los_group.los_convention)
@@ -78,7 +78,11 @@ def get_los(los_group: LOSGroupUnparsed) -> LOS:
     return los
 
 
-def get_heights(height_group: HeightGroupUnparsed, aoi_group: AOIGroupUnparsed, runtime_group: RuntimeGroup) -> HeightGroup:
+def get_heights(
+    height_group: HeightGroupUnparsed,
+    aoi_group: AOIGroupUnparsed,
+    runtime_group: RuntimeGroup,
+) -> HeightGroup:
     """Parse the Height info and download a DEM if needed."""
     result = HeightGroup(
         dem=height_group.dem,
@@ -135,7 +139,7 @@ def get_heights(height_group: HeightGroupUnparsed, aoi_group: AOIGroupUnparsed, 
 
 def get_query_region(aoi_group: AOIGroupUnparsed, height_group: HeightGroupUnparsed, cube_spacing_in_m: float) -> AOI:
     """Parse the query region from inputs.
-    
+
     This function determines the query region from the input parameters. It will return an AOI object that can be used
     to query the weather model.
     Note: both an AOI group and a height group are necessary in case a DEM is needed.
@@ -149,9 +153,11 @@ def get_query_region(aoi_group: AOIGroupUnparsed, height_group: HeightGroupUnpar
         if aoi_group.lat_file is None or aoi_group.lon_file is None:
             raise ValueError('A lon_file must be specified if a lat_file is specified')
         query = RasterRDR(
-            aoi_group.lat_file, aoi_group.lon_file,
-            height_group.height_file_rdr, height_group.dem,
-            cube_spacing_in_m=cube_spacing_in_m
+            aoi_group.lat_file,
+            aoi_group.lon_file,
+            height_group.height_file_rdr,
+            height_group.dem,
+            cube_spacing_in_m=cube_spacing_in_m,
         )
 
     elif aoi_group.station_file is not None:
@@ -238,11 +244,8 @@ def parse_dates(date_group: DateGroupUnparsed) -> DateGroup:
         else:
             step = 1
 
-        date_list = [
-            start + dt.timedelta(days=step)
-            for step in range(0, (end - start).days + 1, step)
-        ]
-    
+        date_list = [start + dt.timedelta(days=step) for step in range(0, (end - start).days + 1, step)]
+
     return DateGroup(
         date_list=date_list,
     )
@@ -286,13 +289,13 @@ def get_wm_by_name(model_name: str) -> tuple[str, Type[WeatherModel]]:
     return module_name, Model
 
 
-def getBufferedExtent(lats: BB.SN, lons: BB.WE, buffer_size: float=0.0) -> BB.SNWE:
+def getBufferedExtent(lats: BB.SN, lons: BB.WE, buffer_size: float = 0.0) -> BB.SNWE:
     """Get the bounding box around a set of lats/lons."""
     return (
         min(lats) - buffer_size,
         max(lats) + buffer_size,
         min(lons) - buffer_size,
-        max(lons) + buffer_size
+        max(lons) + buffer_size,
     )
 
 
@@ -377,7 +380,7 @@ class IntegerOnRangeType:
     ```
     """
 
-    def __init__(self, lo: Optional[int]=None, hi: Optional[int]=None) -> None:
+    def __init__(self, lo: Optional[int] = None, hi: Optional[int] = None) -> None:
         self.lo = lo
         self.hi = hi
 
@@ -404,7 +407,13 @@ class IntegerMappingType(MappingType, IntegerOnRangeType):
     ```
     """
 
-    def __init__(self, lo: Optional[int]=None, hi: Optional[int]=None, mapping: Optional[dict[str, Any]]={}, **kwargs: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        lo: Optional[int] = None,
+        hi: Optional[int] = None,
+        mapping: Optional[dict[str, Any]] = {},
+        **kwargs: dict[str, Any],
+    ) -> None:
         IntegerOnRangeType.__init__(self, lo, hi)
         kwargs.update(mapping)
         MappingType.__init__(self, **kwargs)

@@ -15,15 +15,20 @@ def add_cpus(parser: argparse.ArgumentParser) -> None:
 
 def add_verbose(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
-        '--verbose', '-v',
+        '--verbose',
+        '-v',
         help='Run in verbose mode',
         action='count',
-        default=0
+        default=0,
     )
 
 
 def add_out(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument('--out', help='Output directory', default='.')
+    parser.add_argument(
+        '--out',
+        help='Output directory',
+        default='.',
+    )
 
 
 def add_bbox(parser: argparse.ArgumentParser) -> None:

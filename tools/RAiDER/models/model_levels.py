@@ -9,6 +9,8 @@ altitude is the standard direct vertical distance above mean sea level (MSL)."
 - Wikipedia.org, https://en.wikipedia.org/wiki/International_Standard_Atmosphere
 """
 
+# fmt: off
+
 LEVELS_137_HEIGHTS = [
     80301.65,
     74584.91,
@@ -529,3 +531,5 @@ LEVELS_50_HEIGHTS = [
     4.31591299e+01, 3.26389095e+01, 2.52657431e+01, 2.02104423e+01,
     1.66520787e+01, 1.39366382e+01, 0, -10, -20, -50, -100, -200, -500
 ]
+
+# fmt: on

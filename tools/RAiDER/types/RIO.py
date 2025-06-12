@@ -9,6 +9,7 @@ import rasterio.transform
 
 GDAL = tuple[float, float, float, float, float, float]
 
+
 @dataclass
 class Statistics:
     max: float

@@ -27,10 +27,10 @@ class UnixColorFormatter(Formatter):
     COLORS = {
         logging.WARNING: yellow,
         logging.ERROR: red,
-        logging.CRITICAL: bold_red
+        logging.CRITICAL: bold_red,
     }
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', use_color: bool=True) -> None:
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', use_color: bool = True) -> None:
         super().__init__(fmt, datefmt, style)
         # Save the old function so we can call it later
         self.__formatMessage = self.formatMessage
@@ -47,6 +47,7 @@ class UnixColorFormatter(Formatter):
 
 class CustomFormatter(UnixColorFormatter):
     """Adds levelname prefixes to the message on warning or above."""
+
     def formatMessage(self, record: LogRecord) -> str:
         message = super().formatMessage(record)
         if record.levelno >= logging.WARNING:

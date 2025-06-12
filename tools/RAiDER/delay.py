@@ -42,7 +42,7 @@ def tropo_delay(
     zref: Optional[np.float64] = None,
 ):
     """Calculate integrated delays on query points.
-    
+
     Options are:
     1. Zenith delays (ZTD)
     2. Zenith delays projected to the line-of-sight (STD-projected)
@@ -102,7 +102,7 @@ def tropo_delay(
         # CRS can be an int, str, or CRS object
         try:
             if isinstance(out_proj, str):
-                out_proj = out_proj.split(':')[-1] # handle the case where "EPSG:" is included
+                out_proj = out_proj.split(':')[-1]  # handle the case where "EPSG:" is included
             out_proj = CRS.from_epsg(out_proj)
         except pyproj.exceptions.CRSError:
             pass
@@ -188,7 +188,17 @@ def _get_delays_on_cube(datetime: dt.datetime, weather_model_file, wm_proj, aoi,
         logger.critical('There are missing delay values. Check your inputs.')
 
     # Write output file
-    ds = writeResultsToXarray(datetime, aoi.xpts, aoi.ypts, zpts, crs, wetDelay, hydroDelay, weather_model_file, out_type)
+    ds = writeResultsToXarray(
+        datetime,
+        aoi.xpts,
+        aoi.ypts,
+        zpts,
+        crs,
+        wetDelay,
+        hydroDelay,
+        weather_model_file,
+        out_type,
+    )
 
     return ds
 
@@ -254,7 +264,7 @@ def _build_cube_ray(
 
     # Loop over heights of output cube and compute delays
     for hh, ht in enumerate(zpts):
-        logger.info(f'Processing slice {hh+1} / {len(zpts)}: {ht}')
+        logger.info(f'Processing slice {hh + 1} / {len(zpts)}: {ht}')
         # Slices to fill on output
         outSubs = [x[hh, ...] for x in outputArrs]
 
@@ -326,7 +336,17 @@ def _build_cube_ray(
         return outputArrs
 
 
-def writeResultsToXarray(datetime: dt.datetime, xpts, ypts, zpts, crs, wetDelay, hydroDelay, weather_model_file, out_type):
+def writeResultsToXarray(
+    datetime: dt.datetime,
+    xpts,
+    ypts,
+    zpts,
+    crs,
+    wetDelay,
+    hydroDelay,
+    weather_model_file,
+    out_type,
+):
     """Write a 1-D array to a NETCDF5 file."""
     # Modify this as needed for NISAR / other projects
     ds = xr.Dataset(

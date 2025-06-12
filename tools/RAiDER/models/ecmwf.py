@@ -175,7 +175,7 @@ class ECMWF(WeatherModel):
         if c.url == 'https://cds.climate.copernicus.eu/api/v2':
             logger.warning(
                 'Old CDS API configuration detected: ECMWF released a breaking change in late 2024 that expired all '
-                "existing credentials. This run may fail with a 404 HTTP error, in which case you may have to "
+                'existing credentials. This run may fail with a 404 HTTP error, in which case you may have to '
                 'regenerate your CDS API credentials at https://cds.climate.copernicus.eu/how-to-api.'
             )
 

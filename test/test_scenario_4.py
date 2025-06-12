@@ -14,7 +14,8 @@ from RAiDER.processWM import prepareWeatherModel
 from test import TEST_DIR, pushd
 
 
-SCENARIO_DIR = os.path.join(TEST_DIR, "scenario_4")
+SCENARIO_DIR = os.path.join(TEST_DIR, 'scenario_4')
+
 
 @pytest.mark.long
 def test_aoi_without_xpts(tmp_path):
@@ -24,7 +25,7 @@ def test_aoi_without_xpts(tmp_path):
         lonfile = os.path.join(SCENARIO_DIR, 'lon.rdr')
         hgtfile = os.path.join(SCENARIO_DIR, 'hgt.rdr')
         aoi = RasterRDR(latfile, lonfile, hgtfile)
-        dt = datetime.datetime(2020,1,1)
+        dt = datetime.datetime(2020, 1, 1)
 
         wm = MERRA2()
         wm.set_latlon_bounds(aoi.bounds())
@@ -37,6 +38,7 @@ def test_aoi_without_xpts(tmp_path):
         assert np.nanmean(zen_wet) > 0
         assert np.nanmean(zen_hydro) > 0
 
+
 @pytest.mark.long
 def test_get_delays_on_cube(tmp_path):
     with pushd(tmp_path):
@@ -45,7 +47,7 @@ def test_get_delays_on_cube(tmp_path):
         lonfile = os.path.join(SCENARIO_DIR, 'lon.rdr')
         hgtfile = os.path.join(SCENARIO_DIR, 'hgt.rdr')
         aoi = RasterRDR(latfile, lonfile, hgtfile)
-        dt = datetime.datetime(2020,1,1)
+        dt = datetime.datetime(2020, 1, 1)
 
         wm = MERRA2()
         wm.set_latlon_bounds(aoi.bounds())
@@ -55,14 +57,13 @@ def test_get_delays_on_cube(tmp_path):
         with xarray.load_dataset(f) as ds:
             wm_levels = ds.z.values
             wm_proj = CRS.from_wkt(ds['proj'].attrs['crs_wkt'])
-        
+
         zref = 10000
 
         with pytest.raises(AttributeError):
             aoi.xpts
-        
+
         ds = _get_delays_on_cube(dt, f, wm_proj, aoi, wm_levels, los, wm_proj, zref)
 
         assert len(ds.x) > 0
         assert ds.hydro.mean() > 0
-    
