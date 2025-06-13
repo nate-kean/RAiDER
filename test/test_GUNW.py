@@ -20,7 +20,7 @@ import RAiDER.s1_azimuth_timing
 from RAiDER import aws
 from RAiDER.aria.prepFromGUNW import (
     _get_acq_time_from_gunw_id,
-    check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation,
+    check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation,
     check_weather_model_availability,
     get_acq_time_from_slc_id,
     get_slc_ids_from_gunw,
@@ -115,7 +115,7 @@ def test_GUNW_hyp3_metadata_update(test_gunw_json_path, test_gunw_json_schema_pa
     mocker.patch('RAiDER.aws.upload_file_to_s3')
     mocker.patch('RAiDER.aria.prepFromGUNW.main', return_value=['my_path_cfg', 'my_wavelength'])
     mocker.patch(
-        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation',
+        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation',
         side_effect=[True],
     )
     mocker.patch('RAiDER.aria.prepFromGUNW.check_weather_model_availability', return_value=True)
@@ -178,7 +178,7 @@ def test_GUNW_hyp3_metadata_update_different_prefix(
     mocker.patch('RAiDER.aws.upload_file_to_s3')
     mocker.patch('RAiDER.aria.prepFromGUNW.main', return_value=['my_path_cfg', 'my_wavelength'])
     mocker.patch(
-        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation',
+        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation',
         side_effect=[True],
     )
     mocker.patch('RAiDER.aria.prepFromGUNW.check_weather_model_availability', return_value=True)
@@ -430,7 +430,7 @@ def test_weather_model_availability_integration_using_valid_range(
     # Have another test for checking the actual files - we are only checking for valid
     if weather_model_name == 'HRRR':
         mocker.patch(
-            'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation',
+            'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation',
             side_effect=[True],
         )
     # These are outside temporal availability of GMAO and HRRR
@@ -540,11 +540,11 @@ def test_hrrr_availability_check_using_gunw_ids(mocker) -> None:
     """Hits the HRRR servers and makes sure that for certain dates they are indeed flagged as false."""
     # All dates in 2023 are available
     gunw_id = 'S1-GUNW-A-R-106-tops-20230108_20230101-225947-00078W_00041N-PP-4be8-v3_0_0'
-    assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
+    assert check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id)
 
     # 2016-08-09 16:00:00 is a missing date
     gunw_id = 'S1-GUNW-A-R-106-tops-20160809_20140101-160001-00078W_00041N-PP-4be8-v3_0_0'
-    assert not check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
+    assert not check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id)
 
 
 def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker) -> None:
@@ -553,7 +553,7 @@ def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker) -> None:
     """
     # 2016-08-09 16:00:00 is a missing date
     mocker.patch(
-        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation', side_effect=[False]
+        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation', side_effect=[False]
     )
     # The gunw id should not have a hyp3 file associated with it
     # This call will still hit the HRRR s3 API as done in the previous test
@@ -631,7 +631,7 @@ def test_value_error_for_file_inputs_when_no_data_available(mocker) -> None:
     In this case if a bucket is specified rather than a file; the program exits successfully!
     """
     mocker.patch(
-        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation', side_effect=[False]
+        'RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation', side_effect=[False]
     )
     mocker.patch('RAiDER.aria.prepFromGUNW.main')
     # fmt: off
@@ -671,13 +671,13 @@ def test_invalid_reference_or_secondary() -> None:
 
 
 def test_check_hrrr_availability_all_true() -> None:
-    """Tests if check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation returns True
+    """Tests if check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation returns True
     when all check_hrrr_dataset_availability return True.
     """
     gunw_id = 'S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0'
 
     # Mock _get_acq_time_from_gunw_id to return expected times
-    assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id)
+    assert check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id)
 
 
 def test_get_slc_ids_from_gunw() -> None:
@@ -785,7 +785,7 @@ def test_identify_which_hrrr_invalid() -> None:
         identify_which_hrrr(invalid_gunw_id)
 
 
-def test_check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation_again() -> None:
+def test_check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation_again() -> None:
     """Tests if function raises error for an invalid gunw_id format."""
     gunw_id = 'S1-GUNW-D-R-044-tops-20240418_20240406-171649-00163W_00069N-PP-af6b-v3_0_1.nc'
-    assert check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id, 'hrrrak') is True
+    assert check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id, 'hrrrak') is True

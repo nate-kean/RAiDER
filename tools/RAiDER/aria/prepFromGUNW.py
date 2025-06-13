@@ -49,7 +49,7 @@ def _get_acq_time_from_gunw_id(gunw_id: str, reference_or_secondary: str) -> dt.
     return cen_acq_time
 
 
-def check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(
+def check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(
     gunw_id: str,
     weather_model_name: str = 'hrrr',
 ) -> bool:
@@ -67,7 +67,7 @@ def check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(
     bool
 
     Example:
-    check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation('S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0')
+    check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation('S1-GUNW-A-R-106-tops-20220115_20211222-225947-00078W_00041N-PP-4be8-v3_0_0')
     should return True
     """
     ref_acq_time = _get_acq_time_from_gunw_id(gunw_id, 'reference')

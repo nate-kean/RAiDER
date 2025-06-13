@@ -619,7 +619,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
     if args.file is not None and args.weather_model == 'HRRR' and args.interpolate_time == 'azimuth_time_grid':
         gunw_id = args.file.name.replace('.nc', '')
         weather_model_name = identify_which_hrrr(args.file)
-        if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(
+        if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(
             gunw_id,
             weather_model_name,
         ):
@@ -639,7 +639,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
             raise ValueError(f'GUNW product file could not be found ats3://{args.bucket}/{args.input_bucket_prefix}')
         if args.weather_model == 'HRRR' and args.interpolate_time == 'azimuth_time_grid':
             gunw_id = args.file.name.replace('.nc', '')
-            if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id):
+            if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id):
                 print(
                     'The required HRRR data for time-grid interpolation is not available; '
                     'returning None and not modifying GUNW dataset'
