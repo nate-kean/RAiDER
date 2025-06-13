@@ -88,8 +88,8 @@ def checkArgs(run_config: RunConfig) -> RunConfig:
         wetNames.append(wetFilename)
         hydroNames.append(hydroFilename)
 
-    run_config.wetFilenames = wetNames
-    run_config.hydroFilenames = hydroNames
+    run_config.wetFilenames += wetNames
+    run_config.hydroFilenames += hydroNames
 
     return run_config
 

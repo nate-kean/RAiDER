@@ -207,8 +207,8 @@ class RunConfig:
     runtime_group: RuntimeGroup
     look_dir: LookDir = 'right'
     cube_spacing_in_m: Optional[float] = None  # deprecated
-    wetFilenames: Optional[list[str]] = None
-    hydroFilenames: Optional[list[str]] = None
+    wetFilenames: list[str] = []
+    hydroFilenames: list[str] = []
 
 
 class RAiDERArgs(argparse.Namespace):
