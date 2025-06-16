@@ -10,7 +10,6 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 * [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git
 * [728](https://github.com/dbekaert/RAiDER/pull/728) - Added downloader tests for HRES, GMAO, and MERRA2.
-### Changed
 * [726](https://github.com/dbekaert/RAiDER/pull/726) - Updated code and documentation for changes to the CDS API
 
 ## [0.5.5]
