@@ -147,7 +147,8 @@ class GMAO(WeatherModel):
             # Note that lat/lon gets written twice for GMAO because they are the same as y/x
             writeWeatherVarsXarray(lat, lon, h, q, p, t, self._time, self._proj, out)
         except:
-            logger.exception('Unable to save weathermodel to file')
+            logger.exception('Unable to save weathermodel to file:')
+            raise
 
     def load_weather(self, f=None) -> None:
         """
