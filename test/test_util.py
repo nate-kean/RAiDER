@@ -935,16 +935,16 @@ def test_writeWeatherVarsXarray(tmp_path):
         'crs_wkt': 'WKT representation',
     }
     
-    outName = tmp_path / "test_output.nc"
+    out_path = tmp_path / "test_output.nc"
     
     # Call the function
-    writeWeatherVarsXarray(lat, lon, h, q, p, t, datetime_value, crs, outName)
+    writeWeatherVarsXarray(lat, lon, h, q, p, t, datetime_value, crs, out_path)
     
     # Check that the file was created
-    assert outName.exists()
+    assert out_path.exists()
     
     # Open the written file to verify its contents
-    ds = xr.open_dataset(outName)
+    ds = xr.open_dataset(out_path)
     assert 'latitude' in ds
     assert 'longitude' in ds
     assert 'h' in ds
