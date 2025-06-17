@@ -730,20 +730,6 @@ def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
     return url, username, password
 
 
-def read_EarthData_loginInfo(filepath: str = None) -> Tuple[str, str]:
-    """Returns username and password."""
-    from netrc import netrc
-
-    nrc = netrc(filepath) if filepath else netrc()
-    try:
-        urs_usr, _, urs_pwd = nrc.hosts['urs.earthdata.nasa.gov']
-        if not urs_usr or not urs_pwd:
-            raise ValueError("Invalid login information in netrc")
-        return urs_usr, urs_pwd
-    except KeyError:
-        raise KeyError("No entry for urs.earthdata.nasa.gov in netrc")
-
-
 def show_progress(block_num: Union[int, float], block_size: Union[int, float], total_size: Union[int, float]) -> None:
     """Show download progress."""
     global pbar

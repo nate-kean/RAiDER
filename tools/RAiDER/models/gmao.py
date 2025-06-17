@@ -4,7 +4,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-import pydap.cas.urs
 import pydap.client
 from pyproj import CRS
 
@@ -79,9 +78,8 @@ class GMAO(WeatherModel):
         ml_max = 71
         if corrected_DT >= T0:
             # open the dataset and pull the data
-            url = 'https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv'
-            session = pydap.cas.urs.setup_session('username', 'password', check_url=url)
-            ds = pydap.client.open_url(url, session=session)
+            URL = 'https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv'
+            ds = pydap.client.open_url(URL)
 
             q = (
                 ds['qv']
@@ -118,12 +116,12 @@ class GMAO(WeatherModel):
         else:
             root = 'https://portal.nccs.nasa.gov/datashare/gmao/geos-fp/das/Y{}/M{:02d}/D{:02d}'
             base = f'GEOS.fp.asm.inst3_3d_asm_Nv.{corrected_DT.strftime("%Y%m%d")}_{corrected_DT.hour:02}00.V01.nc4'
-            url = f'{root.format(corrected_DT.year, corrected_DT.month, corrected_DT.day)}/{base}'
+            URL = f'{root.format(corrected_DT.year, corrected_DT.month, corrected_DT.day)}/{base}'
             path = Path(f'{out.stem}_raw{out.suffix}')
             if not path.exists():
                 logger.info('Fetching URL: %s', URL)
                 session = requests_retry_session()
-                resp = session.get(url, stream=True)
+                resp = session.get(URL, stream=True)
                 assert resp.ok, f'Could not access url for datetime: {corrected_DT}'
                 with path.open('wb') as fout:
                     shutil.copyfileobj(resp.raw, fout)
