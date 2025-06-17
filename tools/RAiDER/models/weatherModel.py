@@ -37,6 +37,7 @@ class WeatherModel(ABC):
 
     _dataset: Optional[str]
     _model_level_type: Literal['ml', 'pl']
+    _Name: str
 
     def __init__(self) -> None:
         """Initialize model-specific constants/parameters."""

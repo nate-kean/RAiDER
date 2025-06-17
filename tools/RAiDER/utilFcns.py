@@ -7,28 +7,22 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
+import numpy.typing as npt
 import rasterio
+import requests
 import xarray as xr
 import yaml
 from numpy import ndarray
 from pyproj import CRS, Proj, Transformer
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 import RAiDER
-from RAiDER.constants import (
-    R_EARTH_MAX_WGS84 as Rmax,
-)
-from RAiDER.constants import (
-    R_EARTH_MIN_WGS84 as Rmin,
-)
-from RAiDER.constants import (
-    _THRESHOLD_SECONDS,
-)
-from RAiDER.constants import (
-    _g0 as g0,
-)
-from RAiDER.constants import (
-    _g1 as G1,
-)
+from RAiDER.constants import R_EARTH_MAX_WGS84 as Rmax
+from RAiDER.constants import R_EARTH_MIN_WGS84 as Rmin
+from RAiDER.constants import _THRESHOLD_SECONDS
+from RAiDER.constants import _g0 as g0
+from RAiDER.constants import _g1 as G1
 from RAiDER.llreader import AOI
 from RAiDER.logger import logger
 from RAiDER.types import BB, RIO, CRSLike
@@ -632,16 +626,16 @@ def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> 
     ]
 
 
-def requests_retry_session(retries: int = 10, session=None):  # noqa: ANN001, ANN201
+def requests_retry_session(retries: int = 10, session: Optional[requests.Session] = None) -> requests.Session:
     """https://www.peterbe.com/plog/best-practice-with-retries-with-requests."""
-    import requests
-    from requests.adapters import HTTPAdapter
-    from requests.packages.urllib3.util.retry import Retry
-
     # add a retry strategy; https://findwork.dev/blog/advanced-usage-python-requests-timeouts-retries-hooks/
     session = session or requests.Session()
     retry = Retry(
-        total=retries, read=retries, connect=retries, backoff_factor=0.3, status_forcelist=list(range(429, 505))
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=0.3,
+        status_forcelist=list(range(429, 505)),
     )
     adapter = HTTPAdapter(max_retries=retry)
     session.mount('http://', adapter)
@@ -702,7 +696,7 @@ def writeWeatherVarsXarray(
 
     ds['proj'] = 0
     for k, v in crs.to_cf().items():
-        ds.proj.attrs[k] = v
+        ds['proj'].attrs[k] = v
     for var in ds.data_vars:
         ds[var].attrs['grid_mapping'] = 'proj'
 
@@ -718,7 +712,7 @@ def convertLons(inLons: np.ndarray) -> np.ndarray:
     return outLons
 
 
-def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
+def read_NCMR_loginInfo(filepath: Optional[str] = None) -> Tuple[str, str, str]:
     """Returns login information."""
     from pathlib import Path
 
@@ -744,7 +738,7 @@ def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
     return url, username, password
 
 
-def read_EarthData_loginInfo(filepath: str = None) -> Tuple[str, str]:
+def read_EarthData_loginInfo(filepath: Optional[str] = None) -> Tuple[str, str]:
     """Returns username and password."""
     from netrc import netrc
 

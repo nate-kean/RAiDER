@@ -1,6 +1,7 @@
 import calendar
 import datetime as dt
 import os
+from pathlib import Path
 
 import numpy as np
 import pydap.cas.urs
@@ -67,12 +68,12 @@ class MERRA2(WeatherModel):
         # Projection
         self._proj = CRS.from_epsg(4326)
 
-    def _fetch(self, out) -> None:
+    def _fetch(self, out: Path) -> None:
         """Fetch weather model data from GMAO: note we only extract the lat/lon bounds for this weather model; fetching data is not needed here as we don't actually download any data using OpenDAP."""
         time = self._time
 
         # check whether the file already exists
-        if os.path.exists(out):
+        if out.exists():
             return
 
         # calculate the array indices for slicing the GMAO variable arrays
@@ -81,9 +82,15 @@ class MERRA2(WeatherModel):
         lon_min_ind = int((self._ll_bounds[2] - (-180.0)) / self._lon_res)
         lon_max_ind = int((self._ll_bounds[3] - (-180.0)) / self._lon_res)
 
-        lats = np.arange((-90 + lat_min_ind * self._lat_res), (-90 + (lat_max_ind + 1) * self._lat_res), self._lat_res)
+        lats = np.arange(
+            (-90 + lat_min_ind * self._lat_res),
+            (-90 + (lat_max_ind + 1) * self._lat_res),
+            self._lat_res,
+        )
         lons = np.arange(
-            (-180 + lon_min_ind * self._lon_res), (-180 + (lon_max_ind + 1) * self._lon_res), self._lon_res
+            (-180 + lon_min_ind * self._lon_res),
+            (-180 + (lon_max_ind + 1) * self._lon_res),
+            self._lon_res,
         )
 
         lon, lat = np.meshgrid(lons, lats)
@@ -120,11 +127,11 @@ class MERRA2(WeatherModel):
         h = stream['H'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()
 
         try:
-            writeWeatherVarsXarray(lat, lon, h, q, p, t, time, self._proj, outName=out)
+            writeWeatherVarsXarray(lat, lon, h, q, p, t, time, self._proj, out_path=out)
         except Exception as e:
             logger.debug(e)
-            logger.exception('MERRA-2: Unable to save weathermodel to file')
-            raise RuntimeError(f'MERRA-2 failed with the following error: {e}')
+            logger.exception('MERRA-2: Unable to save weathermodel to file:')
+            raise
 
     def load_weather(self, f=None, *args, **kwargs) -> None:
         """

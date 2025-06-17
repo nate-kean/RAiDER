@@ -1,6 +1,7 @@
 import datetime as dt
 import os
 import shutil
+from pathlib import Path
 
 import h5py
 import numpy as np
@@ -88,21 +89,30 @@ class GMAO(WeatherModel):
             p = (
                 ds['pl']
                 .array[
-                    time_ind, ml_min : (ml_max + 1), lat_min_ind : (lat_max_ind + 1), lon_min_ind : (lon_max_ind + 1)
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
                 ]
                 .data[0]
             )
             t = (
                 ds['t']
                 .array[
-                    time_ind, ml_min : (ml_max + 1), lat_min_ind : (lat_max_ind + 1), lon_min_ind : (lon_max_ind + 1)
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
                 ]
                 .data[0]
             )
             h = (
                 ds['h']
                 .array[
-                    time_ind, ml_min : (ml_max + 1), lat_min_ind : (lat_max_ind + 1), lon_min_ind : (lon_max_ind + 1)
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
                 ]
                 .data[0]
             )
@@ -129,9 +139,15 @@ class GMAO(WeatherModel):
                 h = ds['H'][0, :, lat_min_ind : (lat_max_ind + 1), lon_min_ind : (lon_max_ind + 1)]
             os.remove(f)
 
-        lats = np.arange((-90 + lat_min_ind * self._lat_res), (-90 + (lat_max_ind + 1) * self._lat_res), self._lat_res)
+        lats = np.arange(
+            (-90 + lat_min_ind * self._lat_res),
+            (-90 + (lat_max_ind + 1) * self._lat_res),
+            self._lat_res,
+        )
         lons = np.arange(
-            (-180 + lon_min_ind * self._lon_res), (-180 + (lon_max_ind + 1) * self._lon_res), self._lon_res
+            (-180 + lon_min_ind * self._lon_res),
+            (-180 + (lon_max_ind + 1) * self._lon_res),
+            self._lon_res,
         )
 
         try:
