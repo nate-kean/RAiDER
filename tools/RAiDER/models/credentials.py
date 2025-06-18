@@ -32,7 +32,7 @@ APIS = {
     'cdsapirc': {
         'template': (
             'url: {host}\n'
-            'key: {uid}:{key}\n'
+            'key: {key}\n'
         ),
         'help_url': 'https://cds.climate.copernicus.eu/how-to-api',
         'default_host': 'https://cds.climate.copernicus.eu/api',
@@ -63,7 +63,7 @@ APIS = {
 # Get the environment variables for a given weather model API
 def _get_envs(model: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     if model in ('ERA5', 'ERA5T'):
-        uid = os.getenv('RAIDER_ECMWF_ERA5_UID')
+        uid = None
         key = os.getenv('RAIDER_ECMWF_ERA5_API_KEY')
         host = APIS['cdsapirc']['default_host']
     elif model == 'HRES':
@@ -140,9 +140,14 @@ def check_api(
     else:
         logger.warning(f'{model} API credentials not found in {rc_path}; creating')
     rc_type = RC_FILENAMES[model]
-    if rc_type in ('cdsapirc', 'ecmwfapirc'):
-        # These RC files only ever contain one set of credentials, so
-        # they can just be overwritten when updating.
+    if rc_type == 'cdsapirc':
+        # This RC file only ever contains one set of credentials, so
+        # it can just be overwritten when updating.
+        template = APIS[rc_filename]['template']
+        entry = template.format(host=url, key=key)
+        rc_path.write_text(entry)
+    elif rc_type == 'ecmwfapirc':
+        # This one only contains one set of credentials as well.
         template = APIS[rc_filename]['template']
         entry = template.format(host=url, uid=uid, key=key)
         rc_path.write_text(entry)
