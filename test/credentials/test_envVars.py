@@ -81,7 +81,8 @@ from RAiDER.models import credentials
 )
 # fmt: on
 def test_envVars(
-    monkeypatch,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
     model_name,
     template,
     env_var_name_uid,
@@ -91,7 +92,7 @@ def test_envVars(
     rc_filename = credentials.RC_FILENAMES[model_name]
     if rc_filename is None:
         return
-    rc_path = Path('./') / (hidden_ext + rc_filename)
+    rc_path = tmp_path / (hidden_ext + rc_filename)
     rc_path = rc_path.expanduser()
     rc_path.unlink(missing_ok=True)
 
@@ -104,7 +105,7 @@ def test_envVars(
     with monkeypatch.context() as mp:
         mp.setenv(env_var_name_uid, test_uid)
         mp.setenv(env_var_name_key, test_key)
-        credentials.check_api(model_name, None, None, './', update_rc_file=True)
+        credentials.check_api(model_name, None, None, str(tmp_path), update_rc_file=True)
 
     expected_content = template.format(uid=test_uid, key=test_key)
     actual_content = rc_path.read_text()
