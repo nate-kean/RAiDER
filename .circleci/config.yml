@@ -71,7 +71,7 @@ jobs:
             source "${HOME}/conda/etc/profile.d/mamba.sh"
             mamba activate RAiDER
 
-            COV_OPTIONS=`python -c "import importlib;print(*(' --cov='+p for p in importlib.util.find_spec('RAiDER').submodule_search_locations))"`
+            COV_OPTIONS=`python -c "import importlib.util;print(*(' --cov='+p for p in importlib.util.find_spec('RAiDER').submodule_search_locations))"`
             coverage run -m pytest -m "not long" test/ ${COV_OPTIONS} --cov-report=
 
       - run:
