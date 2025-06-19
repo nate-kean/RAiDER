@@ -234,7 +234,7 @@ def rio_stats(path: Path, band: int=1) -> tuple[RIO.Statistics, Optional[CRS], R
     # Turn off PAM to avoid creating .aux.xml files
     with rasterio.Env(GDAL_PAM_ENABLED='NO'):
         with rasterio.open(path) as src:
-            stats = src.statistics(band)
+            stats = src.stats(indexes=(band,))[0]
             proj = src.crs
             gt = src.transform.to_gdal()
 
