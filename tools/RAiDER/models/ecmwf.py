@@ -170,7 +170,7 @@ class ECMWF(WeatherModel):
         """Used for ERA5."""
         import cdsapi
 
-        c = cdsapi.Client(verify=0)
+        c = cdsapi.Client(verify=1)
 
         if c.url == 'https://cds.climate.copernicus.eu/api/v2':
             logger.warning(
