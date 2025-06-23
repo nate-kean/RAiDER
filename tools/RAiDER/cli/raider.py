@@ -318,7 +318,6 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
                     raise DatetimeFailed(model.Model(), tt)
                 else:
                     continue
-
             # log when something else happens and then continue with the next time
             except Exception as e:
                 S, N, W, E = wm_bounds
@@ -606,7 +605,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
     ):
         gunw_id = args.file.name.replace('.nc', '')
         weather_model_name = identify_which_hrrr(args.file)
-        if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id, weather_model_name):
+        if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id, weather_model_name):
             raise NoWeatherModelData('The required HRRR data for time-grid interpolation is not available')
 
     if args.file is None:
@@ -625,7 +624,7 @@ def calcDelaysGUNW(iargs: Optional[list[str]] = None) -> Optional[xr.Dataset]:
             )
         if args.weather_model == 'HRRR' and args.interpolate_time == 'azimuth_time_grid':
             gunw_id = args.file.name.replace('.nc', '')
-            if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation(gunw_id):
+            if not RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation(gunw_id):
                 print(
                     'The required HRRR data for time-grid interpolation is not available; returning None and not modifying GUNW dataset'
                 )

@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import pytest
 
-from test import TEST_DIR, pushd
 from RAiDER.dem import download_dem
+from test import TEST_DIR, pushd
 
 
 def test_download_dem_1():
@@ -15,7 +17,7 @@ def test_download_dem_1():
     assert meta['crs'] is None
 
 
-def test_download_dem_2():
+def test_download_dem_2() -> None:
     with pytest.raises(ValueError):
         download_dem()
 

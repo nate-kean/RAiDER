@@ -18,10 +18,8 @@ wm = 'ERA5' if WM == 'ERA-5' else WM
 
 
 @pytest.mark.long
-def test_cube_timemean():
-    """ Test the mean interpolation by computing cube delays at 1:30PM vs mean of 12 PM / 3PM for GMAO """
-    SCENARIO_DIR = os.path.join(TEST_DIR, "INTERP_TIME")
-    os.makedirs(SCENARIO_DIR, exist_ok=True)
+def test_cube_timemean(tmp_path: Path):
+    """Test the mean interpolation by computing cube delays at 1:30PM vs mean of 12 PM / 3PM for GMAO."""
     ## make the lat lon grid
     S, N, W, E = 34, 35, -117, -116
     date       = 20200130
@@ -36,7 +34,6 @@ def test_cube_timemean():
             'runtime_group': {'output_directory': SCENARIO_DIR},
         }
 
-
     ## run raider without interpolation for two exact weather model times
     for hr in [hr1, hr2]:
         grp['time_group'].update({'time': f'{hr}:00:00'})
@@ -46,7 +43,7 @@ def test_cube_timemean():
         ## run raider for the default date
         cmd  = f'raider.py {cfg}'
         proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
-        assert np.isclose(proc.returncode, 0)
+        assert proc.returncode == 0
 
     ## run interpolation in the middle of the two
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
@@ -54,8 +51,7 @@ def test_cube_timemean():
 
     cmd  = f'raider.py {cfg}'
     proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
-    assert np.isclose(proc.returncode, 0)
-
+    assert proc.returncode == 0
 
     with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{hr1}0000_ztd.nc')) as ds:
         da1_tot = ds['wet'] + ds['hydro']
@@ -79,11 +75,9 @@ def test_cube_timemean():
 
 
 @pytest.mark.long
-def test_cube_weighting():
-    """ Test the weighting by comparing a small crop with numpy directly """
-    from datetime import datetime
-    SCENARIO_DIR = os.path.join(TEST_DIR, "INTERP_TIME")
-    os.makedirs(SCENARIO_DIR, exist_ok=True)
+def test_cube_weighting(tmp_path: Path):
+    """Test the weighting by comparing a small crop with numpy directly."""
+    import datetime as dt
     ## make the lat lon grid
     S, N, W, E = 34, 35, -117, -116
     date       = 20200130
@@ -108,7 +102,7 @@ def test_cube_weighting():
         ## run raider for the default date
         cmd  = f'raider.py {cfg}'
         proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
-        assert np.isclose(proc.returncode, 0)
+        assert proc.returncode == 0
 
     ## run interpolation very near the first
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}

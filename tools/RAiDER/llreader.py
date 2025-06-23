@@ -167,7 +167,7 @@ class AOI:
             logger.warning('Bounds extend past +/- 180. Results may be incorrect.')
         return bounds
 
-    def set_output_directory(self, output_directory) -> None:
+    def set_output_directory(self, output_directory: Path) -> None:
         self._output_directory = output_directory
 
     def set_output_xygrid(self, dst_crs: Union[int, str]=4326) -> None:
@@ -217,9 +217,9 @@ class StationFile(AOI):
             from RAiDER.interpolator import interpolateDEM
 
             demFile = (
-                os.path.join(self._output_directory, 'GLO30_fullres_dem.tif')
-                if self._demfile is None
-                else self._demfile
+                self._demfile
+                if self._demfile is not None
+                else self._output_directory / 'GLO30_fullres_dem.tif'
             )
 
             download_dem(
@@ -292,9 +292,9 @@ class RasterRDR(AOI):
             from RAiDER.interpolator import interpolateDEM
 
             demFile = (
-                os.path.join(self._output_directory, 'GLO30_fullres_dem.tif')
-                if self._demfile is None
-                else self._demfile
+                self._demfile
+                if self._demfile is not None
+                else self._output_directory / 'GLO30_fullres_dem.tif'
             )
 
             download_dem(
@@ -355,7 +355,7 @@ class GeocodedFile(AOI):
         from RAiDER.dem import download_dem
         from RAiDER.interpolator import interpolateDEM
 
-        demFile = self._filename if self._is_dem else 'GLO30_fullres_dem.tif'
+        demFile = self._filename if self._is_dem else Path('GLO30_fullres_dem.tif')
         bbox = self._bounding_box
         _, _ = download_dem(bbox, writeDEM=True, dem_path=Path(demFile))
         z_out = interpolateDEM(demFile, self.readLL())

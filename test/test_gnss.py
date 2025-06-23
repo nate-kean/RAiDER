@@ -24,9 +24,9 @@ def temp_file():
     df = pd.DataFrame(
         {
             'ID': ['STAT1', 'STAT2', 'STAT3'],
-            'Lat': [15.0, 20., 25.0],
-            'Lon': [-100, -90., -85.],
-            'totalDelay': [1., 1.5, 2.],
+            'Lat': [15.0, 20.0, 25.0],
+            'Lon': [-100, -90.0, -85.0],
+            'totalDelay': [1.0, 1.5, 2.0],
         }
     )
     return df
@@ -92,7 +92,7 @@ def test_concatDelayFiles(tmp_path, temp_file):
 
 
 def test_get_stats_by_llh2():
-    stations = get_stats_by_llh(llhBox=[10, 18, 360-93, 360-88])
+    stations = get_stats_by_llh(llhBox=[10, 18, 360 - 93, 360 - 88])
     assert isinstance(stations, pd.DataFrame)
 
 
@@ -102,16 +102,20 @@ def test_get_stats_by_llh3():
 
 
 def test_get_station_list():
-    stations, output_file = get_station_list(stationFile=os.path.join(
-        SCENARIO2_DIR, 'stations.csv'), writeStationFile=False)
+    stations, output_file = get_station_list(
+        stationFile=os.path.join(SCENARIO2_DIR, 'stations.csv'), writeStationFile=False
+    )
     assert isinstance(stations, list)
     assert isinstance(output_file, pd.DataFrame)
 
 
 def test_download_tropo_delays1():
     with pytest.raises(NotImplementedError):
-        download_tropo_delays(stats=['GUAT', 'SLAC', 'CRSE'], years=[
-                              2022], gps_repo='dummy_repo')
+        download_tropo_delays(
+            stats=['GUAT', 'SLAC', 'CRSE'],
+            years=[2022],
+            gps_repo='dummy_repo',
+        )
 
 
 def test_download_tropo_delays2():
@@ -136,18 +140,21 @@ def test_download_tropo_delays2(tmp_path):
 
 
 def test_filterByBBox1():
-    _, station_data = get_station_list(stationFile=os.path.join(
-        SCENARIO2_DIR, 'stations.csv'), writeStationFile=False)
+    _, station_data = get_station_list(
+        stationFile=str(SCENARIO2_DIR / 'stations.csv'),
+        writeStationFile=False,
+    )
     with pytest.raises(ValueError):
         filterToBBox(station_data, llhBox=[34, 38, -120, -115])
 
 
 def test_filterByBBox2():
-    _, station_data = get_station_list(stationFile=os.path.join(
-        SCENARIO2_DIR, 'stations.csv'), writeStationFile=False)
+    _, station_data = get_station_list(
+        stationFile=str(SCENARIO2_DIR / 'stations.csv'),
+        writeStationFile=False,
+    )
     new_data = filterToBBox(station_data, llhBox=[34, 38, 240, 245])
     for stat in ['CAPE', 'MHMS', 'NVCO']:
         assert stat not in new_data['ID'].to_list()
     for stat in ['FGNW', 'JPLT', 'NVTP', 'WLHG', 'WORG']:
         assert stat in new_data['ID'].to_list()
-

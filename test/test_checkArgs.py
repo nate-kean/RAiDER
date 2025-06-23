@@ -61,7 +61,7 @@ def test_checkArgs_outfmt_2(args):
 
 def test_checkArgs_outfmt_3(args):
     with pytest.raises(FileNotFoundError):
-        args.aoi_group.aoi = StationFile(os.path.join('fake_dir', 'stations.csv'))
+        args.aoi_group.aoi = StationFile(Path('fake_dir/stations.csv'))
 
 
 def test_checkArgs_outfmt_4(args):
