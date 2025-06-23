@@ -1,15 +1,11 @@
+from pathlib import Path
 import pytest
-import glob
-import shutil
-import os
 import subprocess
 import numpy as np
 import xarray as xr
 
 
-from test import (
-    WM, TEST_DIR
-)
+from test import WM
 
 from RAiDER.logger import logger
 from RAiDER.utilFcns import write_yaml
@@ -31,14 +27,14 @@ def test_cube_timemean(tmp_path: Path):
             'weather_model': WM,
             'aoi_group': {'bounding_box': [S, N, W, E]},
             'time_group': {'interpolate_time': 'none'},
-            'runtime_group': {'output_directory': SCENARIO_DIR},
+            'runtime_group': {'output_directory': tmp_path},
         }
 
     ## run raider without interpolation for two exact weather model times
     for hr in [hr1, hr2]:
         grp['time_group'].update({'time': f'{hr}:00:00'})
         ## generate the default run config file and overwrite it with new parms
-        cfg  = write_yaml(grp, 'temp.yaml')
+        cfg  = write_yaml(grp, tmp_path / 'temp1.yaml')
 
         ## run raider for the default date
         cmd  = f'raider.py {cfg}'
@@ -47,31 +43,23 @@ def test_cube_timemean(tmp_path: Path):
 
     ## run interpolation in the middle of the two
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
-    cfg  = write_yaml(grp, 'temp.yaml')
+    cfg  = write_yaml(grp, tmp_path / 'temp2.yaml')
 
     cmd  = f'raider.py {cfg}'
     proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
     assert proc.returncode == 0
 
-    with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{hr1}0000_ztd.nc')) as ds:
+    with xr.open_dataset(tmp_path / f'{WM}_tropo_{date}T{hr1}0000_ztd.nc') as ds:
         da1_tot = ds['wet'] + ds['hydro']
 
-    with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{hr2}0000_ztd.nc')) as ds:
+    with xr.open_dataset(tmp_path/ f'{WM}_tropo_{date}T{hr2}0000_ztd.nc') as ds:
         da2_tot = ds['wet'] + ds['hydro']
 
-    with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{ti.replace(":", "")}_ztd.nc')) as ds:
+    with xr.open_dataset(tmp_path/ f'{WM}_tropo_{date}T{ti.replace(":", "")}_ztd.nc') as ds:
         da_interp_tot = ds['wet'] + ds['hydro']
 
     da_mu = (da1_tot + da2_tot) / 2
     assert np.allclose(da_mu, da_interp_tot)
-
-
-    # Clean up files
-    shutil.rmtree(SCENARIO_DIR)
-    [os.remove(f) for f in glob.glob(f'{WM}*')]
-    os.remove('temp.yaml')
-
-    return
 
 
 @pytest.mark.long
@@ -89,7 +77,7 @@ def test_cube_weighting(tmp_path: Path):
             'weather_model': WM,
             'aoi_group': {'bounding_box': [S, N, W, E]},
             'time_group': {'interpolate_time': 'none'},
-            'runtime_group': {'output_directory': SCENARIO_DIR},
+            'runtime_group': {'output_directory': tmp_path},
         }
 
 
@@ -97,7 +85,7 @@ def test_cube_weighting(tmp_path: Path):
     for hr in [hr1, hr2]:
         grp['time_group'].update({'time': f'{hr}:00:00'})
         ## generate the default run config file and overwrite it with new parms
-        cfg  = write_yaml(grp, 'temp.yaml')
+        cfg  = write_yaml(grp, tmp_path / 'temp1.yaml')
 
         ## run raider for the default date
         cmd  = f'raider.py {cfg}'
@@ -106,25 +94,25 @@ def test_cube_weighting(tmp_path: Path):
 
     ## run interpolation very near the first
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
-    cfg  = write_yaml(grp, 'temp.yaml')
+    cfg  = write_yaml(grp, tmp_path / 'temp2.yaml')
 
     cmd  = f'raider.py {cfg}'
     proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
 
     ## double check on weighting
 
-    with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{hr1}0000_ztd.nc')) as ds:
+    with xr.open_dataset(tmp_path / f'{WM}_tropo_{date}T{hr1}0000_ztd.nc') as ds:
         da1_tot = ds['wet'] + ds['hydro']
 
-    with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{hr2}0000_ztd.nc')) as ds:
+    with xr.open_dataset(tmp_path / f'{WM}_tropo_{date}T{hr2}0000_ztd.nc') as ds:
         da2_tot = ds['wet'] + ds['hydro']
 
-    with xr.open_dataset(os.path.join(SCENARIO_DIR, f'{WM}_tropo_{date}T{ti.replace(":", "")}_ztd.nc')) as ds:
+    with xr.open_dataset(tmp_path / f'{WM}_tropo_{date}T{ti.replace(":", "")}_ztd.nc') as ds:
         da_interp_tot = ds['wet'] + ds['hydro']
 
-    dt1 = datetime.strptime(f'{date}{hr1}', '%Y%m%d%H')
-    dt2 = datetime.strptime(f'{date}{hr2}', '%Y%m%d%H')
-    dt_ref = datetime.strptime(f'{date}{ti}', '%Y%m%d%H:%M:%S')
+    dt1 = dt.datetime.strptime(f'{date}{hr1}', '%Y%m%d%H')
+    dt2 = dt.datetime.strptime(f'{date}{hr2}', '%Y%m%d%H')
+    dt_ref = dt.datetime.strptime(f'{date}{ti}', '%Y%m%d%H:%M:%S')
 
     wgts  = np.array([(dt_ref-dt1).seconds, (dt2-dt_ref).seconds])
     da1_crop = da1_tot.isel(z=0, y=slice(0,1), x=slice(0, 2))
@@ -138,10 +126,3 @@ def test_cube_weighting(tmp_path: Path):
     logger.info ('Data from two dates: %s', dat)
     logger.info ('Weighted mean: %s', da_out_crop.data)
     assert np.allclose(da_out_crop, np.average(dat, weights=1/wgts, axis=0))
-
-    # Clean up files
-    shutil.rmtree(SCENARIO_DIR)
-    [os.remove(f) for f in glob.glob(f'{WM}*')]
-    os.remove('temp.yaml')
-
-    return

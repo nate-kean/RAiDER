@@ -47,7 +47,7 @@ def compute_transform(lats, lons):
 @pytest.mark.isce3
 @pytest.mark.parametrize('weather_model_name', ['GMAO'])
 def test_GUNW_dataset_update(
-    test_dir_path,
+    tmp_path: Path,
     test_gunw_path_factory,
     weather_model_name,
     weather_model_dict_for_gunw_integration_test,
@@ -60,7 +60,7 @@ def test_GUNW_dataset_update(
     Therefore relevant GMAO datetimes are
     12 pm and 3 pm (in that order)
     """
-    scenario_dir = test_dir_path / 'GUNW'
+    scenario_dir = tmp_path / 'GUNW'
     scenario_dir.mkdir(exist_ok=True, parents=True)
     orig_GUNW = test_gunw_path_factory()
     updated_GUNW = scenario_dir / orig_GUNW.name
@@ -70,7 +70,8 @@ def test_GUNW_dataset_update(
     iargs = [
         '--weather-model', weather_model_name,
         '--file', str(updated_GUNW),
-        '-interp', 'center_time'
+        '-interp', 'center_time',
+        '--output-directory', str(scenario_dir),
     ]
     # fmt: on
 
@@ -95,11 +96,6 @@ def test_GUNW_dataset_update(
 
         crs = rio.crs.CRS.from_wkt(ds['crs'].crs_wkt)
         assert crs.to_epsg() == epsg, 'CRS incorrect'
-
-    # Clean up files
-    shutil.rmtree(scenario_dir)
-    os.remove('GUNW_20200130-20200124_135156.yaml')
-    [os.remove(f) for f in glob.glob(f'{weather_model_name}*')]
 
 
 def test_GUNW_hyp3_metadata_update(test_gunw_json_path, test_gunw_json_schema_path, tmp_path: Path, mocker: MockerFixture) -> None:
@@ -127,6 +123,7 @@ def test_GUNW_hyp3_metadata_update(test_gunw_json_path, test_gunw_json_schema_pa
         '--weather-model', 'HRES',
         '--bucket', 'myBucket',
         '--bucket-prefix', 'myPrefix',
+        '--output-directory', str(tmp_path),
     ]
     # fmt: on
     calcDelaysGUNW(iargs)
@@ -191,6 +188,7 @@ def test_GUNW_hyp3_metadata_update_different_prefix(
         '--bucket', 'myBucket',
         '--bucket-prefix', 'myOutputPrefix',
         '--input-bucket-prefix', 'myInputPrefix',
+        '--output-directory', str(tmp_path),
     ]
     # fmt: on
     calcDelaysGUNW(iargs)
@@ -318,20 +316,27 @@ def test_azimuth_timing_interp_against_center_time_interp(
     # RAiDER needs strings for paths
     side_effect = list(map(str, side_effect))
     mocker.patch('RAiDER.processWM.prepareWeatherModel', side_effect=side_effect)
+
     # fmt: off
+    path_0 = tmp_path / '0'
+    path_0.mkdir()
     iargs_0 = [
         '--file', str(out_path_0),
         '--weather-model', weather_model_name,
-        '-interp', 'center_time'
+        '-interp', 'center_time',
+        '--output-directory', str(path_0),
     ]
     # fmt: on
     calcDelaysGUNW(iargs_0)
 
+    path_1 = tmp_path / '1'
+    path_1.mkdir()
     # fmt: off
     iargs_1 = [
         '--file', str(out_path_1),
         '--weather-model', weather_model_name,
-        '-interp', 'azimuth_time_grid'
+        '-interp', 'azimuth_time_grid',
+        '--output-directory', str(path_1),
     ]
     # fmt: on
     calcDelaysGUNW(iargs_1)
@@ -445,7 +450,8 @@ def test_weather_model_availability_integration_using_valid_range(
     iargs = [
         '--weather-model', weather_model_name,
         '--bucket', 'myBucket',
-        '--bucket-prefix', 'myPrefix'
+        '--bucket-prefix', 'myPrefix',
+        '--output-directory', str(tmp_path),
     ]
     # fmt: on
     out = calcDelaysGUNW(iargs)
@@ -514,7 +520,8 @@ def test_provenance_metadata_for_tropo_group(
     iargs = [
         '--file', str(out_path),
         '--weather-model', weather_model_name,
-        '-interp', interp_method
+        '-interp', interp_method,
+        '--output-directory', str(tmp_path),
     ]
     # fmt: on
     calcDelaysGUNW(iargs)
@@ -578,7 +585,7 @@ def test_hyp3_exits_succesfully_when_hrrr_not_available(mocker: MockerFixture) -
     RAiDER.aria.prepFromGUNW.check_weather_model_availability.assert_not_called()
 
 
-def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_for_azimuth_time_test, mocker) -> None:
+def test_GUNW_workflow_fails_if_a_download_fails(tmp_path: Path, gunw_azimuth_test, orbit_dict_for_azimuth_time_test, mocker: MockerFixture) -> None:
     """Makes sure for azimuth-time-grid interpolation that an error is raised if one of the files fails to
     download and does not do additional processing.
     """
@@ -616,7 +623,8 @@ def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_f
     iargs_1 = [
         '--file', str(gunw_azimuth_test),
         '--weather-model', 'HRRR',
-        '-interp', 'azimuth_time_grid'
+        '-interp', 'azimuth_time_grid',
+        '--output-directory', str(tmp_path),
     ]
     # fmt: on
 
@@ -625,7 +633,7 @@ def test_GUNW_workflow_fails_if_a_download_fails(gunw_azimuth_test, orbit_dict_f
     RAiDER.s1_azimuth_timing.get_s1_azimuth_time_grid.assert_not_called()
 
 
-def test_value_error_for_file_inputs_when_no_data_available(mocker) -> None:
+def test_value_error_for_file_inputs_when_no_data_available(tmp_path: Path, mocker: MockerFixture) -> None:
     """See test_hyp3_exits_succesfully_when_hrrr_not_available above.
 
     In this case if a bucket is specified rather than a file; the program exits successfully!
@@ -638,7 +646,8 @@ def test_value_error_for_file_inputs_when_no_data_available(mocker) -> None:
     iargs = [
         '--file', 'foo.nc',
         '--weather-model', 'HRRR',
-        '-interp', 'azimuth_time_grid'
+        '-interp', 'azimuth_time_grid',
+        '--output-directory', str(tmp_path),
     ]
     # fmt: on
 

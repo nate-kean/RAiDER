@@ -2,14 +2,15 @@
 When update_rc_file is either True or False, the relevant API RC file should be
 created if it doesn't exist.
 '''
-from typing import Tuple
-
-import pytest
 import os
 from pathlib import Path
 from platform import system
-from RAiDER.models import credentials
+from typing import Tuple
+
+import pytest
 from test import random_string
+
+from RAiDER.models import credentials
 
 
 def get_creds_cds(rc_path: Path) -> Tuple[str, str]:
@@ -51,13 +52,13 @@ def get_creds_netrc(rc_path: Path) -> Tuple[str, str]:
         ('MERRA2', get_creds_netrc)
     )
 )
-def test_createFile(model_name, get_creds):
+def test_createFile(tmp_path: Path, model_name, get_creds):
     # Get the rc file's path
     hidden_ext = '_' if system() == "Windows" else '.'
     rc_filename = credentials.RC_FILENAMES[model_name]
     if rc_filename is None:
         return
-    rc_path = Path('./') / (hidden_ext + rc_filename)
+    rc_path = tmp_path / (hidden_ext + rc_filename)
     rc_path = rc_path.expanduser()
     rc_path.unlink(missing_ok=True)
 
@@ -65,7 +66,7 @@ def test_createFile(model_name, get_creds):
     test_key = random_string()
 
     # Test creation of the rc file
-    credentials.check_api(model_name, test_uid, test_key, './', update_rc_file=False)
+    credentials.check_api(model_name, test_uid, test_key, tmp_path, update_rc_file=False)
     assert rc_path.exists(), f'{rc_path} does not exist'
 
     # Check if API is written correctly
