@@ -37,7 +37,7 @@ jobs:
             mamba env create -f environment.yml
 
       - run:
-          name: Install raider and check environment
+          name: Install RAiDER and check environment
           shell: /bin/bash -xl
           command: |
             source "${HOME}/conda/etc/profile.d/conda.sh"
@@ -54,7 +54,7 @@ jobs:
             python -c "import pyproj; print(pyproj.__version__)"
 
       - run:
-          name: Setup data stores
+          name: Set up data stores
           shell: /bin/bash -xl
           command: |
             source "${HOME}/conda/etc/profile.d/conda.sh"
