@@ -370,7 +370,8 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
         # A dataset was returned by the above
         # Dataset returned: Cube e.g. GUNW workflow
         if hydro_delay is None:
-            out_path = Path(out_filename.replace('wet', 'tropo'))
+            new_filename = Path(out_filename).name.replace('wet', 'tropo')
+            out_path = Path(out_filename).parent / new_filename
             ds = wet_delay
             ext = out_path.suffix
 
