@@ -272,7 +272,7 @@ class GUNW:
         # Remove ".zip" from the granule ids included in this field
         slcs_lst = list(map(lambda slc: slc.replace('.zip', ''), slcs_lst))
 
-        path_orb = get_orbits_from_slc_ids(slcs_lst)
+        path_orb = get_orbits_from_slc_ids(slcs_lst, str(orbit_dir))
 
         return [str(o) for o in path_orb]
 
@@ -380,7 +380,7 @@ def main(args: CalcDelaysArgs) -> tuple[Path, float]:
         },
     }
 
-    path_cfg = Path(f'GUNW_{GUNWObj.name}.yaml')
+    path_cfg = args.output_directory / f'GUNW_{GUNWObj.name}.yaml'
     write_yaml(raider_cfg, path_cfg)
     return path_cfg, GUNWObj.wavelength
 
