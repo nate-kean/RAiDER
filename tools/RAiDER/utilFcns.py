@@ -966,3 +966,16 @@ def parse_crs(proj: CRSLike) -> CRS:
     elif isinstance(proj, int):
         return CRS.from_epsg(proj)
     raise TypeError(f'Data type "{type(proj)}" not supported for CRS')
+
+def read_EarthData_loginInfo(filepath: str = None) -> Tuple[str, str]:
+    """Returns username and password."""
+    from netrc import netrc
+
+    nrc = netrc(filepath) if filepath else netrc()
+    try:
+        urs_usr, _, urs_pwd = nrc.hosts['urs.earthdata.nasa.gov']
+        if not urs_usr or not urs_pwd:
+            raise ValueError("Invalid login information in netrc")
+        return urs_usr, urs_pwd
+    except KeyError:
+        raise KeyError("No entry for urs.earthdata.nasa.gov in netrc")
