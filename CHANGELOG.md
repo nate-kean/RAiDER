@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [PEP 440](https://www.python.org/dev/peps/pep-0440/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased
 ### Changed
 * [745](https://github.com/dbekaert/RAiDER/pull/745) - Refactored the test suite to be able to run tests in parallel. 
-### Fixed
 * [733](https://github.com/dbekaert/RAiDER/pull/733) - Fixed coverage reports being generated for incorrect directories.
+### Fixed
+* [731](https://github.com/dbekaert/RAiDER/pull/731) - Fixed fetch routine for GMAO.
+
 ### Added
 * [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git.
 * [728](https://github.com/dbekaert/RAiDER/pull/728) - Added downloader tests for HRES, GMAO, and MERRA2.
