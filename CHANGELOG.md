@@ -9,11 +9,12 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 ### Changed
 * [745](https://github.com/dbekaert/RAiDER/pull/745) - Refactored the test suite to be able to run tests in parallel. 
-
+### Fixed
+* [733](https://github.com/dbekaert/RAiDER/pull/733) - Fixed coverage reports being generated for incorrect directories.
 ### Added
-* [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git
+* [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git.
 * [728](https://github.com/dbekaert/RAiDER/pull/728) - Added downloader tests for HRES, GMAO, and MERRA2.
-* [726](https://github.com/dbekaert/RAiDER/pull/726) - Updated code and documentation for changes to the CDS API
+* [726](https://github.com/dbekaert/RAiDER/pull/726) - Updated code and documentation for changes to the CDS API.
 
 ## [0.5.5]
 ### Changed
