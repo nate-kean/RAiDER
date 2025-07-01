@@ -8,6 +8,8 @@ jobs:
     docker:
       - image: cimg/base:current
         user: root
+    resource_class: medium
+
     steps:
       - checkout
 
@@ -72,7 +74,7 @@ jobs:
             mamba activate RAiDER
 
             COV_OPTIONS=`python -c "import importlib.util;print(*(' --cov='+p for p in importlib.util.find_spec('RAiDER').submodule_search_locations))"`
-            pytest -n 16 -m "not long" test/ ${COV_OPTIONS} --cov-report=
+            pytest -n 8 -m "not long" test/ ${COV_OPTIONS} --cov-report=
 
       - run:
           name: Report coverage
