@@ -100,7 +100,7 @@ class MERRA2(WeatherModel):
 
         # open the dataset and pull the data
         url = (
-            'https://goldsmr5.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T3NVASM.5.12.4/'
+            'dap4://goldsmr5.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T3NVASM.5.12.4/'
             + time.strftime('%Y/%m')
             + '/MERRA2_'
             + str(url_sub)

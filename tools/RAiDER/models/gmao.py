@@ -1,5 +1,6 @@
 import datetime as dt
 import shutil
+import warnings
 from pathlib import Path
 
 import h5py
@@ -78,8 +79,12 @@ class GMAO(WeatherModel):
         ml_max = 71
         if corrected_DT >= T0:
             # open the dataset and pull the data
-            URL = 'https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv'
-            ds = pydap.client.open_url(URL)
+            url = 'https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv'
+            # For warning from pydap when using HTTPS instead of DAP2 or DAP4:
+            # pydap is incompatible with DAP data from opendap.nccs.nasa.gov. See issue #736
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                ds = pydap.client.open_url(url)
 
             q = (
                 ds['qv']
