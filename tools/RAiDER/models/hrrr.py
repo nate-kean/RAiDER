@@ -24,7 +24,7 @@ HRRR_AK_PROJ = CRS.from_string(
     '+x_0=0.0 +y_0=0.0 +lat_ts=60.0 +no_defs +type=crs'
 )
 # Source: https://eric.clst.org/tech/usgeojson/
-AK_GEO = gpd.read_file(Path(__file__).parent / 'data' / 'alaska.geojson.zip').geometry.unary_union
+AK_GEO = gpd.read_file(Path(__file__).parent / 'data' / 'alaska.geojson.zip').geometry.union_all("unary")
 
 
 def check_hrrr_dataset_availability(datetime: dt.datetime, model='hrrr') -> bool:
