@@ -397,8 +397,8 @@ class WeatherModel(ABC):
         # Get the integrated ZTD
         wet_total, hydro_total = np.zeros(wet.shape), np.zeros(hydro.shape)
         for level in range(wet.shape[2]):
-            wet_total[..., level] = 1e-6 * np.trapz(wet[..., level:], x=self._zs[level:], axis=2)
-            hydro_total[..., level] = 1e-6 * np.trapz(hydro[..., level:], x=self._zs[level:], axis=2)
+            wet_total[..., level] = 1e-6 * np.trapezoid(wet[..., level:], x=self._zs[level:], axis=2)
+            hydro_total[..., level] = 1e-6 * np.trapezoid(hydro[..., level:], x=self._zs[level:], axis=2)
         self._hydrostatic_ztd = hydro_total
         self._wet_ztd = wet_total
 

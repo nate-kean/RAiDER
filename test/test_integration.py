@@ -13,8 +13,8 @@ def test_integrate_along_axis():
 
     for level in range(y.shape[2]):
         assert np.allclose(
-            np.apply_along_axis(np.trapz, 2, y[..., level:], x=x[level:]),
-            np.trapz(y[..., level:], x[level:], axis=2)
+            np.apply_along_axis(np.trapezoid, 2, y[..., level:], x=x[level:]),
+            np.trapezoid(y[..., level:], x[level:], axis=2)
         )
 
 
@@ -27,8 +27,8 @@ def test_integrate_along_axis_2():
 
     for level in range(y.shape[2]):
         assert np.allclose(
-            np.apply_along_axis(np.trapz, 2, y[..., level:], x=x[level:]),
-            np.trapz(y[..., level:], x[level:], axis=2)
+            np.apply_along_axis(np.trapezoid, 2, y[..., level:], x=x[level:]),
+            np.trapezoid(y[..., level:], x[level:], axis=2)
         )
 
 
@@ -38,6 +38,6 @@ def test_integrate_along_axis_large():
 
     for level in range(y.shape[2]):
         assert np.allclose(
-            np.apply_along_axis(np.trapz, 2, y[..., level:], x=x[level:]),
-            np.trapz(y[..., level:], x[level:], axis=2)
+            np.apply_along_axis(np.trapezoid, 2, y[..., level:], x=x[level:]),
+            np.trapezoid(y[..., level:], x[level:], axis=2)
         )
