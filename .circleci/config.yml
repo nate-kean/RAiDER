@@ -31,7 +31,7 @@ jobs:
 
       - run:
           name: Create RAiDER environment
-          no_output_timeout: 30m
+          no_output_timeout: 60m
           shell: /bin/bash -xl
           command: |
             PYTHON_VERSION="<< parameters.python-version >>"

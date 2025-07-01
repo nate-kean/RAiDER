@@ -9,12 +9,16 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 ### Fixed
 * [741](https://github.com/dbekaert/RAiDER/pull/741) - Updated mamba setup commands in CircleCI for mamba 2.0.0.
-* [733](https://github.com/dbekaert/RAiDER/pull/733) - Fixed coverage reports being generated for incorrect directories
+* [738](https://github.com/dbekaert/RAiDER/pull/738) - Resolved an InsecureRequestWarning when fetching data through CDS, such as for ERA5.
+* [734](https://github.com/dbekaert/RAiDER/pull/734) - Resolved a deprecation warning from Rasterio about the use of `statistics()`.
+* [733](https://github.com/dbekaert/RAiDER/pull/733) - Fixed coverage reports being generated for incorrect directories.
+* [732](https://github.com/dbekaert/RAiDER/pull/732) - Updated `hrrr.py` to resolve a deprecation warning about `unary_union`.
+* [731](https://github.com/dbekaert/RAiDER/pull/731) - Fixed fetch routine for GMAO.
 
 ### Added
-* [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git
+* [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git.
 * [728](https://github.com/dbekaert/RAiDER/pull/728) - Added downloader tests for HRES, GMAO, and MERRA2.
-* [726](https://github.com/dbekaert/RAiDER/pull/726) - Updated code and documentation for changes to the CDS API
+* [726](https://github.com/dbekaert/RAiDER/pull/726) - Updated code and documentation for changes to the CDS API.
 
 ## [0.5.5]
 ### Changed
