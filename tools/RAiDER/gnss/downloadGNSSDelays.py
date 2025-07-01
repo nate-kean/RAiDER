@@ -56,8 +56,8 @@ def get_station_list(
                     if k == 0:
                         names = line.strip().split()
                     else:
-                        stations.append([line.strip().split()])
-            station_data = pd.DataFrame(stations, columns=names)
+                        stations.append(line.strip().split())
+            station_data = pd.DataFrame(stations, columns=names)         
     else:
         station_data = get_stats_by_llh(llhBox=bbox)
 
