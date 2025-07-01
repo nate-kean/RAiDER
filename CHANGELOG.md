@@ -13,6 +13,9 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * [732](https://github.com/dbekaert/RAiDER/pull/732) - Updated `hrrr.py` to resolve a deprecation warning about `unary_union`.
 * [731](https://github.com/dbekaert/RAiDER/pull/731) - Fixed fetch routine for GMAO.
 
+### Changed
+* [746](https://github.com/dbekaert/RAiDER/pull/746) - Upgraded numpy version to >2.
+
 ### Added
 * [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git
 * [728](https://github.com/dbekaert/RAiDER/pull/728) - Added downloader tests for HRES, GMAO, and MERRA2.
