@@ -8,6 +8,8 @@ jobs:
     docker:
       - image: cimg/base:current
         user: root
+    resource_class: medium
+
     steps:
       - checkout
 
@@ -31,7 +33,7 @@ jobs:
 
       - run:
           name: Create RAiDER environment
-          no_output_timeout: 30m
+          no_output_timeout: 60m
           shell: /bin/bash -xl
           command: |
             PYTHON_VERSION="<< parameters.python-version >>"
@@ -64,7 +66,7 @@ jobs:
           command: |
             python -m pip install pytest-cov
             COV_OPTIONS=`python -c "import importlib.util; print(*(' --cov='+p for p in importlib.util.find_spec('RAiDER').submodule_search_locations))"`
-            pytest -m "not long" test/ ${COV_OPTIONS} --cov-report= --junitxml=test-results/junit.xml
+            pytest -n 4 -m "not long" test/ ${COV_OPTIONS} --cov-report= --junitxml=test-results/junit.xml
 
       - run:
           name: Report coverage

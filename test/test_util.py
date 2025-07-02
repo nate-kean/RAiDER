@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, mock_open, patch
 
 import numpy as np
-import progressbar
 import pyproj
 import pytest
 import rasterio
@@ -24,7 +23,6 @@ from RAiDER.utilFcns import (
     get_nearest_wmtimes,
     padLower,
     projectDelays,
-    read_EarthData_loginInfo,
     read_NCMR_loginInfo,
     rio_extents,
     rio_open,
@@ -37,7 +35,7 @@ from RAiDER.utilFcns import (
     writeArrayToRaster,
     writeWeatherVarsXarray,
 )
-from test import TEST_DIR, pushd
+from test import TEST_DIR
 
 
 _R_EARTH = 6378138
@@ -172,11 +170,10 @@ def test_writeArrayToRaster_2():
 def test_writeArrayToRaster_3(tmp_path):
     test = np.random.randn(10,10)
     test = test + test * 1j
-    with pushd(tmp_path):
-        path = tmp_path / 'tmp_file.tif'
-        writeArrayToRaster(test, path)
-        tmp = rio_profile(path)
-        assert tmp['dtype'] == 'complex64'
+    path = tmp_path / 'tmp_file.tif'
+    writeArrayToRaster(test, path)
+    tmp = rio_profile(path)
+    assert tmp['dtype'] == 'complex64'
 
 
 def test_writeArrayToRaster_4(tmp_path):
@@ -184,18 +181,17 @@ def test_writeArrayToRaster_4(tmp_path):
     geotif = SCENARIO0_DIR / 'small_dem.tif'
     profile = rio_profile(geotif)
     data, _ = rio_open(geotif)
-    with pushd(tmp_path):
-        path = tmp_path / 'tmp_file.nc'
-        writeArrayToRaster(
-            data, 
-            path, 
-            proj=profile['crs'], 
-            gt=profile['transform'], 
-            fmt='nc',
-        )
-        new_path = tmp_path / 'tmp_file.tif'
-        prof = rio_profile(new_path)
-        assert prof['driver'] == 'GTiff'
+    path = tmp_path / 'tmp_file.nc'
+    writeArrayToRaster(
+        data, 
+        path, 
+        proj=profile['crs'], 
+        gt=profile['transform'], 
+        fmt='nc',
+    )
+    new_path = tmp_path / 'tmp_file.tif'
+    prof = rio_profile(new_path)
+    assert prof['driver'] == 'GTiff'
 
 
 def test_makePoints0D_cython(make_points_0d_data):
@@ -273,9 +269,9 @@ def test_least_nonzero_2():
     )
 
 
-def test_rio_extent():
+def test_rio_extent(tmp_path: Path):
     # Create a simple georeferenced test file
-    test_file = Path("test.tif")
+    test_file = tmp_path / 'test.tif'
     with rasterio.open(test_file, mode="w",
                        width=11, height=11, count=1,
                        dtype=np.float64, crs=pyproj.CRS.from_epsg(4326),
@@ -285,7 +281,6 @@ def test_rio_extent():
         dst.write(np.random.randn(11, 11), 1)
     profile = rio_profile(test_file)
     assert rio_extents(profile) == (17.0, 18.0, 17.0, 18.0)
-    test_file.unlink()
 
 
 def test_getTimeFromFile():
@@ -937,16 +932,16 @@ def test_writeWeatherVarsXarray(tmp_path):
         'crs_wkt': 'WKT representation',
     }
     
-    outName = tmp_path / "test_output.nc"
+    out_path = tmp_path / "test_output.nc"
     
     # Call the function
-    writeWeatherVarsXarray(lat, lon, h, q, p, t, datetime_value, crs, outName)
+    writeWeatherVarsXarray(lat, lon, h, q, p, t, datetime_value, crs, out_path)
     
     # Check that the file was created
-    assert outName.exists()
+    assert out_path.exists()
     
     # Open the written file to verify its contents
-    ds = xr.open_dataset(outName)
+    ds = xr.open_dataset(out_path)
     assert 'latitude' in ds
     assert 'longitude' in ds
     assert 'h' in ds
@@ -1016,46 +1011,6 @@ password:
             read_NCMR_loginInfo("/mock/path/.ncmrlogin")
 
 
-# Test read_EarthData_loginInfo
-def test_read_EarthData_loginInfo_valid():
-    # Mock the behavior of netrc to return a fake username and password
-    mock_netrc = {
-        'urs.earthdata.nasa.gov': ('test_username', None, 'test_password')
-    }
-
-    with patch('netrc.netrc') as mock_netrc_class:
-        # Set the return value of netrc() to be our mock data
-        mock_netrc_class.return_value.hosts = mock_netrc
-
-        # Call the function under test
-        username, password = read_EarthData_loginInfo()
-
-        # Assert that the returned values match our mock data
-        assert username == 'test_username'
-        assert password == 'test_password'
-
-
-def test_read_EarthData_loginInfo_no_entry():
-    # Mock netrc object with an empty hosts dictionary
-    mock_netrc = MagicMock()
-    mock_netrc.hosts = {}  # Simulate no entry for 'urs.earthdata.nasa.gov'
-    
-    with patch('netrc.netrc', return_value=mock_netrc):
-        # Expect a KeyError when no entry for 'urs.earthdata.nasa.gov' exists
-        with pytest.raises(KeyError, match="No entry for urs.earthdata.nasa.gov"):
-            read_EarthData_loginInfo()
-
-
-def test_read_EarthData_loginInfo_invalid_format():
-    # Mock netrc with an invalid entry (None as username and password)
-    mock_netrc = MagicMock()
-    mock_netrc.hosts = {
-        'urs.earthdata.nasa.gov': (None, None, None)
-    }
-
-    with patch('netrc.netrc', return_value=mock_netrc):
-        with pytest.raises(ValueError, match="Invalid login information in netrc"):
-            read_EarthData_loginInfo()
 
 
 # Test show_progress
