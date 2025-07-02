@@ -20,6 +20,9 @@ def main(file, replacement):
         "Has any file path been changed?",
         np.any(np.array(results) != np.array(patched))
     )
+    for orig, patch in zip(results, patched):
+        if orig[0] != patch[0]:
+            print(f"{orig[0]}\n{patch[0]}\n")
 
     cur.executemany("update file set path=? where id=?", patched)
 
