@@ -77,7 +77,8 @@ jobs:
               coveralls --verbose
             fi
 
-      - store_test_results
+      - store_test_results:
+          path: test-results
 
 workflows:
   all-tests:
