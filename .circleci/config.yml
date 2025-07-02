@@ -64,8 +64,7 @@ jobs:
           command: |
             python -m pip install pytest-cov
             COV_OPTIONS=`python -c "import importlib.util; print(*(' --cov='+p for p in importlib.util.find_spec('RAiDER').submodule_search_locations))"`
-            pytest -m "not long" test/ ${COV_OPTIONS} --cov-report=
-            # pytest -m "not long" test/ ${COV_OPTIONS} --cov-report= --junitxml=test-results/junit.xml
+            pytest -m "not long" test/ ${COV_OPTIONS} --cov-report= --junitxml=test-results/junit.xml
 
       - run:
           name: Report coverage
@@ -74,13 +73,11 @@ jobs:
             PYTHON_VERSION="<< parameters.python-version >>"
             if [ "${PYTHON_VERSION}" == "3.12" ]; then
               python -m pip install coveralls
-              pwd
-              python .circleci/fix_coverage_paths.py .coverage ${PWD}/tools/RAiDER/
-              coverage report -mi --show-missing --data-file=.coverage
+              coverage report -mi --show-missing --data-file=test-results/junit.xml
               coveralls --verbose
             fi
 
-      # - store_test_results
+      - store_test_results
 
 workflows:
   all-tests:
