@@ -13,7 +13,7 @@ def main(file, replacement):
     results = list(cur)
     patched = [
         (re.sub(r"/.*/RAiDER/", replacement, r[0]), r[1])
-        for r in cur
+        for r in results
     ]
 
     print(
