@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from datetime import datetime, time, date
 
 import os
+from typing import Union
 import pytest
 
 import numpy as np
@@ -95,11 +96,13 @@ def test_date_type():
     ("T23:00", time(23, 0, 0)),
     ("T2300", time(23, 0, 0)),
     ("23:00", time(23, 0, 0)),
-    ("2300", time(23, 0, 0))
+    ("2300", time(23, 0, 0)),
+    (82800, time(23, 0, 0))
 ))
 @pytest.mark.parametrize("timezone", ("", "z", "+0000"))
-def test_time_type(input, timezone, expected):
-    assert TimeGroup.coerce_into_time(input + timezone) == expected
+def test_time_type(input: Union[str, int], timezone: str, expected: time) -> None:
+    time_string = input + timezone if isinstance(input, str) else input
+    assert TimeGroup.coerce_into_time(time_string) == expected
 
 
 def test_time_type_error():
