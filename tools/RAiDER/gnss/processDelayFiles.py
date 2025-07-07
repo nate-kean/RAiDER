@@ -245,7 +245,7 @@ def readZTDFile(filename, col_name='ZTD'):
     return data
 
 
-def file_choices(p: argparse.ArgumentParser, choices: tuple[str], s: str) -> Path:
+def file_choices(p: argparse.ArgumentParser, choices: tuple[str, ...], s: str) -> Path:
     path = Path(s)
     if path.suffix not in choices:
         p.error(f'File must end with one of {choices}')
