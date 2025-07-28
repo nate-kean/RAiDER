@@ -211,7 +211,7 @@ class ECMWF(WeatherModel):
             'format': 'netcdf',
         }
 
-        c.retrieve('reanalysis-era5-complete', dataDict, str(out_path))
+        c.retrieve('reanalysis-era5-complete', dataDict, out_path)
 
     def _download_ecmwf(self, lat_min, lat_max, lat_step, lon_min, lon_max, lon_step, time, out: Path) -> None:
         """Used for HRES."""
