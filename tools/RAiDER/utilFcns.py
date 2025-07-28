@@ -955,6 +955,9 @@ yaml.add_representer(
     tuple,
     lambda dumper, data: dumper.represent_sequence('tag:yaml.org,2002:seq', data),
 )
+yaml.add_representer(tuple, lambda dumper, data: dumper.represent_sequence('tag:yaml.org,2002:seq', data))
+
+BASE_YAML_PATH = Path(RAiDER.__file__).parent / 'cli/examples/template/template.yaml'
 
 
 def write_yaml(content: dict[str, Any], dst: Union[str, Path]) -> Path:
@@ -962,14 +965,12 @@ def write_yaml(content: dict[str, Any], dst: Union[str, Path]) -> Path:
 
     Each key-value pair in 'content' will override the one from template.yaml.
     """
-    yaml_path = Path(RAiDER.__file__).parent / 'cli/examples/template/template.yaml'
-
-    with yaml_path.open() as f:
+    with BASE_YAML_PATH.open() as f:
         try:
             params = yaml.safe_load(f)
         except yaml.YAMLError as exc:
             print(exc)
-            raise ValueError(f'Something is wrong with the yaml file {yaml_path}')
+            raise ValueError(f'Something is wrong with the yaml file {BASE_YAML_PATH}')
 
     params = {**params, **content}
 
