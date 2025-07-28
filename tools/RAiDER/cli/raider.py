@@ -323,10 +323,10 @@ def calcDelays(iargs: Optional[Sequence[str]] = None) -> list[Path]:
             # log when something else happens and then continue with the next time
             except Exception as e:
                 S, N, W, E = wm_bounds
-                logger.info(f'Weather model point bounds are {S:.2f}/{N:.2f}/{W:.2f}/{E:.2f}')
-                logger.info(f'Query datetime: {tt}')
+                logger.error(f'Weather model point bounds are {S:.2f}/{N:.2f}/{W:.2f}/{E:.2f}')
+                logger.error(f'Query datetime: {tt}')
                 logger.error(e)
-                logger.error(f'Weather model files are: {wfiles}')
+                logger.error(f'Weather model files processed so far are: {wfiles}')
                 logger.error(f'Downloading and/or preparation of {model._Name} failed.')
                 continue
 
