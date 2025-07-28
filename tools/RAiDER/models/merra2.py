@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 
 import numpy as np
-import pydap.cas.urs
 import pydap.client
 import xarray as xr
 from pyproj import CRS
@@ -14,7 +13,7 @@ from RAiDER.models.model_levels import (
     LEVELS_137_HEIGHTS,
 )
 from RAiDER.models.weatherModel import WeatherModel
-from RAiDER.utilFcns import read_EarthData_loginInfo, writeWeatherVarsXarray
+from RAiDER.utilFcns import writeWeatherVarsXarray
 
 
 # Path to Netrc file, can be controlled by env var
@@ -104,12 +103,9 @@ class MERRA2(WeatherModel):
         else:
             url_sub = 400
 
-        # Earthdata credentials
-        earthdata_usr, earthdata_pwd = read_EarthData_loginInfo(EARTHDATA_RC)
-
         # open the dataset and pull the data
         url = (
-            'https://goldsmr5.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T3NVASM.5.12.4/'
+            'dap4://goldsmr5.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T3NVASM.5.12.4/'
             + time.strftime('%Y/%m')
             + '/MERRA2_'
             + str(url_sub)
@@ -118,8 +114,7 @@ class MERRA2(WeatherModel):
             + '.nc4'
         )
 
-        session = pydap.cas.urs.setup_session(earthdata_usr, earthdata_pwd, check_url=url)
-        stream = pydap.client.open_url(url, session=session)
+        stream = pydap.client.open_url(url)
 
         q = stream['QV'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()
         p = stream['PL'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()

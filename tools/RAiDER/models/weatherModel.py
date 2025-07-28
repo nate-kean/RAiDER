@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Iterable, List, Literal, Optional, Tuple, Union
 
-from RAiDER.types import BB
 import numpy as np
 import xarray as xr
 from pyproj import CRS
@@ -19,7 +18,8 @@ from RAiDER.interpolator import fillna3D
 from RAiDER.logger import logger
 from RAiDER.models import plotWeather as plots
 from RAiDER.models.customExceptions import DatetimeOutsideRange
-from RAiDER.utilFcns import calcgeoh, clip_bbox, transform_coords
+from RAiDER.types import BB
+from RAiDER.utilFcns import calcgeoh, clip_bbox, np_trapezoid, transform_coords
 
 
 TIME_RES = {
@@ -404,8 +404,8 @@ class WeatherModel(ABC):
         # Get the integrated ZTD
         wet_total, hydro_total = np.zeros(wet.shape), np.zeros(hydro.shape)
         for level in range(wet.shape[2]):
-            wet_total[..., level] = 1e-6 * np.trapz(wet[..., level:], x=self._zs[level:], axis=2)
-            hydro_total[..., level] = 1e-6 * np.trapz(hydro[..., level:], x=self._zs[level:], axis=2)
+            wet_total[..., level] = 1e-6 * np_trapezoid(wet[..., level:], x=self._zs[level:], axis=2)
+            hydro_total[..., level] = 1e-6 * np_trapezoid(hydro[..., level:], x=self._zs[level:], axis=2)
         self._hydrostatic_ztd = hydro_total
         self._wet_ztd = wet_total
 

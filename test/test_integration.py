@@ -1,5 +1,7 @@
 import numpy as np
 
+from RAiDER.utilFcns import np_trapezoid
+
 
 # The purpose of these tests is to verify that the axis parameter for trapz is
 # equivalent to calling apply_along_axis(trapz, axis).
@@ -18,8 +20,8 @@ def test_integrate_along_axis() -> None:
 
     for level in range(y.shape[2]):
         assert np.allclose(
-            np.apply_along_axis(np.trapz, 2, y[..., level:], x=x[level:]),
-            np.trapz(y[..., level:], x[level:], axis=2),
+            np.apply_along_axis(np_trapezoid, 2, y[..., level:], x=x[level:]),
+            np_trapezoid(y[..., level:], x[level:], axis=2)
         )
 
 
@@ -36,8 +38,8 @@ def test_integrate_along_axis_2() -> None:
 
     for level in range(y.shape[2]):
         assert np.allclose(
-            np.apply_along_axis(np.trapz, 2, y[..., level:], x=x[level:]),
-            np.trapz(y[..., level:], x[level:], axis=2),
+            np.apply_along_axis(np_trapezoid, 2, y[..., level:], x=x[level:]),
+            np_trapezoid(y[..., level:], x[level:], axis=2)
         )
 
 
@@ -47,6 +49,6 @@ def test_integrate_along_axis_large() -> None:
 
     for level in range(y.shape[2]):
         assert np.allclose(
-            np.apply_along_axis(np.trapz, 2, y[..., level:], x=x[level:]),
-            np.trapz(y[..., level:], x[level:], axis=2),
+            np.apply_along_axis(np_trapezoid, 2, y[..., level:], x=x[level:]),
+            np_trapezoid(y[..., level:], x[level:], axis=2)
         )

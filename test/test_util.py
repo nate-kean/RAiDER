@@ -23,7 +23,6 @@ from RAiDER.utilFcns import (
     get_nearest_wmtimes,
     padLower,
     projectDelays,
-    read_EarthData_loginInfo,
     read_NCMR_loginInfo,
     rio_extents,
     rio_open,
@@ -542,14 +541,14 @@ def test_transform_bbox_1() -> None:
 
 def test_transform_bbox_2() -> None:
     snwe_in = (34.0, 35.0, -77.0, -76.0)
-    
+
     expected_snwe = (
         3762606.6598762725,  # South
         3874870.6347308,  # North
         315290.16886786406,  # West
-        408746.7471660769,    # East
+        408746.7471660769,  # East
     )
-    
+
     snwe = transform_bbox(snwe_in, src_crs=4326, dest_crs=32618)
 
     # Increase the tolerance to account for geospatial precision issues
@@ -1004,15 +1003,15 @@ def test_writeWeatherVarsXarray(tmp_path) -> None:
         'grid_mapping_name': 'latitude_longitude',
         'crs_wkt': 'WKT representation',
     }
-    
-    out_path = tmp_path / "test_output.nc"
-    
+
+    out_path = tmp_path / 'test_output.nc'
+
     # Call the function
     writeWeatherVarsXarray(lat, lon, h, q, p, t, datetime_value, crs, out_path)
-    
+
     # Check that the file was created
     assert out_path.exists()
-    
+
     # Open the written file to verify its contents
     ds = xr.open_dataset(out_path)
     assert 'latitude' in ds
@@ -1082,44 +1081,6 @@ password:
     with patch('pathlib.Path.open', mock_open(read_data=mock_file_content)):
         with pytest.raises(ValueError, match='Improperly formatted login file'):
             read_NCMR_loginInfo('/mock/path/.ncmrlogin')
-
-
-# Test read_EarthData_loginInfo
-def test_read_EarthData_loginInfo_valid() -> None:
-    # Mock the behavior of netrc to return a fake username and password
-    mock_netrc = {'urs.earthdata.nasa.gov': ('test_username', None, 'test_password')}
-
-    with patch('netrc.netrc') as mock_netrc_class:
-        # Set the return value of netrc() to be our mock data
-        mock_netrc_class.return_value.hosts = mock_netrc
-
-        # Call the function under test
-        username, password = read_EarthData_loginInfo()
-
-        # Assert that the returned values match our mock data
-        assert username == 'test_username'
-        assert password == 'test_password'
-
-
-def test_read_EarthData_loginInfo_no_entry() -> None:
-    # Mock netrc object with an empty hosts dictionary
-    mock_netrc = MagicMock()
-    mock_netrc.hosts = {}  # Simulate no entry for 'urs.earthdata.nasa.gov'
-
-    with patch('netrc.netrc', return_value=mock_netrc):
-        # Expect a KeyError when no entry for 'urs.earthdata.nasa.gov' exists
-        with pytest.raises(KeyError, match='No entry for urs.earthdata.nasa.gov'):
-            read_EarthData_loginInfo()
-
-
-def test_read_EarthData_loginInfo_invalid_format() -> None:
-    # Mock netrc with an invalid entry (None as username and password)
-    mock_netrc = MagicMock()
-    mock_netrc.hosts = {'urs.earthdata.nasa.gov': (None, None, None)}
-
-    with patch('netrc.netrc', return_value=mock_netrc):
-        with pytest.raises(ValueError, match='Invalid login information in netrc'):
-            read_EarthData_loginInfo()
 
 
 # Test show_progress
