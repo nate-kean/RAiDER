@@ -579,7 +579,12 @@ def UTM_to_WGS84(z: np.array, ltr: np.array, x: np.array, y: np.array) -> tuple[
     return np.reshape(lon, x.shape), np.reshape(lat, x.shape)
 
 
-def transform_bbox(snwe_in: list, dest_crs: int = 4326, src_crs: int = 4326, buffer: float = 100.0) -> Tuple[np.array]:
+def transform_bbox(
+    snwe_in: BB.SNWE,
+    dest_crs: CRSLike = 4326,
+    src_crs: CRSLike = 4326,
+    buffer: float = 100.0,
+) -> BB.SNWE:
     """Transform bbox to lat/lon or another CRS for use with rest of workflow."""
     """
     Returns: SNWE
@@ -612,8 +617,7 @@ def transform_bbox(snwe_in: list, dest_crs: int = 4326, src_crs: int = 4326, buf
     xx, yy = T.transform(X, Y)
 
     # query_area convention
-    snwe = [np.nanmin(yy), np.nanmax(yy), np.nanmin(xx), np.nanmax(xx)]
-    return snwe
+    return np.nanmin(yy), np.nanmax(yy), np.nanmin(xx), np.nanmax(xx)
 
 
 def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> List[np.array]:

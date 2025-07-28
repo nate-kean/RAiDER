@@ -534,22 +534,22 @@ def test_ecef2enu_9() -> None:
 
 
 def test_transform_bbox_1() -> None:
-    wesn = [-77.0, -76.0, 34.0, 35.0]
+    wesn = (-77.0, -76.0, 34.0, 35.0)
     snwe = wesn[2:] + wesn[:2]
 
     assert transform_bbox(snwe, src_crs=4326, dest_crs=4326) == snwe
 
 
 def test_transform_bbox_2() -> None:
-    snwe_in = [34.0, 35.0, -77.0, -76.0]
-
-    expected_snwe = [
+    snwe_in = (34.0, 35.0, -77.0, -76.0)
+    
+    expected_snwe = (
         3762606.6598762725,  # South
         3874870.6347308,  # North
         315290.16886786406,  # West
-        408746.7471660769,  # East
-    ]
-
+        408746.7471660769,    # East
+    )
+    
     snwe = transform_bbox(snwe_in, src_crs=4326, dest_crs=32618)
 
     # Increase the tolerance to account for geospatial precision issues

@@ -181,13 +181,13 @@ class AOI:
             except pyproj.exceptions.CRSError:
                 out_proj = dst_crs
 
-        out_snwe = transform_bbox(self.bounds(), src_crs=4326, dest_crs=out_proj)
-        logger.debug(f'Output SNWE: {out_snwe}')
+        s, n, w, e = transform_bbox(BB.SNWE(self.bounds()), src_crs=4326, dest_crs=out_proj)
+        logger.debug(f'Output SNWE: {s} {n} {w} {e}')
 
         # Build the output grid
         out_spacing = self.get_output_spacing(out_proj)
-        self.xpts = np.arange(out_snwe[2], out_snwe[3] + out_spacing, out_spacing)
-        self.ypts = np.arange(out_snwe[1], out_snwe[0] - out_spacing, -out_spacing)
+        self.xpts = np.arange(w, e + out_spacing, out_spacing)
+        self.ypts = np.arange(n, s - out_spacing, -out_spacing)
 
 
 class StationFile(AOI):

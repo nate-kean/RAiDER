@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Literal, Optional, Tuple, Union
 
+from RAiDER.types import BB
 import numpy as np
 import xarray as xr
 from pyproj import CRS
@@ -190,7 +191,7 @@ class WeatherModel(ABC):
 
     def set_latlon_bounds(
         self,
-        ll_bounds: Union[list, np.ndarray],
+        ll_bounds: Union[BB.SNWE, Iterable[float]],
         Nextra: int = 2,
         output_spacing: float = None,
     ) -> None:
