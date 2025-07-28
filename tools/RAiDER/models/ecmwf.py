@@ -197,7 +197,7 @@ class ECMWF(WeatherModel):
             'class': 'ea',
             'expver': '1',
             'levelist': 'all',
-            'levtype': f'{self._model_level_type}',  # 'ml' for model levels or 'pl' for pressure levels
+            'levtype': self._model_level_type,  # 'ml' for model levels or 'pl' for pressure levels
             'param': var,
             'stream': 'oper',
             'type': 'an',
