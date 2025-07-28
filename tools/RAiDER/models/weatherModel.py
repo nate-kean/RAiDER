@@ -2,7 +2,7 @@ import datetime as dt
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List, Literal, Optional, Tuple, Union
+from typing import Iterable, List, Literal, Optional, Tuple, Union
 
 from RAiDER.types import BB
 import numpy as np
@@ -193,7 +193,7 @@ class WeatherModel(ABC):
         self,
         ll_bounds: Union[BB.SNWE, Iterable[float]],
         Nextra: int = 2,
-        output_spacing: float = None,
+        output_spacing: Optional[float] = None,
     ) -> None:
         """
         Need to correct lat/lon bounds because not all of the weather models have valid
@@ -238,7 +238,8 @@ class WeatherModel(ABC):
         """Set the path to the directory with the weather model files."""
         self._wmLoc = weather_model_directory
 
-    def load(self, *args: tuple, _zlevels: Union[np.ndarray, list] = None, **kwargs: dict) -> None:
+
+    def load(self, *args: tuple, _zlevels: Optional[Union[np.ndarray, list]]=None, **kwargs: dict) -> None:
         """
         Calls the load_weather method. Each model class should define a load_weather
         method appropriate for that class. 'args' should be one or more filenames.

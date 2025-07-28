@@ -24,7 +24,7 @@ except ImportError:
 from pyproj import CRS
 
 from RAiDER.logger import logger
-from RAiDER.types import BB, RIO
+from RAiDER.types import BB, RIO, CRSLike
 
 
 class AOI:
@@ -59,7 +59,7 @@ class AOI:
     def projection(self):
         return self._proj
 
-    def get_output_spacing(self, crs=4326):
+    def get_output_spacing(self, crs: CRSLike = 4326) -> float:
         """Return the output spacing in desired units."""
         output_spacing_deg = self._output_spacing
         if not isinstance(crs, CRS):

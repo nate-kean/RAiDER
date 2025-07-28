@@ -5,8 +5,10 @@
 #  RESERVED. United States Government Sponsorship acknowledged.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+import datetime as dt
 import os
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,17 +20,23 @@ from RAiDER.models.customExceptions import (
     ExistingWeatherModelTooSmall,
     TryToKeepGoingError,
 )
-from RAiDER.models.weatherModel import checkContainment_raw, make_raw_weather_data_filename, make_weather_model_filename
+from RAiDER.models.weatherModel import (
+    WeatherModel,
+    checkContainment_raw,
+    make_raw_weather_data_filename,
+    make_weather_model_filename,
+)
+from RAiDER.types import BB
 
 
 def prepareWeatherModel(
-    weather_model,
-    time,
-    ll_bounds,
+    weather_model: WeatherModel,
+    time: dt.datetime,
+    ll_bounds: BB.SNWE,
     download_only: bool = False,
     makePlots: bool = False,
     force_download: bool = False,
-) -> str:
+) -> Optional[str]:
     """Parse inputs to download and prepare a weather model grid for interpolation.
 
     Args:
