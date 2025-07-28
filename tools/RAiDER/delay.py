@@ -74,7 +74,7 @@ def tropo_delay(
 
     # get heights
     with xr.load_dataset(weather_model_file) as ds:
-        wm_levels = ds.z.values
+        wm_levels = ds['z'].values
         toa = wm_levels.max() - 1
 
     if height_levels is None:
@@ -138,8 +138,8 @@ def _get_delays_on_cube(datetime: dt.datetime, weather_model_file, wm_proj, aoi,
         aoi.xpts
     except AttributeError:
         with xr.load_dataset(weather_model_file) as ds:
-            x_spacing = ds.x.diff(dim='x').values.mean()
-            y_spacing = ds.y.diff(dim='y').values.mean()
+            x_spacing = ds['x'].diff(dim='x').values.mean()
+            y_spacing = ds['y'].diff(dim='y').values.mean()
         aoi.set_output_spacing(ll_res=np.min([x_spacing, y_spacing]))
         aoi.set_output_xygrid(crs)
 
@@ -390,33 +390,33 @@ def writeResultsToXarray(
     # Write projection system mapping
     ds['crs'] = -2147483647  # dummy placeholder
     for k, v in crs.to_cf().items():
-        ds.crs.attrs[k] = v
+        ds['crs'].attrs[k] = v
 
     # Write z-axis information
-    ds.z.attrs['axis'] = 'Z'
-    ds.z.attrs['units'] = 'm'
-    ds.z.attrs['description'] = 'height above ellipsoid'
+    ds['z'].attrs['axis'] = 'Z'
+    ds['z'].attrs['units'] = 'm'
+    ds['z'].attrs['description'] = 'height above ellipsoid'
 
     # If in degrees
     if crs.axis_info[0].unit_name == 'degree':
-        ds.y.attrs['units'] = 'degrees_north'
-        ds.y.attrs['standard_name'] = 'latitude'
-        ds.y.attrs['long_name'] = 'latitude'
+        ds['y'].attrs['units'] = 'degrees_north'
+        ds['y'].attrs['standard_name'] = 'latitude'
+        ds['y'].attrs['long_name'] = 'latitude'
 
-        ds.x.attrs['units'] = 'degrees_east'
-        ds.x.attrs['standard_name'] = 'longitude'
-        ds.x.attrs['long_name'] = 'longitude'
+        ds['x'].attrs['units'] = 'degrees_east'
+        ds['x'].attrs['standard_name'] = 'longitude'
+        ds['x'].attrs['long_name'] = 'longitude'
 
     else:
-        ds.y.attrs['axis'] = 'Y'
-        ds.y.attrs['standard_name'] = 'projection_y_coordinate'
-        ds.y.attrs['long_name'] = 'y-coordinate in projected coordinate system'
-        ds.y.attrs['units'] = 'm'
+        ds['y'].attrs['axis'] = 'Y'
+        ds['y'].attrs['standard_name'] = 'projection_y_coordinate'
+        ds['y'].attrs['long_name'] = 'y-coordinate in projected coordinate system'
+        ds['y'].attrs['units'] = 'm'
 
-        ds.x.attrs['axis'] = 'X'
-        ds.x.attrs['standard_name'] = 'projection_x_coordinate'
-        ds.x.attrs['long_name'] = 'x-coordinate in projected coordinate system'
-        ds.x.attrs['units'] = 'm'
+        ds['x'].attrs['axis'] = 'X'
+        ds['x'].attrs['standard_name'] = 'projection_x_coordinate'
+        ds['x'].attrs['long_name'] = 'x-coordinate in projected coordinate system'
+        ds['x'].attrs['units'] = 'm'
 
     return ds
 

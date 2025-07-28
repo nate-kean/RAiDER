@@ -386,21 +386,21 @@ class Geocube(AOI):
 
     def get_extent(self):
         with xr.open_dataset(self.path) as ds:
-            S, N = ds.latitude.min().item(), ds.latitude.max().item()
-            W, E = ds.longitude.min().item(), ds.longitude.max().item()
+            S, N = ds['latitude'].min().item(), ds['latitude'].max().item()
+            W, E = ds['longitude'].min().item(), ds['longitude'].max().item()
         return [S, N, W, E]
 
     # untested
     def readLL(self) -> tuple[np.ndarray, np.ndarray]:
         with xr.open_dataset(self.path) as ds:
-            lats = ds.latitutde.data()
-            lons = ds.longitude.data()
+            lats = ds['latitutde'].data()
+            lons = ds['longitude'].data()
         Lats, Lons = np.meshgrid(lats, lons)
         return Lats, Lons
 
     def readZ(self):
         with xr.open_dataset(self.path) as ds:
-            heights = ds.heights.data
+            heights = ds['heights'].data()
         return heights
 
 

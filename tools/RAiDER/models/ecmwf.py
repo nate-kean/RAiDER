@@ -256,9 +256,9 @@ class ECMWF(WeatherModel):
             z = np.squeeze(block['z'].values)
             t = np.squeeze(block['t'].values)
             q = np.squeeze(block['q'].values)
-            lats = np.squeeze(block.latitude.values)
-            lons = np.squeeze(block.longitude.values)
-            levels = np.squeeze(block.level.values) * 100
+            lats = np.squeeze(block['latitude'].values)
+            lons = np.squeeze(block['longitude'].values)
+            levels = np.squeeze(block['level'].values) * 100
 
         z = np.flip(z, axis=1)
 
@@ -312,11 +312,11 @@ class ECMWF(WeatherModel):
         S, N, W, E = self._ll_bounds
 
         with xr.open_dataset(fname) as ds:
-            ds = ds.assign_coords(longitude=(((ds.longitude + 180) % 360) - 180))
+            ds = ds.assign_coords(longitude=(((ds['longitude'] + 180) % 360) - 180))
 
             # mask based on query bounds
-            m1 = (S <= ds.latitude) & (N >= ds.latitude)
-            m2 = (W <= ds.longitude) & (E >= ds.longitude)
+            m1 = (s <= ds['latitude']) & (n >= ds['latitude'])
+            m2 = (w <= ds['longitude']) & (e >= ds['longitude'])
             block = ds.where(m1 & m2, drop=True)
 
             # Pull the data
@@ -324,8 +324,8 @@ class ECMWF(WeatherModel):
             t = np.squeeze(block['t'].values)
             q = np.squeeze(block['q'].values)
             lnsp = np.squeeze(block['lnsp'].values)[0, ...]
-            lats = np.squeeze(block.latitude.values)
-            lons = np.squeeze(block.longitude.values)
+            lats = np.squeeze(block['latitude'].values)
+            lons = np.squeeze(block['longitude'].values)
 
             xs = lons.copy()
             ys = lats.copy()
