@@ -730,7 +730,7 @@ class WeatherModel(ABC):
         return f
 
 
-def make_weather_model_filename(name: str, time: dt.datetime, ll_bounds: Union[list, tuple, np.ndarray]) -> str:
+def make_weather_model_filename(name: str, time: dt.datetime, ll_bounds: Union[list, BB.SNWE, np.ndarray]) -> str:
     """Creates the filename for the weather model."""
     s = np.floor(ll_bounds[0])
     S = f'{np.abs(s):.0f}S' if s < 0 else f'{s:.0f}N'
