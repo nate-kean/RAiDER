@@ -246,7 +246,7 @@ class WeatherModel(ABC):
         """
         # If the weather file has already been processed, do nothing
         outLoc = self.get_wmLoc()
-        path_wm_raw = make_raw_weather_data_filename(outLoc, self.Model(), self.getTime())
+        path_wm_raw = make_raw_weather_data_path(outLoc, self.Model(), self.getTime())
         self._out_name = self.out_file(outLoc)
 
         if Path.exists(Path(self._out_name)):
@@ -542,11 +542,12 @@ class WeatherModel(ABC):
         Determine whether any of extent1 lies outside extent2.
         extent1/2 should be a list containing [lower_lat, upper_lat, left_lon, right_lon].
         """
-        t1 = extent1[0] < extent2[0]
-        t2 = extent1[1] > extent2[1]
-        t3 = extent1[2] < extent2[2]
-        t4 = extent1[3] > extent2[3]
-        return np.any([t1, t2, t3, t4])
+        return (
+            extent1[0] < extent2[0]
+            or extent1[1] > extent2[1]
+            or extent1[2] < extent2[2]
+            or extent1[3] > extent2[3]
+        )
 
     def _trimExtent(self, extent: list) -> None:
         """Get the bounding box around a set of lats/lons."""
@@ -634,14 +635,13 @@ class WeatherModel(ABC):
         self._t = fillna3D(self._t, fill_value=1e16)  # to avoid division by zero later on
         self._e = fillna3D(self._e)
 
-    def out_file(self, outLoc: str) -> Path:
-        """Returns outloc."""
-        f = make_weather_model_filename(
+    def out_file(self, out_dir: Path) -> Path:
+        filename = make_weather_model_filename(
             self._Name,
             self._time,
             self._ll_bounds,
         )
-        return os.path.join(outLoc, f)
+        return out_dir / filename
 
     def filename(self, time: dt.datetime = None, outLoc: str = 'weather_files') -> str:
         """Create a filename to store the weather model."""
@@ -653,7 +653,7 @@ class WeatherModel(ABC):
             else:
                 time = self._time
 
-        f = make_raw_weather_data_filename(
+        f = make_raw_weather_data_path(
             outLoc,
             self._Name,
             time,
@@ -746,11 +746,10 @@ def make_weather_model_filename(name: str, time: dt.datetime, ll_bounds: Union[l
     return f'{name}_{time.strftime("%Y_%m_%d_T%H_%M_%S")}_{S}_{N}_{W}_{E}.nc'
 
 
-def make_raw_weather_data_filename(outLoc: str, name: str, time: dt.datetime) -> str:
+def make_raw_weather_data_path(out_dir: Path, name: str, time: dt.datetime) -> Path:
     """Filename generator for the raw downloaded weather model data."""
     date_string = dt.datetime.strftime(time, '%Y_%m_%d_T%H_%M_%S')
-    f = os.path.join(outLoc, f'{name}_{date_string}.nc')
-    return f
+    return out_dir / f'{name}_{date_string}.nc'
 
 
 def find_svp(t: np.ndarray) -> np.ndarray:

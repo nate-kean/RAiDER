@@ -26,7 +26,7 @@ from RAiDER.models.ncmr import NCMR
 from RAiDER.models.weatherModel import (
     WeatherModel,
     find_svp,
-    make_raw_weather_data_filename,
+    make_raw_weather_data_path,
     make_weather_model_filename,
 )
 
@@ -266,7 +266,7 @@ def test_mrwmf() -> None:
     outLoc = './'
     name = 'ERA-5'
     time = dt.datetime(2020, 1, 1)
-    assert make_raw_weather_data_filename(outLoc, name, time) == './ERA-5_2020_01_01_T00_00_00.nc'
+    assert make_raw_weather_data_path(outLoc, name, time) == './ERA-5_2020_01_01_T00_00_00.nc'
 
 
 def test_erai(erai: ERAI) -> None:
