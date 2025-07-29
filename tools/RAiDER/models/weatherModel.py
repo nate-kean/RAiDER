@@ -643,7 +643,7 @@ class WeatherModel(ABC):
         )
         return out_dir / filename
 
-    def filename(self, time: dt.datetime = None, outLoc: str = 'weather_files') -> str:
+    def filename(self, time: Optional[dt.datetime] = None, outLoc: str = 'weather_files') -> str:
         """Create a filename to store the weather model."""
         Path.mkdir(outLoc, exist_ok=True)
 
