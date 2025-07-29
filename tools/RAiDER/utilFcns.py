@@ -721,8 +721,6 @@ def convertLons(inLons: np.ndarray) -> np.ndarray:
 
 def read_NCMR_loginInfo(filepath: Optional[str] = None) -> Tuple[str, str, str]:
     """Returns login information."""
-    from pathlib import Path
-
     if filepath is None:
         filepath = str(Path.home()) + '/.ncmrlogin'
 
