@@ -103,15 +103,12 @@ class MERRA2(WeatherModel):
 
         # open the dataset and pull the data
         url = (
-            'dap4://goldsmr5.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T3NVASM.5.12.4/'
-            + time.strftime('%Y/%m')
-            + '/MERRA2_'
-            + str(url_sub)
-            + '.tavg3_3d_asm_Nv.'
-            + time.strftime('%Y%m%d')
-            + '.nc4'
+            f'dap4://goldsmr5.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T3NVASM.5.12.4/'
+            f'{time.strftime('%Y/%m')}/'
+            f'MERRA2_{url_sub}.tavg3_3d_asm_Nv.{time.strftime('%Y%m%d')}.nc4'
         )
 
+        # pydap engine required for password-protected datasets
         ds = xr.open_dataset(url, decode_times=False, engine='pydap')
 
         q = ds['QV'][
