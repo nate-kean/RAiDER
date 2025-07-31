@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 import numpy as np
-import pydap.client
 import xarray as xr
 from pyproj import CRS
 
@@ -69,7 +68,11 @@ class MERRA2(WeatherModel):
         self._proj = CRS.from_epsg(4326)
 
     def _fetch(self, out: Path) -> None:
-        """Fetch weather model data from GMAO: note we only extract the lat/lon bounds for this weather model; fetching data is not needed here as we don't actually download any data using OpenDAP."""
+        """Fetch weather model data from GMAO.
+        
+        Note: we only extract the lat/lon bounds for this weather model; fetching data is not needed here as we don't
+        actually download any data using OPeNDAP.
+        """
         time = self._time
 
         # check whether the file already exists
@@ -109,12 +112,32 @@ class MERRA2(WeatherModel):
             + '.nc4'
         )
 
-        stream = pydap.client.open_url(url)
+        ds = xr.open_dataset(url, decode_times=False, engine='pydap')
 
-        q = stream['QV'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()
-        p = stream['PL'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()
-        t = stream['T'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()
-        h = stream['H'][0, :, lat_min_ind : lat_max_ind + 1, lon_min_ind : lon_max_ind + 1].data.squeeze()
+        q = ds['QV'][
+            0,
+            :,
+            lat_min_ind : lat_max_ind + 1,
+            lon_min_ind : lon_max_ind + 1,
+        ].data.squeeze()
+        p = ds['PL'][
+            0,
+            :,
+            lat_min_ind : lat_max_ind + 1,
+            lon_min_ind : lon_max_ind + 1,
+        ].data.squeeze()
+        t = ds['T'][
+            0,
+            :,
+            lat_min_ind : lat_max_ind + 1,
+            lon_min_ind : lon_max_ind + 1,
+        ].data.squeeze()
+        h = ds['H'][
+            0,
+            :,
+            lat_min_ind : lat_max_ind + 1,
+            lon_min_ind : lon_max_ind + 1,
+        ].data.squeeze()
 
         try:
             writeWeatherVarsXarray(lat, lon, h, q, p, t, time, self._proj, out_path=out)

@@ -651,18 +651,18 @@ def writeWeatherVarsXarray(
     NoDataValue: int = -9999,
     chunksize: Tuple[int, ...] = (1, 91, 144),
 ) -> None:
-    assert len(h.shape) == 3, "Invalid h array dimensions"
-    assert len(q.shape) == 3, "Invalid q array dimensions"
-    assert len(p.shape) == 3, "Invalid p array dimensions"
-    assert len(t.shape) == 3, "Invalid t array dimensions"
+    assert h.ndim == 3, "Invalid h array dimensions"
+    assert q.ndim == 3, "Invalid q array dimensions"
+    assert p.ndim == 3, "Invalid p array dimensions"
+    assert t.ndim == 3, "Invalid t array dimensions"
     dataset_dict = {
         'h': (('z', 'y', 'x'), h),
         'q': (('z', 'y', 'x'), q),
         'p': (('z', 'y', 'x'), p),
         't': (('z', 'y', 'x'), t),
     }
-    assert len(lat.shape) == 2, "Invalid lats array dimensions"
-    assert len(lon.shape) == 2, "Invalid lons array dimensions"
+    assert lat.ndim == 2, "Invalid lats array dimensions"
+    assert lon.ndim == 2, "Invalid lons array dimensions"
     dimension_dict = {
         'latitude': (('y', 'x'), lat),
         'longitude': (('y', 'x'), lon),
