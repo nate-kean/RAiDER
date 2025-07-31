@@ -140,8 +140,8 @@ class MERRA2(WeatherModel):
             writeWeatherVarsXarray(lat, lon, h, q, p, t, time, self._proj, out_path=out)
         except Exception as e:
             logger.debug(e)
-            logger.exception('MERRA-2: Unable to save weathermodel to file')
-            raise RuntimeError(f'MERRA-2 failed with the following error: {e}')
+            logger.exception('MERRA-2: Unable to save weather model query to file')
+            raise
 
     def load_weather(self, f=None, *args, **kwargs) -> None:
         """
@@ -154,7 +154,7 @@ class MERRA2(WeatherModel):
         self._load_model_level(f)
 
     def _load_model_level(self, filename) -> None:
-        """Get the variables from the GMAO link using OpenDAP."""
+        """Get the variables from the GMAO link using OPeNDAP."""
         # adding the import here should become absolute when transition to netcdf
         ds = xr.load_dataset(filename)
         lons = ds['longitude'].values
