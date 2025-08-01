@@ -55,14 +55,14 @@ def prepareWeatherModel(
         weather_model.set_latlon_bounds(ll_bounds)
 
     # Ensure the file output location exists
-    wmLoc = weather_model.get_wmLoc()
+    wm_dir = weather_model.get_wmLoc()
     weather_model.setTime(time)
 
     # get the path to the less processed weather model file
-    path_wm_raw = make_raw_weather_data_path(wmLoc, weather_model.Model(), time)
+    path_wm_raw = make_raw_weather_data_path(wm_dir, weather_model.Model(), time)
 
     # get the path to the more processed (cropped) weather model file
-    path_wm_crop = weather_model.out_file(wmLoc)
+    path_wm_crop = weather_model.out_file(wm_dir)
 
     # check whether weather model files exists and/or or should be downloaded
     if os.path.exists(path_wm_crop) and not force_download:
