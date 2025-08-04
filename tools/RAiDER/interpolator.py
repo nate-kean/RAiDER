@@ -7,10 +7,14 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Generator, Tuple, Union
 
+from RAiDER.types import FloatArray1D, FloatArray2D
 import numpy as np
 import pandas as pd
+import rasterio as rio
+from rasterio import io as rioio
+from rasterio import warp as riow
 from scipy.interpolate import interp1d
 
 from RAiDER.interpolate import interpolate
@@ -131,7 +135,11 @@ def fillna3D(array, axis=-1, fill_value=0.0):
     return outmat
 
 
-def interpolateDEM(dem_path: Union[Path, str], outLL: Tuple[np.ndarray, np.ndarray], method='nearest') -> np.ndarray:
+def interpolateDEM(
+    dem_path: Union[Path, str],
+    outLL: Tuple[Union[FloatArray1D, FloatArray2D], Union[FloatArray1D, FloatArray2D]],
+    method='nearest'
+) -> np.ndarray:
     """Interpolate a DEM raster to a set of lat/lon query points using rioxarray.
 
     outLL will be a tuple of (lats, lons). lats/lons can either be 1D arrays or 2
@@ -144,9 +152,9 @@ def interpolateDEM(dem_path: Union[Path, str], outLL: Tuple[np.ndarray, np.ndarr
         import rioxarray as xrr
         from xarray import Dataset
 
-        data = xrr.open_rasterio(dem_path, band_as_variable=True)
-        assert isinstance(data, Dataset), 'DEM could not be opened as a rioxarray dataset'
-        da_dem = data['band_1']
+        ds = xrr.open_rasterio(dem_path, band_as_variable=True)
+        assert isinstance(ds, Dataset), 'DEM could not be opened as a rioxarray dataset'
+        da_dem = ds['band_1']
         z_out: np.ndarray = da_dem.interp(y=np.sort(lats)[::-1], x=lons).data
 
     return z_out
@@ -163,7 +171,7 @@ def interpolate_elevation(dem_path: Union[Path, str], x: np.ndarray, y: np.ndarr
     Returns:
     List of elevation values corresponding to the input points.
     """
-    import rasterio
+    import rasterio.transform
 
     # with rasterio.open(dem_path) as src:
     with reproject_raster(dem_path, 4326) as src:
@@ -184,37 +192,30 @@ def interpolate_elevation(dem_path: Union[Path, str], x: np.ndarray, y: np.ndarr
 
 
 @contextmanager
-def reproject_raster(in_path, crs):
-    # reproject raster to project crs
-    import rasterio
-    from rasterio.io import MemoryFile
-    from rasterio.warp import Resampling, calculate_default_transform, reproject
-
-    with rasterio.open(in_path) as src:
-        src_crs = src.crs
-        transform, width, height = calculate_default_transform(src_crs, crs, src.width, src.height, *src.bounds)
+def reproject_raster(in_path: Path, crs: int) -> Generator[rio.DatasetReader]:
+    """Reproject raster to project crs."""
+    with rio.open(in_path) as src:
+        transform, width, height = riow.calculate_default_transform(src.crs, crs, src.width, src.height, *src.bounds)
         kwargs = src.meta.copy()
 
-        kwargs.update(
-            {
-                'crs': crs,
-                'transform': transform,
-                'width': width,
-                'height': height,
-            }
-        )
+        kwargs.update({
+            'crs': crs,
+            'transform': transform,
+            'width': width,
+            'height': height,
+        })
 
-        with MemoryFile() as memfile:
+        with rioio.MemoryFile() as memfile:
             with memfile.open(**kwargs) as dst:
                 for i in range(1, src.count + 1):
-                    reproject(
-                        source=rasterio.band(src, i),
-                        destination=rasterio.band(dst, i),
+                    riow.reproject(
+                        source=rio.band(src, i),
+                        destination=rio.band(dst, i),
                         src_transform=src.transform,
                         src_crs=src.crs,
                         dst_transform=transform,
                         dst_crs=crs,
-                        resampling=Resampling.nearest,
+                        resampling=riow.Resampling.nearest,
                     )
-            with memfile.open() as dataset:  # Reopen as DatasetReader
-                yield dataset  # Note yield not return as we're a contextmanager
+            with memfile.open() as ds:  # Reopen as DatasetReader
+                yield ds  # Note yield not return as we're a contextmanager
