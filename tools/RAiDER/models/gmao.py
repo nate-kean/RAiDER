@@ -86,25 +86,25 @@ class GMAO(WeatherModel):
                 ml_min : (ml_max + 1),
                 lat_min_ind : (lat_max_ind + 1),
                 lon_min_ind : (lon_max_ind + 1),
-            ].data
+            ]
             p = ds['pl'][
                 time_ind,
                 ml_min : (ml_max + 1),
                 lat_min_ind : (lat_max_ind + 1),
                 lon_min_ind : (lon_max_ind + 1),
-            ].data
+            ]
             t = ds['t'][
                 time_ind,
                 ml_min : (ml_max + 1),
                 lat_min_ind : (lat_max_ind + 1),
                 lon_min_ind : (lon_max_ind + 1),
-            ].data
+            ]
             h = ds['h'][
                 time_ind,
                 ml_min : (ml_max + 1),
                 lat_min_ind : (lat_max_ind + 1),
                 lon_min_ind : (lon_max_ind + 1),
-            ].data
+            ]
 
         else:
             root = 'https://portal.nccs.nasa.gov/datashare/gmao/geos-fp/das/Y{}/M{:02d}/D{:02d}'
