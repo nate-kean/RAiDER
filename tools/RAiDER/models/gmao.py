@@ -1,6 +1,5 @@
 import datetime as dt
 import shutil
-import warnings
 from pathlib import Path
 
 import h5py
@@ -80,9 +79,7 @@ class GMAO(WeatherModel):
         if corrected_DT >= T0:
             # open the dataset and pull the data
             url = 'https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv'
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                ds = xr.open_dataset(url, decode_times=False)
+            ds = xr.open_dataset(url, decode_times=False)
 
             q = ds['qv'][
                 time_ind,
