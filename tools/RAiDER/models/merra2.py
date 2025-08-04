@@ -11,7 +11,7 @@ from RAiDER.models.model_levels import (
     LEVELS_137_HEIGHTS,
 )
 from RAiDER.models.weatherModel import WeatherModel
-from RAiDER.utilFcns import writeWeatherVarsXarray
+from RAiDER.utilFcns import write_weather_vars_to_ds
 
 
 # Path to Netrc file, can be controlled by env var
@@ -137,7 +137,7 @@ class MERRA2(WeatherModel):
         ].data.squeeze()
 
         try:
-            writeWeatherVarsXarray(lat, lon, h, q, p, t, time, self._proj, out_path=out)
+            write_weather_vars_to_ds(lat, lon, h, q, p, t, time, self._proj, out_path=out)
         except Exception as e:
             logger.debug(e)
             logger.exception('MERRA-2: Unable to save weather model query to file')

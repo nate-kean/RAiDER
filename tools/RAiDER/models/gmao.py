@@ -12,7 +12,7 @@ from RAiDER.models.model_levels import (
     LEVELS_137_HEIGHTS,
 )
 from RAiDER.models.weatherModel import TIME_RES, WeatherModel
-from RAiDER.utilFcns import requests_retry_session, round_date, writeWeatherVarsXarray
+from RAiDER.utilFcns import requests_retry_session, round_date, write_weather_vars_to_ds
 
 
 class GMAO(WeatherModel):
@@ -142,7 +142,7 @@ class GMAO(WeatherModel):
 
         try:
             # Note that lat/lon gets written twice for GMAO because they are the same as y/x
-            writeWeatherVarsXarray(lat, lon, h, q, p, t, self._time, self._proj, out)
+            write_weather_vars_to_ds(lat, lon, h, q, p, t, self._time, self._proj, out)
         except:
             logger.exception('Unable to save weathermodel to file:')
             raise
