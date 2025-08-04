@@ -121,17 +121,17 @@ def download_hrrr_file(ll_bounds, DATE, out: Path, model='hrrr', product='nat', 
     t = Transformer.from_crs(4326, proj, always_xy=True)
 
     xl, yl = t.transform(ds_out['longitude'].values, ds_out['latitude'].values)
-    W, E, S, N = np.nanmin(xl), np.nanmax(xl), np.nanmin(yl), np.nanmax(yl)
+    s, n, w, e = np.nanmin(yl), np.nanmax(yl), np.nanmin(xl), np.nanmax(xl)
 
     grid_x = 3000  # meters
     grid_y = 3000  # meters
-    xs = np.arange(W, E + grid_x / 2, grid_x)
-    ys = np.arange(S, N + grid_y / 2, grid_y)
+    xs = np.arange(w, e + grid_x / 2, grid_x)
+    ys = np.arange(s, n + grid_y / 2, grid_y)
 
     ds_out['x'] = xs
     ds_out['y'] = ys
     ds_sub = ds_out.isel(x=slice(x_min, x_max), y=slice(y_min, y_max))
-    ds_sub.to_netcdf(out, engine='netcdf4')
+    ds_sub.to_netcdf(out)
 
 
 def get_bounds_indices(SNWE, lats, lons):
