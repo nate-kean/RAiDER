@@ -108,13 +108,13 @@ class GMAO(WeatherModel):
 
         else:
             root = 'https://portal.nccs.nasa.gov/datashare/gmao/geos-fp/das/Y{}/M{:02d}/D{:02d}'
-            base = f'GEOS.fp.asm.inst3_3d_asm_Nv.{corrected_DT.strftime("%Y%m%d")}_{corrected_DT.hour:02}00.V01.nc4'
-            URL = f'{root.format(corrected_DT.year, corrected_DT.month, corrected_DT.day)}/{base}'
+            filename = f'GEOS.fp.asm.inst3_3d_asm_Nv.{corrected_DT.strftime("%Y%m%d")}_{corrected_DT.hour:02}00.V01.nc4'
+            url = f'{root.format(corrected_DT.year, corrected_DT.month, corrected_DT.day)}/{filename}'
             path = Path(f'{out.stem}_raw{out.suffix}')
             if not path.exists():
-                logger.info('Fetching URL: %s', URL)
+                logger.info('Fetching URL: %s', url)
                 session = requests_retry_session()
-                resp = session.get(URL, stream=True)
+                resp = session.get(url, stream=True)
                 assert resp.ok, f'Could not access url for datetime: {corrected_DT}'
                 with path.open('wb') as fout:
                     shutil.copyfileobj(resp.raw, fout)
@@ -128,9 +128,15 @@ class GMAO(WeatherModel):
                 h = ds['H'][0, :, lat_min_ind : (lat_max_ind + 1), lon_min_ind : (lon_max_ind + 1)]
             path.unlink()
 
-        lats = np.arange((-90 + lat_min_ind * self._lat_res), (-90 + (lat_max_ind + 1) * self._lat_res), self._lat_res)
+        lats = np.arange(
+            -90 + lat_min_ind * self._lat_res,
+            -90 + (lat_max_ind + 1) * self._lat_res,
+            self._lat_res,
+        )
         lons = np.arange(
-            (-180 + lon_min_ind * self._lon_res), (-180 + (lon_max_ind + 1) * self._lon_res), self._lon_res
+            -180 + lon_min_ind * self._lon_res,
+            -180 + (lon_max_ind + 1) * self._lon_res,
+            self._lon_res,
         )
         lon, lat = np.meshgrid(lons, lats)
 
