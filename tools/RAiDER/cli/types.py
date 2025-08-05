@@ -207,8 +207,8 @@ class RunConfig:
     runtime_group: RuntimeGroup
     look_dir: LookDir = 'right'
     cube_spacing_in_m: Optional[float] = None  # deprecated
-    wetFilenames: list[str] = []
-    hydroFilenames: list[str] = []
+    wetFilenames: list[str] = dataclasses.field(default_factory=list)
+    hydroFilenames: list[str] = dataclasses.field(default_factory=list)
 
 
 class RAiDERArgs(argparse.Namespace):
