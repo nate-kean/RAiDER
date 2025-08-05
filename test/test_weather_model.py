@@ -17,7 +17,6 @@ from RAiDER.models.weatherModel import (
     make_raw_weather_data_filename,
     make_weather_model_filename,
 )
-from RAiDER.models.erai import ERAI
 from RAiDER.models.era5 import ERA5
 from RAiDER.models.era5t import ERA5T
 from RAiDER.models.hres import HRES
@@ -32,11 +31,6 @@ from RAiDER.models.customExceptions import (
 
 _LON0 = 0
 _LAT0 = 0
-
-@pytest.fixture
-def erai():
-    wm = ERAI()
-    return wm
 
 
 @pytest.fixture
@@ -262,16 +256,6 @@ def test_mrwmf() -> None:
     time = datetime.datetime(2020, 1, 1)
     assert make_raw_weather_data_filename(outLoc, name, time) == \
         './ERA-5_2020_01_01_T00_00_00.nc'
-
-
-def test_erai(erai: ERAI) -> None:
-    """Test ERA-I."""
-    wm = erai
-    assert wm._humidityType == 'q'
-    assert wm._Name == 'ERA-I'
-    assert wm._valid_range[0] == datetime.datetime(1979, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
-    assert wm._valid_range[1] == datetime.datetime(2019, 8, 31).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
-    assert wm._proj.to_epsg() == 4326
 
 
 def test_era5(era5: ERA5) -> None:

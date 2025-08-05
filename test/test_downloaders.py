@@ -8,7 +8,6 @@ import pytest
 from requests.exceptions import HTTPError
 
 from RAiDER.models import ERA5, ERA5T, GMAO, HRES, MERRA2
-from RAiDER.models.erai import ERAI
 from RAiDER.models.weatherModel import WeatherModel
 from test import random_string
 
@@ -33,14 +32,6 @@ def test_downloader(tmp_path: Path, name: str, Model: Type[WeatherModel]) -> Non
     wm = Model()
     wm.set_latlon_bounds(BOUNDS)
     wm.fetch(out_path, DATETIME)
-
-
-@pytest.mark.long
-def test_erai(tmp_path: Path) -> None:
-    out_path = tmp_path / 'test_erai.nc'
-    wm = ERAI()
-    wm.set_latlon_bounds(BOUNDS)
-    wm.fetch(out_path, dt.datetime(2017, 1, 1, 0, 0, 0).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
 
 def test_old_api_url_warning(tmp_path: Path, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch) -> None:
