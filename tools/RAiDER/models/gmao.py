@@ -17,17 +17,17 @@ from RAiDER.utilFcns import requests_retry_session, round_date, writeWeatherVars
 
 
 class GMAO(WeatherModel):
+    _Name = 'GMAO'
+    _classname = 'gmao'
+    _dataset = 'gmao'
+    _humidityType = 'q'
+
     # I took this from GMAO model level weblink
     # https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv
     def __init__(self) -> None:
-        # initialize a weather model
-        WeatherModel.__init__(self)
+        super().__init__()
 
-        self._humidityType = 'q'
         self._model_level_type = 'ml'  # Default, pressure levels are 'pl'
-
-        self._classname = 'gmao'
-        self._dataset = 'gmao'
 
         # Tuple of min/max years where data is available.
         self._valid_range = (
@@ -51,7 +51,6 @@ class GMAO(WeatherModel):
 
         self._zlevels = np.flipud(LEVELS_137_HEIGHTS)
 
-        self._Name = 'GMAO'
         self.files = None
         self._bounds = None
 

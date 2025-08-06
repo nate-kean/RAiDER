@@ -19,6 +19,10 @@ class WRF(WeatherModel):
 
     # TODO: finish implementing
 
+    # Currently WRF is using RH instead of Q to get E
+    _humidityType = 'rh'
+    _Name = 'WRF'
+
     def __init__(self) -> None:
         WeatherModel.__init__(self)
 
@@ -26,9 +30,6 @@ class WRF(WeatherModel):
         self._k2 = 0.233  # K/Pa
         self._k3 = 3.75e3  # K^2/Pa
 
-        # Currently WRF is using RH instead of Q to get E
-        self._humidityType = 'rh'
-        self._Name = 'WRF'
         self._time_res = TIME_RES[self._Name]
 
     def _fetch(self) -> None:

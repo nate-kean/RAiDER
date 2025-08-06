@@ -10,12 +10,14 @@ from RAiDER.models.weatherModel import WeatherModel
 
 
 class customModelReader(WeatherModel):
+    _Name = 'ABCD'  # name of the custom weather model (better to be capitalized)
+    _classname = 'abcd'  # name of the custom weather model
+    _dataset = 'abcd'  # same name as above
+    _humidityType = 'q'  # can be "q" (specific humidity) or "rh" (relative humidity)
+
     def __init__(self) -> None:
-        WeatherModel.__init__(self)
-        self._humidityType = 'q'  # can be "q" (specific humidity) or "rh" (relative humidity)
+        super().__init__()
         self._model_level_type = 'pl'  # Default, pressure levels are "pl", and model levels are "ml"
-        self._classname = 'abcd'  # name of the custom weather model
-        self._dataset = 'abcd'  # same name as above
 
         # Tuple of min/max years where data is available.
         #  valid range of the dataset. Users need to specify the start date and end date (can be "present")
@@ -44,8 +46,6 @@ class customModelReader(WeatherModel):
 
         # zlevels specify fixed heights at which to interpolate the weather model variables
         self._zlevels = np.flipud(LEVELS_137_HEIGHTS)
-
-        self._Name = 'ABCD'  # name of the custom weather model (better to be capitalized)
 
         # Projections in RAiDER are defined using pyproj (python wrapper around Proj)
         # If the projection is defined with EPSG code, one can use "self._proj = CRS.from_epsg(4326)"

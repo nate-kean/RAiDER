@@ -4,14 +4,14 @@ from RAiDER.models.era5 import ERA5
 
 
 class ERA5T(ERA5):
+    _Name = 'ERA-5T'
+    _dataset = 'era5t'
+    _expver = '0005'
+
     # I took this from
     # https://www.ecmwf.int/en/forecasts/documentation-and-support/137-model-levels.
     def __init__(self) -> None:
-        ERA5.__init__(self)
-
-        self._expver = '0005'
-        self._dataset = 'era5t'
-        self._Name = 'ERA-5T'
+        super().__init__()
 
         self._valid_range = (
             dt.datetime(1950, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())),

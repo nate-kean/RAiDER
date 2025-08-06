@@ -19,9 +19,10 @@ from RAiDER.models.weatherModel import TIME_RES, WeatherModel
 class ECMWF(WeatherModel):
     """Implement ECMWF models."""
 
+    _proj = CRS.from_epsg(4326)
+
     def __init__(self) -> None:
-        # initialize a weather model
-        WeatherModel.__init__(self)
+        super().__init__()
 
         # model constants
         self._k1 = 0.776  # [K/Pa]
@@ -32,7 +33,6 @@ class ECMWF(WeatherModel):
 
         self._lon_res = 0.25
         self._lat_res = 0.25
-        self._proj = CRS.from_epsg(4326)
 
         self._model_level_type = 'ml'  # Default
 

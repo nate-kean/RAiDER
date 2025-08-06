@@ -2,23 +2,21 @@ import datetime as dt
 from pathlib import Path
 
 from dateutil.relativedelta import relativedelta
-from pyproj import CRS
 
 from RAiDER.models.ecmwf import ECMWF
 
 
 class ERA5(ECMWF):
+    _Name = 'ERA-5'
+    _dataset = 'era5'
+    _classname = 'ea'
+    _humidityType = 'q'
+    _expver = '0001'
+
     # I took this from
     # https://www.ecmwf.int/en/forecasts/documentation-and-support/137-model-levels.
     def __init__(self) -> None:
-        ECMWF.__init__(self)
-
-        self._humidityType = 'q'
-        self._expver = '0001'
-        self._classname = 'ea'
-        self._dataset = 'era5'
-        self._Name = 'ERA-5'
-        self._proj = CRS.from_epsg(4326)
+        super().__init__()
 
         # Tuple of min/max years where data is available.
         lag_time = 3  # months

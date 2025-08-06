@@ -10,15 +10,20 @@ from RAiDER.models.model_levels import (
     B_91_HRES,
     LEVELS_91_HEIGHTS,
 )
-from RAiDER.models.weatherModel import TIME_RES, WeatherModel
+from RAiDER.models.weatherModel import TIME_RES
 
 
 class HRES(ECMWF):
     """Implement ECMWF models."""
+    _Name = 'HRES'
+    _dataset = 'hres'
+    _classname = 'od'
+    _humidityType = 'q'
+    _expver = '1'
+    _proj = CRS.from_epsg(4326)
 
     def __init__(self, level_type='ml') -> None:
-        # initialize a weather model
-        WeatherModel.__init__(self)
+        super().__init__()
 
         # model constants
         self._k1 = 0.776  # [K/Pa]
@@ -30,14 +35,6 @@ class HRES(ECMWF):
         self._lat_res = 9.0 / 111  # 0.08108115
         self._x_res = 9.0 / 111  # 0.08108115
         self._y_res = 9.0 / 111  # 0.08108115
-
-        self._humidityType = 'q'
-        # Default, pressure levels are 'pl'
-        self._expver = '1'
-        self._classname = 'od'
-        self._dataset = 'hres'
-        self._Name = 'HRES'
-        self._proj = CRS.from_epsg(4326)
 
         self._time_res = TIME_RES[self._dataset.upper()]
         # Tuple of min/max years where data is available.

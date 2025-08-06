@@ -26,15 +26,15 @@ def Model():
 
 
 class MERRA2(WeatherModel):
+    _Name = 'MERRA2'
+    _classname = 'merra2'
+    _dataset = 'merra2'
+    _humidityType = 'q'
+
     def __init__(self) -> None:
-        # initialize a weather model
-        WeatherModel.__init__(self)
+        super().__init__()
 
-        self._humidityType = 'q'
         self._model_level_type = 'ml'  # Default, pressure levels are 'pl'
-
-        self._classname = 'merra2'
-        self._dataset = 'merra2'
 
         # Tuple of min/max years where data is available.
         utcnow = dt.datetime.now(dt.timezone.utc)
@@ -59,7 +59,6 @@ class MERRA2(WeatherModel):
         self._x_res = 0.625
         self._y_res = 0.5
 
-        self._Name = 'MERRA2'
         self.files = None
         self._bounds = None
         self._zlevels = np.flipud(LEVELS_137_HEIGHTS)

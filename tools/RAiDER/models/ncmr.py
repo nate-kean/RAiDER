@@ -24,16 +24,16 @@ from RAiDER.utilFcns import (
 
 class NCMR(WeatherModel):
     """Implement NCMRWF NCUM (named as NCMR) model in future."""
+    
+    _Name = 'NCMR'  # name of the new weather model (in Capital)
+    _dataset = 'ncmr'  # same name as above
+    _classname = 'ncmr'  # name of the custom weather model
+    _humidityType = 'q'  # q for specific humidity and rh for relative humidity
 
     def __init__(self) -> None:
-        # initialize a weather model
-        WeatherModel.__init__(self)
+        super().__init__()
 
-        self._humidityType = 'q'  # q for specific humidity and rh for relative humidity
         self._model_level_type = 'ml'  # Default, pressure levels are 'pl', and model levels are "ml"
-        self._classname = 'ncmr'  # name of the custom weather model
-        self._dataset = 'ncmr'  # same name as above
-        self._Name = 'NCMR'  # name of the new weather model (in Capital)
         self._time_res = TIME_RES[self._dataset.upper()]
 
         # Tuple of min/max years where data is available.

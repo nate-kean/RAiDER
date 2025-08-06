@@ -197,15 +197,16 @@ def load_weather_hrrr(filename):
 
 
 class HRRR(WeatherModel):
+    _Name = 'HRRR'
+    _classname = 'hrrr'
+    _dataset = 'hrrr'
+    _humidityType = 'q'
+    _expver = '0001'
+
     def __init__(self) -> None:
-        # initialize a weather model
         super().__init__()
 
-        self._humidityType = 'q'
         self._model_level_type = 'pl'  # Default, pressure levels are 'pl'
-        self._expver = '0001'
-        self._classname = 'hrrr'
-        self._dataset = 'hrrr'
 
         self._time_res = TIME_RES[self._dataset.upper()]
 
@@ -228,7 +229,6 @@ class HRRR(WeatherModel):
         self._y_res = 3.0
 
         self._Nproc = 1
-        self._Name = 'HRRR'
         self._Npl = 0
         self.files = None
         self._bounds = None

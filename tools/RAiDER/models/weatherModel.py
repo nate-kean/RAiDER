@@ -35,19 +35,19 @@ TIME_RES = {
 
 class WeatherModel(ABC):
     """Implement a generic weather model for getting estimated SAR delays."""
-
-    _dataset: Optional[str]
-    _model_level_type: Literal['ml', 'pl']
     _Name: str
+    _classname: str
+    _dataset: str
+    _proj: CRS
+    _humidityType: Literal['q', 'rh']
 
     def __init__(self) -> None:
         """Initialize model-specific constants/parameters."""
         self._k1 = None
         self._k2 = None
         self._k3 = None
-        self._humidityType = 'q'
-        self._a = []
-        self._b = []
+        self._a: list[float] = []
+        self._b: list[float] = []
 
         self.files = None
 
@@ -58,12 +58,9 @@ class WeatherModel(ABC):
         self._x_res = None
         self._y_res = None
 
-        self._classname = None
-        self._dataset = None
-        self._Name = ''
         self._wmLoc = None
 
-        self._model_level_type = 'ml'
+        self._model_level_type: Literal['ml', 'pl'] = 'ml'
 
         self._valid_range = (
             dt.datetime(1900, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())),
@@ -79,7 +76,6 @@ class WeatherModel(ABC):
         self._g0 = _g0  # gravity constant
         self._zmin = _ZMIN  # minimum integration height
         self._zmax = _ZREF  # max integration height
-        self._proj = None
 
         # setup data structures
         self._levels = []
