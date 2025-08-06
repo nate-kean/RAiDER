@@ -53,10 +53,10 @@ def getInterpolators(
         xs_wm = make_shared_raw(xs_wm)
         ys_wm = make_shared_raw(ys_wm)
         zs_wm = make_shared_raw(zs_wm)
-        wet = make_shared_raw(wet)
+        wet   = make_shared_raw(wet)
         hydro = make_shared_raw(hydro)
 
-    ifWet = Interpolator((ys_wm, xs_wm, zs_wm), wet, fill_value=np.nan, bounds_error=False)
+    ifWet   = Interpolator((ys_wm, xs_wm, zs_wm), wet,   fill_value=np.nan, bounds_error=False)
     ifHydro = Interpolator((ys_wm, xs_wm, zs_wm), hydro, fill_value=np.nan, bounds_error=False)
 
     return ifWet, ifHydro

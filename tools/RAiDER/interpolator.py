@@ -9,7 +9,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator, Tuple, Union
 
-from RAiDER.types import FloatArray1D, FloatArray2D
 import numpy as np
 import pandas as pd
 import rasterio as rio
@@ -18,6 +17,7 @@ from rasterio import warp as riow
 from scipy.interpolate import interp1d
 
 from RAiDER.interpolate import interpolate
+from RAiDER.types import FloatArray1D, FloatArray2D
 
 
 class RegularGridInterpolator:
@@ -165,16 +165,17 @@ def interpolate_elevation(dem_path: Union[Path, str], x: np.ndarray, y: np.ndarr
     Interpolates elevation values from a DEM to scattered points.
 
     Args:
-    dem_path: Path to the DEM file.
-    points: List of (latitude, longitude) tuples.
+        dem_path: Path to the DEM file.
+        x: TODO
+        y: TODO
 
     Returns:
-    List of elevation values corresponding to the input points.
+        List of elevation values corresponding to the input points.
     """
     import rasterio.transform
 
     # with rasterio.open(dem_path) as src:
-    with reproject_raster(dem_path, 4326) as src:
+    with reproject_raster(Path(dem_path), 4326) as src:
         # Get raster metadata
         transform = src.transform
 

@@ -83,7 +83,7 @@ class GMAO(WeatherModel):
             # For warning from pydap when using HTTPS instead of DAP2 or DAP4:
             # pydap is incompatible with DAP data from opendap.nccs.nasa.gov. See issue #736
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
+                warnings.simplefilter('ignore')
                 ds = pydap.client.open_url(url)
 
             q = (
