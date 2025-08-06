@@ -73,7 +73,7 @@ def tropo_delay(
             wm_proj = CRS.from_epsg(4326)
 
     # get heights
-    with xr.load_dataset(weather_model_file) as ds:
+    with xr.open_dataset(weather_model_file) as ds:
         wm_levels = ds['z'].values
         toa = wm_levels.max() - 1
 
