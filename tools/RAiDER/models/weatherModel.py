@@ -472,22 +472,20 @@ class WeatherModel(ABC):
 
     def checkContainment(self, ll_bounds: Union[List, Tuple,np.ndarray], buffer_deg: float = 1e-5) -> bool:
         """
-        Checks containment of weather model bbox. 
+        Checks containment of weather model bbox.
 
         Args:
-        ----------
-        weather_model : WeatherModel
-        ll_bounds: an array of floats (SNWE) demarcating bbox of targets
-        buffer_deg : float
-            For x-translates for extents that lie outside of world bounding box,
-            this ensures that translates have some overlap. The default is 1e-5
-            or ~11.1 meters.
+            weather_model: WeatherModel
+            ll_bounds: an array of floats (SNWE) demarcating bbox of targets
+            buffer_deg:
+                For x-translates for extents that lie outside of world bounding box,
+                this ensures that translates have some overlap. The default is 1e-5
+                or ~11.1 meters.
 
         Returns:
-        -------
-        bool
-           True if weather model contains bounding box of OutLats and outLons
-           and False otherwise.
+            bool:
+                True if weather model contains bounding box of OutLats and
+                outLons and False otherwise.
         """
         # Parse the input
         ymin_input, ymax_input, xmin_input, xmax_input = ll_bounds

@@ -195,7 +195,6 @@ class GMAO(WeatherModel):
         h = np.flip(h, axis=2)
 
         # assign the regular-grid (lat/lon/h) variables
-
         self._p = p
         self._q = q
         self._t = t
