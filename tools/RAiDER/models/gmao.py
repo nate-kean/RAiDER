@@ -10,9 +10,7 @@ import xarray as xr
 from pyproj import CRS
 
 from RAiDER.logger import logger
-from RAiDER.models.model_levels import (
-    LEVELS_137_HEIGHTS,
-)
+from RAiDER.models.model_levels import LEVELS_137_HEIGHTS
 from RAiDER.models.weatherModel import TIME_RES, WeatherModel
 from RAiDER.utilFcns import requests_retry_session, round_date, writeWeatherVarsXarray
 
@@ -154,7 +152,7 @@ class GMAO(WeatherModel):
             logger.exception('Unable to save weathermodel to file:')
             raise
 
-    def load_weather(self, f=None) -> None:
+    def load_weather(self, f=None, *args, **kwargs) -> None:
         """
         Consistent class method to be implemented across all weather model types.
         As a result of calling this method, all of the variables (x, y, z, p, q,
@@ -164,7 +162,7 @@ class GMAO(WeatherModel):
         f = self.files[0] if f is None else f
         self._load_model_level(f)
 
-    def _load_model_level(self, filename) -> None:
+    def _load_model_level(self, filename: Path) -> None:
         """Get the variables from the GMAO link using OpenDAP."""
         with xr.open_dataset(filename) as ds:
             lons = ds['x']
@@ -175,7 +173,7 @@ class GMAO(WeatherModel):
             t = ds['t'].data
 
         # restructure the 1-D lat/lon in regular 2D grid
-        _lons, _lats = np.meshgrid(lons, lats)
+        lons, lats = np.meshgrid(lons, lats)
 
         # Re-structure everything from (heights, lats, lons) to (lons, lats, heights)
         p = np.transpose(p)
@@ -201,8 +199,8 @@ class GMAO(WeatherModel):
         self._p = p
         self._q = q
         self._t = t
-        self._lats = _lats
-        self._lons = _lons
-        self._xs = _lons
-        self._ys = _lats
+        self._lats = lats
+        self._lons = lons
+        self._xs = lons
+        self._ys = lats
         self._zs = h
