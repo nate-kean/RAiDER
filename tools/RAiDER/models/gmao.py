@@ -6,6 +6,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pydap.client
+import xarray as xr
 from pyproj import CRS
 
 from RAiDER.logger import logger
@@ -83,7 +84,7 @@ class GMAO(WeatherModel):
             # For warning from pydap when using HTTPS instead of DAP2 or DAP4:
             # pydap is incompatible with DAP data from opendap.nccs.nasa.gov. See issue #736
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
+                warnings.simplefilter('ignore')
                 ds = pydap.client.open_url(url)
 
             q = (
@@ -165,16 +166,13 @@ class GMAO(WeatherModel):
 
     def _load_model_level(self, filename) -> None:
         """Get the variables from the GMAO link using OpenDAP."""
-        # adding the import here should become absolute when transition to netcdf
-        from netCDF4 import Dataset
-
-        with Dataset(filename, mode='r') as f:
-            lons = np.array(f.variables['x'][:])
-            lats = np.array(f.variables['y'][:])
-            h = np.array(f.variables['H'][:])
-            q = np.array(f.variables['QV'][:])
-            p = np.array(f.variables['PL'][:])
-            t = np.array(f.variables['T'][:])
+        with xr.open_dataset(filename) as ds:
+            lons = ds['x']
+            lats = ds['y']
+            h = ds['h'].data
+            q = ds['q'].data
+            p = ds['p'].data
+            t = ds['t'].data
 
         # restructure the 1-D lat/lon in regular 2D grid
         _lons, _lats = np.meshgrid(lons, lats)
