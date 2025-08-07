@@ -916,7 +916,7 @@ def test_UTM_to_WGS84_empty_input():
     assert lat.size == 0
 
 
-# Test writeWeatherVarsXarray
+# Test write_weather_vars_to_ds
 def test_write_weather_vars_to_ds(tmp_path):
     """Test writing weather variables to an xarray dataset and NetCDF file."""
     # Mock inputs
