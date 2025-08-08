@@ -2,7 +2,6 @@ import datetime as dt
 import shutil
 from pathlib import Path
 
-import h5py
 import numpy as np
 import xarray as xr
 from pyproj import CRS
@@ -77,74 +76,62 @@ class GMAO(WeatherModel):
         if corrected_DT >= T0:
             # open the dataset and pull the data
             url = 'https://opendap.nccs.nasa.gov/dods/GEOS-5/fp/0.25_deg/assim/inst3_3d_asm_Nv'
-            ds = xr.open_dataset(url, decode_times=False)
-
-            q = ds['qv'][
-                time_ind,
-                ml_min : (ml_max + 1),
-                lat_min_ind : (lat_max_ind + 1),
-                lon_min_ind : (lon_max_ind + 1),
-            ]
-            p = ds['pl'][
-                time_ind,
-                ml_min : (ml_max + 1),
-                lat_min_ind : (lat_max_ind + 1),
-                lon_min_ind : (lon_max_ind + 1),
-            ]
-            t = ds['t'][
-                time_ind,
-                ml_min : (ml_max + 1),
-                lat_min_ind : (lat_max_ind + 1),
-                lon_min_ind : (lon_max_ind + 1),
-            ]
-            h = ds['h'][
-                time_ind,
-                ml_min : (ml_max + 1),
-                lat_min_ind : (lat_max_ind + 1),
-                lon_min_ind : (lon_max_ind + 1),
-            ]
+            with xr.open_dataset(url, decode_times=False) as ds:
+                q = ds['qv'][
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
+                ]
+                p = ds['pl'][
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
+                ]
+                t = ds['t'][
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
+                ]
+                h = ds['h'][
+                    time_ind,
+                    ml_min : (ml_max + 1),
+                    lat_min_ind : (lat_max_ind + 1),
+                    lon_min_ind : (lon_max_ind + 1),
+                ]
 
         else:
             root = 'https://portal.nccs.nasa.gov/datashare/gmao/geos-fp/das/Y{}/M{:02d}/D{:02d}'
             filename = f'GEOS.fp.asm.inst3_3d_asm_Nv.{corrected_DT.strftime("%Y%m%d")}_{corrected_DT.hour:02}00.V01.nc4'
             url = f'{root.format(corrected_DT.year, corrected_DT.month, corrected_DT.day)}/{filename}'
-            path = Path(f'{out.stem}_raw{out.suffix}')
-            if not path.exists():
-                logger.info('Fetching URL: %s', url)
-                session = requests_retry_session()
-                resp = session.get(url, stream=True)
-                assert resp.ok, f'Could not access url for datetime: {corrected_DT}'
-                with path.open('wb') as fout:
-                    shutil.copyfileobj(resp.raw, fout)
-            else:
-                logger.warning('Weather model already exists, skipping download')
-
-            with h5py.File(path, 'r') as ds:
+            url += '#mode=bytes'  # https://github.com/pydata/xarray/issues/3653#issuecomment-832712426
+            with xr.open_dataset(url) as ds:
                 q = ds['QV'][
-                    0,
-                    :,
-                    lat_min_ind : (lat_max_ind + 1),
-                    lon_min_ind : (lon_max_ind + 1),
+                    0,  # time (always just 1)
+                    ml_min : (ml_max + 1),  # lev
+                    lat_min_ind : (lat_max_ind + 1),  # lat
+                    lon_min_ind : (lon_max_ind + 1),  # lon
                 ]
                 p = ds['PL'][
                     0,
-                    :,
+                    ml_min : (ml_max + 1),
                     lat_min_ind : (lat_max_ind + 1),
                     lon_min_ind : (lon_max_ind + 1),
                 ]
                 t = ds['T'][
                     0,
-                    :,
+                    ml_min : (ml_max + 1),
                     lat_min_ind : (lat_max_ind + 1),
                     lon_min_ind : (lon_max_ind + 1),
                 ]
                 h = ds['H'][
                     0,
-                    :,
+                    ml_min : (ml_max + 1),
                     lat_min_ind : (lat_max_ind + 1),
                     lon_min_ind : (lon_max_ind + 1),
                 ]
-            path.unlink()
 
         lats = np.arange(
             -90 + lat_min_ind * self._lat_res,
