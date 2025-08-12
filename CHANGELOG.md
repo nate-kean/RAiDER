@@ -19,7 +19,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * [731](https://github.com/dbekaert/RAiDER/pull/731) - Fixed fetch routine for GMAO.
 
 ### Changed
-* [746](https://github.com/dbekaert/RAiDER/pull/746) - Upgraded numpy version to >2.
+* [746](https://github.com/dbekaert/RAiDER/pull/746) - Added support for numpy v2. numpy v1 support is unaffected.
 
 ### Added
 * [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git.
