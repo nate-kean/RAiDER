@@ -12,6 +12,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * []() - Changed GMAO and MERRA2 fetch implementations to use xarray, eliminating pydap as a dependency.
 
 ### Fixed
+* [759](https://github.com/dbekaert/RAiDER/pull/759) - Added a `browse` S3 tag for `.png` files when uploaded to AWS.
 * [741](https://github.com/dbekaert/RAiDER/pull/741) - Updated mamba setup commands in CircleCI for mamba 2.0.0.
 * [738](https://github.com/dbekaert/RAiDER/pull/738) - Resolved an InsecureRequestWarning when fetching data through CDS, such as for ERA5.
 * [734](https://github.com/dbekaert/RAiDER/pull/734) - Resolved a deprecation warning from Rasterio about the use of `statistics()`.
