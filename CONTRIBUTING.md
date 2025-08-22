@@ -48,7 +48,7 @@ RAiDER distributes two conda packages, `raider-base` a lighter-weight package th
 
 Fork RAiDER from GitHub UI, and then
 
-```
+```sh
 git clone https://github.com/dbekaert/RAiDER.git
 cd RAiDER
 git remote add my_user_name https://github.com/my_user_name/RAiDER.git
@@ -58,7 +58,7 @@ git remote add my_user_name https://github.com/my_user_name/RAiDER.git
 
 Fork RAiDER-docs from GitHub UI, and then
 
-```
+```sh
 git clone https://github.com/dbekaert/RAiDER-docs.git
 cd RAiDER-docs
 git remote add my_user_name https://github.com/my_user_name/RAiDER-docs.git
@@ -67,7 +67,7 @@ git remote add my_user_name https://github.com/my_user_name/RAiDER-docs.git
 
 ### Updating your local master against upstream master ###
 
-```
+```sh
 git checkout master
 git fetch origin
 # Be careful: this will loose all local changes you might have done now
@@ -78,9 +78,9 @@ git reset --hard origin/master
 
 [Here](https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history) is a great tutorial if you are new to rewriting history with git.
 
-```
+```sh
 git checkout master
-(potentially update your local master against upstream, as described above)
+# (potentially update your local master against upstream, as described above)
 git checkout -b my_new_feature_branch
 
 # do work. For example:
@@ -114,11 +114,11 @@ git push my_user_name my_new_feature_branch
 ### Formatting and linting with [Ruff](https://docs.astral.sh/ruff/) ###
 
 Format your code to follow the style of the project with:
-```
+```sh
 ruff format
 ```
 and check for linting problems with:
-```
+```sh
 ruff check
 ```
 Please ensure that any linting problems in your changes are resolved before
@@ -130,17 +130,28 @@ editor.
 ### Issue a pull request from GitHub UI ###
 commit locally and push. To get a reasonable history, you may need to
 
-```
+```sh
 git rebase -i master
 ```
 
 , in which case you will have to force-push your branch with 
 
-```
+```sh
 git push -f origin my_new_feature_branch
 ```
 
 Once a pull request is issued it will be reviewed by multiple members before it will be approved and integrated into the main.
+
+### Changing dependencies ###
+If your branch makes changes to `environment.yml`, we ask that you regenerate
+and commit the lockfiles to reflect your changes for other users.
+This step also helps ensure that the project can still be solved in all of our
+supported Python versions after your changes.
+```sh
+python .circleci/regenerate_locks.py
+git add conda-lock.yml
+git add .circleci/conda-lock*.yml
+```
 
 ### Things you should NOT do
 (For anyone with push rights to RAiDER or RAiDER-docs) Never modify a commit or the history of anything that has been committed to https://github.com/dbekaert/RAiDER and https://github.com/dbekaert/RAiDER-docs.
