@@ -27,7 +27,12 @@ jobs:
             # it even in non-interactive terminals
             "${HOME}/conda/bin/mamba" shell hook --shell bash --root-prefix "${HOME}/conda" \
               > /etc/profile.d/mamba-raider-circleci.sh
-            echo "mamba activate RAiDER" >> /etc/profile.d/mamba-raider-circleci.sh
+
+      - run:
+          name: Install conda-lock
+          shell: /bin/bash -xl
+          command: |
+            mamba install --channel=conda-forge --name=base conda-lock
 
       - run:
           name: Create RAiDER environment
@@ -35,8 +40,14 @@ jobs:
           shell: /bin/bash -xl
           command: |
             PYTHON_VERSION="<< parameters.python-version >>"
-            sed -i "/python>=/c\ - python=${PYTHON_VERSION}" environment.yml
-            mamba env create -f environment.yml
+            if [ "${PYTHON_VERSION}" == "3.12" ]; then
+              LOCKFILE_PATH="conda-lock.yml"
+            else
+              LOCKFILE_PATH=".circleci/conda-lock-${PYTHON_VERSION}.yml"
+            fi
+            mamba activate base
+            conda-lock install --prefix "${HOME}/conda/envs/RAiDER" "${LOCKFILE_PATH}"
+            echo "mamba activate RAiDER" >> /etc/profile.d/mamba-raider-circleci.sh
 
       - run:
           name: Install RAiDER and check environment
