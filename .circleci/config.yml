@@ -76,7 +76,7 @@ jobs:
           command: |
             python -m pip install pytest-cov
             COV_OPTIONS=`python -c "import importlib.util; print(*(' --cov=' + p for p in importlib.util.find_spec('RAiDER').submodule_search_locations))"`
-            pytest -n 2 -m "not long" test/ ${COV_OPTIONS} --cov-report=
+            pytest test/ -n 2 -m "not long" ${COV_OPTIONS} --cov-report=
 
       - run:
           name: Report coverage
