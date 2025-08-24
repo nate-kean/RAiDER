@@ -966,3 +966,9 @@ def parse_crs(proj: CRSLike) -> CRS:
     elif isinstance(proj, int):
         return CRS.from_epsg(proj)
     raise TypeError(f'Data type "{type(proj)}" not supported for CRS')
+
+
+if int(np.__version__.split('.')[0]) >= 2:
+    np_trapezoid = np.trapezoid
+else:
+    np_trapezoid = np.trapz
