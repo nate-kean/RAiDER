@@ -14,6 +14,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * [743](https://github.com/dbekaert/RAiDER/pull/743) - Switched from HTTPS to DAP4 for retrieving MERRA2 data, and suppressed a warning for using DAP4 for GMAO data where doing so is not possible.
 
 ### Fixed
+* [759](https://github.com/dbekaert/RAiDER/pull/759) - Added a `browse` S3 tag for `.png` files when uploaded to AWS.
 * [741](https://github.com/dbekaert/RAiDER/pull/741) - Updated mamba setup commands in CircleCI for mamba 2.0.0.
 * [738](https://github.com/dbekaert/RAiDER/pull/738) - Resolved an InsecureRequestWarning when fetching data through CDS, such as for ERA5.
 * [734](https://github.com/dbekaert/RAiDER/pull/734) - Resolved a deprecation warning from Rasterio about the use of `statistics()`.
@@ -21,10 +22,9 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * [732](https://github.com/dbekaert/RAiDER/pull/732) - Updated `hrrr.py` to resolve a deprecation warning about `unary_union`.
 * [731](https://github.com/dbekaert/RAiDER/pull/731) - Fixed fetch routine for GMAO.
 
-### Changed
-* [746](https://github.com/dbekaert/RAiDER/pull/746) - Upgraded numpy version to >2.
-
 ### Added
+* [762](https://github.com/dbekaert/RAiDER/pull/762) - Added lockfiles through conda-lock to the repo, documentation, and CircleCI runners.
+* [746](https://github.com/dbekaert/RAiDER/pull/746) - Added support for numpy v2.
 * [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git.
 * [728](https://github.com/dbekaert/RAiDER/pull/728) - Added downloader tests for HRES, GMAO, and MERRA2.
 * [726](https://github.com/dbekaert/RAiDER/pull/726) - Updated code and documentation for changes to the CDS API.
