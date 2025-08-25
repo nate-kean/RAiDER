@@ -1,14 +1,14 @@
 from pathlib import Path
-import pytest
-import subprocess
+
 import numpy as np
+import pytest
 import xarray as xr
 
-
-from test import WM
-
+from RAiDER.cli.raider import calcDelays
 from RAiDER.logger import logger
 from RAiDER.utilFcns import write_yaml
+from test import WM
+
 
 wm = 'ERA5' if WM == 'ERA-5' else WM
 
@@ -34,20 +34,15 @@ def test_cube_timemean(tmp_path: Path):
     for hr in [hr1, hr2]:
         grp['time_group'].update({'time': f'{hr}:00:00'})
         ## generate the default run config file and overwrite it with new parms
-        cfg  = write_yaml(grp, tmp_path / 'temp1.yaml')
+        cfg = write_yaml(grp, tmp_path / 'temp1.yaml')
 
         ## run raider for the default date
-        cmd  = f'raider.py {cfg}'
-        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
-        assert proc.returncode == 0
+        calcDelays([str(cfg)])
 
     ## run interpolation in the middle of the two
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
-    cfg  = write_yaml(grp, tmp_path / 'temp2.yaml')
-
-    cmd  = f'raider.py {cfg}'
-    proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
-    assert proc.returncode == 0
+    cfg = write_yaml(grp, 'temp.yaml')
+    calcDelays([str(cfg)])
 
     with xr.open_dataset(tmp_path / f'{WM}_tropo_{date}T{hr1}0000_ztd.nc') as ds:
         da1_tot = ds['wet'] + ds['hydro']
@@ -88,16 +83,12 @@ def test_cube_weighting(tmp_path: Path):
         cfg  = write_yaml(grp, tmp_path / 'temp1.yaml')
 
         ## run raider for the default date
-        cmd  = f'raider.py {cfg}'
-        proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
-        assert proc.returncode == 0
+        calcDelays([str(cfg)])
 
     ## run interpolation very near the first
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
     cfg  = write_yaml(grp, tmp_path / 'temp2.yaml')
-
-    cmd  = f'raider.py {cfg}'
-    proc = subprocess.run(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True)
+    calcDelays([str(cfg)])
 
     ## double check on weighting
 
