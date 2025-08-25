@@ -110,7 +110,7 @@ def test_GUNW_hyp3_metadata_update(test_gunw_json_path, test_gunw_json_schema_pa
     mocker.patch("RAiDER.aws.get_s3_file", side_effect=[Path('foo.nc'), temp_json_path, Path('foo.png')])
     mocker.patch("RAiDER.aws.upload_file_to_s3")
     mocker.patch("RAiDER.aria.prepFromGUNW.main", return_value=['my_path_cfg', 'my_wavelength'])
-    mocker.patch('RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availablity_for_s1_azimuth_time_interpolation',
+    mocker.patch('RAiDER.aria.prepFromGUNW.check_hrrr_dataset_availability_for_s1_azimuth_time_interpolation',
                  side_effect=[True])
     mocker.patch("RAiDER.aria.prepFromGUNW.check_weather_model_availability", return_value=True)
     mocker.patch("RAiDER.cli.raider.calcDelays", return_value=['file1', 'file2'])
