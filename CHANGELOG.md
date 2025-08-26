@@ -15,6 +15,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * [743](https://github.com/dbekaert/RAiDER/pull/743) - Switched from HTTPS to DAP4 for retrieving MERRA2 data, and suppressed a warning for using DAP4 for GMAO data where doing so is not possible.
 
 ### Fixed
+* [765](https://github.com/dbekaert/RAiDER/pull/765) - Fixed a dead link to "Installing from Source" in the ReadMe.
 * [759](https://github.com/dbekaert/RAiDER/pull/759) - Added a `browse` S3 tag for `.png` files when uploaded to AWS.
 * [741](https://github.com/dbekaert/RAiDER/pull/741) - Updated mamba setup commands in CircleCI for mamba 2.0.0.
 * [738](https://github.com/dbekaert/RAiDER/pull/738) - Resolved an InsecureRequestWarning when fetching data through CDS, such as for ERA5.
