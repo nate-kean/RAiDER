@@ -18,7 +18,7 @@ THIS IS RESEARCH CODE PROVIDED TO YOU "AS IS" WITH NO WARRANTIES OF CORRECTNESS.
 1. [Getting Started](#1-getting-started)
     - [Installing With Conda](#installing-with-conda)
     - [Using the Docker Image](#using-the-docker-image)
-    - [Installing from Source](#installing-from-source)
+    - [Installing from Source](docs/Installing_from_source.md)
 2. [Setup of third party weather model access](#2-setup-of-third-party-weather-model-access)
 3. [Running RAiDER and Documentation](#3-running-raider-and-documentation)
 4. [Citing](#4-citation)
