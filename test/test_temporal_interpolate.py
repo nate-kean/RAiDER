@@ -41,7 +41,7 @@ def test_cube_timemean(tmp_path: Path):
 
     ## run interpolation in the middle of the two
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
-    cfg = write_yaml(grp, 'temp.yaml')
+    cfg = write_yaml(grp, tmp_path / 'temp.yaml')
     calcDelays([str(cfg)])
 
     with xr.open_dataset(tmp_path / f'{WM}_tropo_{date}T{hr1}0000_ztd.nc') as ds:
