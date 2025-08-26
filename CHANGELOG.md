@@ -7,6 +7,9 @@ and this project adheres to [PEP 440](https://www.python.org/dev/peps/pep-0440/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Removed
+* [764](https://github.com/dbekaert/RAiDER/pull/764) - Removed Python 3.8 support. Python 3.9 is now the minimum version officially required to run RAiDER.
+
 ### Changed
 * [743](https://github.com/dbekaert/RAiDER/pull/743) - Switched from HTTPS to DAP4 for retrieving MERRA2 data, and suppressed a warning for using DAP4 for GMAO data where doing so is not possible.
 
