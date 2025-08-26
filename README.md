@@ -2,7 +2,7 @@
 
 Raytracing Atmospheric Delay Estimation for RADAR
 
-[![Language](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/)
+[![Language](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/dbekaert/RAiDER/blob/dev/LICENSE)
 [![CircleCI](https://circleci.com/gh/dbekaert/RAiDER.svg?style=svg)](https://circleci.com/gh/dbekaert/RAiDER)
 [![Coverage Status](https://coveralls.io/repos/github/dbekaert/RAiDER/badge.svg?branch=dev)](https://coveralls.io/github/dbekaert/RAiDER?branch=dev)
@@ -18,7 +18,7 @@ THIS IS RESEARCH CODE PROVIDED TO YOU "AS IS" WITH NO WARRANTIES OF CORRECTNESS.
 1. [Getting Started](#1-getting-started)
     - [Installing With Conda](#installing-with-conda)
     - [Using the Docker Image](#using-the-docker-image)
-    - [Installing from Source](#installing-from-source)
+    - [Installing from Source](docs/Installing_from_source.md)
 2. [Setup of third party weather model access](#2-setup-of-third-party-weather-model-access)
 3. [Running RAiDER and Documentation](#3-running-raider-and-documentation)
 4. [Citing](#4-citation)
