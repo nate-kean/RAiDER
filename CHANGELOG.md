@@ -8,6 +8,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Removed
+* [764](https://github.com/dbekaert/RAiDER/pull/764) - Removed Python 3.8 support. Python 3.9 is now the minimum version officially required to run RAiDER.
 * [753](https://github.com/dbekaert/RAiDER/pull/753) - Removed support for ERA-Interim.
 
 ### Changed
