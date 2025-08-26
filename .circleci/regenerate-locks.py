@@ -22,7 +22,7 @@ VERSIONS = [
 
 # The dependencies entry for python.
 # First group: " - python"
-# Second group: ">=3.8" or any version specification
+# Second group: ">=3.9" or any version specification
 PATTERN_PYTHON_DEP = re.compile(r'^(\s*-\s*python)([<>=~]?=?.+$)', re.MULTILINE)
 
 ENVIROMENT_YML_PATH = Path('environment.yml')

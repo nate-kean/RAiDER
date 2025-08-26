@@ -1,12 +1,12 @@
 ## Common Installation Issues
 1. This package uses GDAL and g++, both of which can be tricky to set up correctly.
-GDAL in particular will often break after installing a new program
+GDAL in particular will often break after installing a new program.
 If you receive error messages such as the following:
 
 ```
-ImportError: ~/anaconda3/envs/RAiDER/lib/python3.7/site-packages/matplotlib/../../../libstdc++.so.6: version `CXXABI_1.3.9' not found (required by ~/anaconda3/envs/RAiDER/lib/python3.7/site-packages/matplotlib/ft2font.cpython-37m-x86_64-linux-gnu.so)
+ImportError: .../site-packages/matplotlib/../../../libstdc++.so.6: version `CXXABI_1.3.9' not found (required by .../site-packages/matplotlib/ft2font.cpython-37m-x86_64-linux-gnu.so)
 ImportError: libtiledb.so.1.6.0: cannot open shared object file: No such file or directory
-***cmake: ~/anaconda3/envs/RAiDER/bin/../lib/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by cmake)***
+***cmake: .../conda/envs/RAiDER/bin/../lib/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by cmake)***
 ```
 
 try running the following commands within your RAiDER conda environment:
