@@ -190,9 +190,7 @@
     },
     "coordinate": {
       "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
-      "items": [
+      "prefixItems": [
         {
           "type": "number",
           "minimum": -180,
@@ -203,7 +201,8 @@
           "minimum": -90,
           "maximum": 90
         }
-      ]
+      ],
+      "items": false
     },
     "iso_datetime": {
       "type": "string",
