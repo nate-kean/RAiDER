@@ -337,7 +337,14 @@ def calcDelays(iargs: Optional[Sequence[str]]=None) -> list[Path]:
             raise NoWeatherModelData('Weather model processing failed for all times')
         
         # Get the weather model file
-        weather_model_file = getWeatherFile(wfiles, times, t, model._Name, interp_method)
+        weather_model_file = getWeatherFile(
+            wfiles,
+            times,
+            t,
+            model._Name,
+            run_config.runtime_group.output_directory,
+            interp_method
+        )
         if weather_model_file is None:
             continue
 
@@ -728,6 +735,7 @@ def getWeatherFile(
     times: list,
     time: dt.datetime,
     model: str,
+    out_path: Path,
     interp_method: TimeInterpolationMethod='none'
 ) -> Optional[Path]:
     """Time interpolation.
@@ -761,7 +769,7 @@ def getWeatherFile(
 
     elif interp_method == 'center_time':
         if Nmatch:  # Case 3: two weather files downloaded
-            weather_model_file = combine_weather_files(wfiles, time, model, interp_method='center_time')
+            weather_model_file = combine_weather_files(wfiles, time, model, out_path, interp_method='center_time')
         elif Tmatch:  # Case 4: Exact time is available without interpolation
             logger.warning('Time interpolation is not needed as exact time is available')
             weather_model_file = wfiles[0]
@@ -775,7 +783,7 @@ def getWeatherFile(
 
     elif interp_method == 'azimuth_time_grid':
         if Nmatch or Tmatch:  # Case 6: all files downloaded
-            weather_model_file = combine_weather_files(wfiles, time, model, interp_method='azimuth_time_grid')
+            weather_model_file = combine_weather_files(wfiles, time, model, out_path, interp_method='azimuth_time_grid')
         else:
             raise WrongNumberOfFiles(Nfiles_expected, Nfiles)
 
@@ -789,7 +797,13 @@ def getWeatherFile(
     return weather_model_file
 
 
-def combine_weather_files(wfiles: list[Path], time: dt.datetime, model: str, interp_method: TimeInterpolationMethod='center_time') -> Path:
+def combine_weather_files(
+    wfiles: list[Path],
+    time: dt.datetime,
+    model: str,
+    out_dir: Path,
+    interp_method: TimeInterpolationMethod='center_time',
+) -> Path:
     """Interpolate downloaded weather files and save to a single file."""
     STYLE = {'center_time': '_timeInterp_', 'azimuth_time_grid': '_timeInterpAziGrid_'}
 
@@ -821,7 +835,7 @@ def combine_weather_files(wfiles: list[Path], time: dt.datetime, model: str, int
     ds_out.attrs['Date2'] = 0
 
     # Give the weighted combination a new file name
-    weather_model_file = wfiles[0].parent / (
+    weather_model_file = out_dir / (
         wfiles[0].name.split('_')[0]
         + '_'
         + time.strftime('%Y_%m_%dT%H_%M_%S')
