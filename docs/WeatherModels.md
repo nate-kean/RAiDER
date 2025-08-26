@@ -13,7 +13,7 @@ In addition, RAiDER provides functionality for adding additional weather models.
       heading_level: 3
 
 ### Potential download failure
-ERA-5/ERA-I datasets require access to the ESA Copernicus servers. GMAO and MERRA-2 datasets require access to the NASA Earthdata servers. If you are unable to download datasets, ensure that you have registered an account, configured your public API key on your computer, and accepted/added the license/application for type of dataset you wish to download as detailed below. 
+ERA-5 dataset requires access to the ESA Copernicus servers. GMAO and MERRA-2 datasets require access to the NASA Earthdata servers. If you are unable to download datasets, ensure that you have registered an account, configured your public API key on your computer, and accepted/added the license/application for type of dataset you wish to download as detailed below. 
 
 ------
 
@@ -24,10 +24,10 @@ High-resolution rapid refresh (HRRR) weather model data products are generated b
 
 ------
 
-## 3. ECMWF weather models (ERA5, ERA5T, ERAI, HRES)
+## 3. ECMWF weather models (ERA5, ERA5T, HRES)
 The European Centre for Medium-Range Weather Forecasts (__[ECMWF](https://www.ecmwf.int/)__), through the Copernicus Climate Data Store (CDS), provides a number of different weather models, including ERA5 and ERA5T reanalysis models.  
 
-You can read more information about their reanalysis models __[here](https://www.ecmwf.int/en/research/climate-reanalysis)__ and real-time model __[here](https://www.ecmwf.int/en/forecasts/datasets/catalogue-ecmwf-real-time-products)__. ECMWF models are global, with horizontal resolution of about 30 km for ERA-I, ERA-5, and ERA-5T, and 6 km for Hi-RES. All of these models come in a global projection (EPSG 4326, WGS-84). 
+You can read more information about their reanalysis models __[here](https://www.ecmwf.int/en/research/climate-reanalysis)__ and real-time model __[here](https://www.ecmwf.int/en/forecasts/datasets/catalogue-ecmwf-real-time-products)__. ECMWF models are global, with horizontal resolution of about 30 km for ERA-5 and ERA-5T, and 6 km for Hi-RES. All of these models come in a global projection (EPSG 4326, WGS-84). 
 
 ### Accessing ERA5 and ERA5T weather reanalysis datasets from Copernicus CDS
 1. Create an ECMWF account at __[ecmwf.int](https://www.ecmwf.int/)__. 
@@ -45,11 +45,11 @@ You can read more information about their reanalysis models __[here](https://www
 > In late 2024, the CDS API underwent a migration that invalidated all existing personal access tokens. Current RAiDER users will have to follow the above instructions again to continue being able to use the ECMWF weather models.
 
 
-### Accessing ERAI, HRES
+### Accessing HRES
 
 ECMWF requires a license agreement to be able to access, download, and use their datasets. Instructions for completing this process is below. 
 
-1. Create an ECMWF account at __[ecmwf.int](https://www.ecmwf.int/)__.  The ERA-I model is open-access, while HRES requires a special licence agreement.
+1. Create an ECMWF account at __[ecmwf.int](https://www.ecmwf.int/)__.  The HRES model requires a special license agreement.
 2. Confirm your email, etc. 
 3. Install the public API key and client as instructed __[here](https://confluence.ecmwf.int/display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key)__: 
     
