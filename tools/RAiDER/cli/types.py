@@ -95,7 +95,8 @@ class TimeGroup:
     
     @staticmethod
     def coerce_into_time(val: Union[int, str]) -> dt.time:
-        val = str(val)
+        if isinstance(val, int):
+            return dt.datetime.fromtimestamp(val, tz=dt.timezone.utc).time()
         all_formats = map(''.join, itertools.product(TimeGroup.TIME_FORMATS, TimeGroup.TIMEZONE_FORMATS))
         for tf in all_formats:
             try:
@@ -172,8 +173,8 @@ class RuntimeGroup:
         output_projection: str = 'EPSG:4326',
         cube_spacing_in_m: float = _CUBE_SPACING_IN_M,
         download_only: bool = False,
-        output_directory: str = '.',
-        weather_model_directory: Optional[str] = None,
+        output_directory: Union[Path, str] = Path.cwd(),
+        weather_model_directory: Optional[Union[Path, str]] = None,
     ):
         self.raster_format = raster_format
         self.file_format = file_format

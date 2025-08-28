@@ -17,7 +17,6 @@ from RAiDER.models.weatherModel import (
     make_raw_weather_data_filename,
     make_weather_model_filename,
 )
-from RAiDER.models.erai import ERAI
 from RAiDER.models.era5 import ERA5
 from RAiDER.models.era5t import ERA5T
 from RAiDER.models.hres import HRES
@@ -32,11 +31,6 @@ from RAiDER.models.customExceptions import (
 
 _LON0 = 0
 _LAT0 = 0
-
-@pytest.fixture
-def erai():
-    wm = ERAI()
-    return wm
 
 
 @pytest.fixture
@@ -264,16 +258,6 @@ def test_mrwmf() -> None:
         './ERA-5_2020_01_01_T00_00_00.nc'
 
 
-def test_erai(erai: ERAI) -> None:
-    """Test ERA-I."""
-    wm = erai
-    assert wm._humidityType == 'q'
-    assert wm._Name == 'ERA-I'
-    assert wm._valid_range[0] == datetime.datetime(1979, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
-    assert wm._valid_range[1] == datetime.datetime(2019, 8, 31).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
-    assert wm._proj.to_epsg() == 4326
-
-
 def test_era5(era5: ERA5) -> None:
     """Test ERA-5."""
     wm = era5
@@ -456,13 +440,13 @@ def test_get_bounds_indices_4() -> None:
     assert bounds_list == (0, 4, 0, 9)
 
 
-def test_hrrr_badloc(wm:hrrr=HRRR) -> None:
+def test_hrrr_badloc(tmp_path: Path, wm:hrrr=HRRR) -> None:
     """Test HRRR out of bounds."""
     wm = wm()
     wm.set_latlon_bounds([-10, 10, -10, 10])
     wm.setTime(datetime.datetime(2020, 10, 1, 0, 0, 0))
     with pytest.raises(ValueError):
-        wm._fetch(Path('dummy_filename'))
+        wm._fetch(tmp_path / 'this_file_will_not_be_made.nc')
 
 def test_hrrrak_dl(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
     """Test HRRR-AK."""
@@ -471,7 +455,7 @@ def test_hrrrak_dl(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
     d.mkdir()
     fname = d / "hrrr_ak.nc"
     wm.set_latlon_bounds([65, 67, -160, -150])
-    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 0))
+    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 1))
 
     wm._fetch(fname)
     assert True
@@ -484,7 +468,7 @@ def test_hrrrak_dl2(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
     fname = d / "hrrr_ak.nc"
 
     wm.set_latlon_bounds([50, 52, 179, -179])
-    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 0))
+    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 2))
 
     wm._fetch(fname)
     assert True
