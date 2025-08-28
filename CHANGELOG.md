@@ -26,6 +26,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 * [762](https://github.com/dbekaert/RAiDER/pull/762) - Added lockfiles through conda-lock to the repo, documentation, and CircleCI runners.
+* [761](https://github.com/dbekaert/RAiDER/pull/761) - Added Python 3.13 support.
 * [747](https://github.com/dbekaert/RAiDER/pull/747) - Added support for run config time format `%H:%M:%S` (without quotes).
 * [746](https://github.com/dbekaert/RAiDER/pull/746) - Added support for numpy v2.
 * [725](https://github.com/dbekaert/RAiDER/pull/725) - Added rules to ignore all test artifacts in git.
