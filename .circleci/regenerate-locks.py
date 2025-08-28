@@ -50,9 +50,11 @@ def main() -> None:
     # Read RAiDER's supported Python versions from CircleCI config.
     # The last entry in the list will be placed in the project root.
     with Path('.circleci/config.yml').open(encoding='utf-8') as f_ci_config:
+        # fmt: off
         versions: list[str] = yaml.safe_load(f_ci_config) \
             ['workflows']['all-tests']['jobs'][0] \
             ['build']['matrix']['parameters']['python-version']
+        # fmt: on
 
     for i, version in tqdm(enumerate(versions), total=len(versions), unit='lockfiles written'):
         if i < len(versions) - 1:
