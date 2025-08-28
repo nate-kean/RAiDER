@@ -87,7 +87,7 @@ def test_cube_weighting(tmp_path: Path):
 
     ## run interpolation very near the first
     grp['time_group'] =  {'time': ti, 'interpolate_time': 'center_time'}
-    cfg  = write_yaml(grp, tmp_path / 'temp2.yaml')
+    cfg = write_yaml(grp, tmp_path / 'temp2.yaml')
     calcDelays([str(cfg)])
 
     ## double check on weighting

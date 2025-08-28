@@ -23,7 +23,6 @@ dependencies:
  - h5py
  - herbie-data<2025.2.1
  - isce3>=0.15.0
- - jsonschema==3.2.0  # this is for ASF DAAC ingest schema validation
  - lxml
  - matplotlib
  - netcdf4
@@ -47,6 +46,7 @@ dependencies:
  - cmake
  - cxx-compiler
  - cython
+ - jsonschema>=4  # this is for ASF DAAC ingest schema validation
  - pybind11
  - pytest
  - pytest-console-scripts

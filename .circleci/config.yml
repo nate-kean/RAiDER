@@ -42,7 +42,7 @@ jobs:
           shell: /bin/bash -xl
           command: |
             PYTHON_VERSION="<< parameters.python-version >>"
-            if [ "${PYTHON_VERSION}" == "3.12" ]; then
+            if [ "${PYTHON_VERSION}" == "3.13" ]; then
               LOCKFILE_PATH="conda-lock.yml"
             else
               LOCKFILE_PATH=".circleci/conda-lock-${PYTHON_VERSION}.yml"
@@ -83,7 +83,7 @@ jobs:
           shell: /bin/bash -xl
           command: |
             PYTHON_VERSION="<< parameters.python-version >>"
-            if [ "${PYTHON_VERSION}" == "3.12" ]; then
+            if [ "${PYTHON_VERSION}" == "3.13" ]; then
               python -m pip install coveralls
               python .circleci/fix_coverage_paths.py .coverage ${PWD}/tools/RAiDER/
               coverage report -mi --show-missing --data-file=.coverage
@@ -96,4 +96,4 @@ workflows:
       - build:
           matrix:
             parameters:
-              python-version: ["3.9", "3.10", "3.11", "3.12"]
+              python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
