@@ -16,7 +16,7 @@ from RAiDER.logger import logger
 
 # Matches the "dependencies" entry for python.
 # First group: like " - python"
-# Second group: like ">=3.8"
+# Second group: like ">=3.9"
 PATTERN_PYTHON_DEP = re.compile(r'^(\s*-\s*python)([<>=~]?=?.+)$', re.MULTILINE)
 
 

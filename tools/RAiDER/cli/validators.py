@@ -270,15 +270,17 @@ def get_wm_by_name(model_name: str) -> tuple[str, Type[WeatherModel]]:
     """
     Turn an arbitrary string into a module name.
 
-    Takes as input a model name, which hopefully looks like ERA-I, and
-    converts it to a module name, which will look like erai. It doesn't
-    always produce a valid module name, but that's not the goal. The
-    goal is just to handle common cases.
-    Inputs:
-       model_name  - Name of an allowed weather model (e.g., 'era-5')
-    Outputs:
-       module_name - Name of the module
-       wmObject    - callable, weather model object.
+    Takes as input a model name, which hopefully looks like "ERA-5", for
+    instance, and converts it to a module name, which will look like "era5".
+    It doesn't always produce a valid module name, but that's not the goal.
+    The goal is just to handle common cases.
+
+    Args:
+       model_name: Name of an allowed weather model (e.g., 'era-5')
+
+    Returns:
+       module_name: Name of the module
+       wmObject: callable, weather model object.
     """
     module_name = 'RAiDER.models.' + model_name.lower().replace('-', '')
     module = importlib.import_module(module_name)
