@@ -17,6 +17,7 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 * [765](https://github.com/dbekaert/RAiDER/pull/765) - Fixed a dead link to "Installing from Source" in the ReadMe.
 * [759](https://github.com/dbekaert/RAiDER/pull/759) - Added a `browse` S3 tag for `.png` files when uploaded to AWS.
+* [751](https://github.com/dbekaert/RAiDER/pull/751) - Fixed ERA-5 interface for a change to its API that requires pressure variables to be requested separately from temperature and humidity.
 * [741](https://github.com/dbekaert/RAiDER/pull/741) - Updated mamba setup commands in CircleCI for mamba 2.0.0.
 * [738](https://github.com/dbekaert/RAiDER/pull/738) - Resolved an InsecureRequestWarning when fetching data through CDS, such as for ERA5.
 * [734](https://github.com/dbekaert/RAiDER/pull/734) - Resolved a deprecation warning from Rasterio about the use of `statistics()`.
