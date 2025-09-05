@@ -472,7 +472,7 @@ class WeatherModel(ABC):
 
     def checkContainment(self, ll_bounds: Union[List, Tuple,np.ndarray], buffer_deg: float = 1e-5) -> bool:
         """
-        Checks containment of weather model bbox. 
+        Checks containment of weather model bbox.
 
         Args:
         ----------
@@ -574,23 +574,30 @@ class WeatherModel(ABC):
         self._wet_refractivity = self._wet_refractivity[index1:index2, index3:index4, ...]
         self._hydrostatic_refractivity = self._hydrostatic_refractivity[index1:index2, index3:index4, :]
 
-    def _calculategeoh(self, z: np.ndarray, lnsp: np.ndarray) -> Union[list, tuple, np.ndarray]:
+    def _calculategeoh(
+        self,
+        z_surface: FloatArray2D,
+        lnsp: FloatArray2D,
+        t: FloatArray3D,
+        q: FloatArray3D,
+    ) -> tuple[FloatArray3D, FloatArray3D, FloatArray3D]:
         """
         Function to calculate pressure, geopotential, and geopotential height
         from the surface pressure and model levels provided by a weather model.
         The model levels are numbered from the highest eleveation to the lowest.
 
-        Inputs:
-            self - weather model object with parameters a, b defined
-            z    - 3-D array of surface heights for the location(s) of interest
-            lnsp - log of the surface pressure
-        Outputs:
-            geopotential - The geopotential in units of height times acceleration
-            pressurelvs  - The pressure at each of the model levels for each of
-                           the input points
-            geoheight    - The geopotential heights
+        Args:
+            self:  weather model object with parameters a, b, R_d, and num_levels defined
+            z:     2D array, surface heights for the location(s) of interest
+            lnsp:  2D array, log of the surface pressure
+            t:     3D array, temperature up to _levels levels
+            q:     3D array, specific humidity up to _levels levels
+        Returns:
+            z:          The geopotential in units of height times acceleration
+            p:          The pressure at each of the model levels for each of the input points
+            z_heights:  The geopotential heights
         """
-        return calcgeoh(lnsp, self._t, self._q, z, self._a, self._b, self._R_d, self._levels)
+        return calcgeoh(lnsp, t, q, z_surface, self._a, self._b, self._R_d, self._levels)
 
     def getProjection(self) -> CRS:
         """Returns: the native weather projection, which should be a pyproj object."""
