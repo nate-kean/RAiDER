@@ -114,8 +114,8 @@ def tropo_delay(
 
         try:
             ifWet, ifHydro = getInterpolators(ds, 'ztd')
-        except RuntimeError:
-            raise RuntimeError(f'Failed to get weather model {weather_model_file} interpolators.')
+        except RuntimeError as exc:
+            raise RuntimeError(f'Failed to get weather model {weather_model_file} interpolators.') from exc
 
         wetDelay = ifWet(pnts)
         hydroDelay = ifHydro(pnts)
