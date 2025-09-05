@@ -4,7 +4,7 @@ import datetime as dt
 import pathlib
 import re
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Optional, Union, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -574,7 +574,7 @@ def UTM_to_WGS84(z: np.array, ltr: np.array, x: np.array, y: np.array) -> tuple[
     return np.reshape(lon, x.shape), np.reshape(lat, x.shape)
 
 
-def transform_bbox(snwe_in: list, dest_crs: int=4326, src_crs: int=4326, buffer: float=100.0) -> Tuple[np.array]:
+def transform_bbox(snwe_in: list, dest_crs: int = 4326, src_crs: int = 4326, buffer: float = 100.0) -> tuple[np.array]:
     """Transform bbox to lat/lon or another CRS for use with rest of workflow."""
     """
     Returns: SNWE
@@ -611,7 +611,7 @@ def transform_bbox(snwe_in: list, dest_crs: int=4326, src_crs: int=4326, buffer:
     return snwe
 
 
-def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> List[np.array]:
+def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> list[np.array]:
     """Clip box to multiple of spacing."""
     return [
         np.floor(bbox[0] / spacing) * spacing,
@@ -649,7 +649,7 @@ def writeWeatherVarsXarray(
     crs: CRS,
     out_path: Path,
     NoDataValue: int = -9999,
-    chunksize: Tuple[int, ...] = (1, 91, 144),
+    chunksize: tuple[int, ...] = (1, 91, 144),
 ) -> None:
     assert len(h.shape) == 3, "Invalid h array dimensions"
     assert len(q.shape) == 3, "Invalid q array dimensions"
@@ -710,7 +710,7 @@ def convertLons(inLons: np.ndarray) -> np.ndarray:
     return outLons
 
 
-def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
+def read_NCMR_loginInfo(filepath: str = None) -> tuple[str, str, str]:
     """Returns login information."""
     from pathlib import Path
 
@@ -759,7 +759,7 @@ def show_progress(block_num: Union[int, float], block_size: Union[int, float], t
         pbar = None
 
 
-def getChunkSize(in_shape: ndarray) -> Tuple:
+def getChunkSize(in_shape: ndarray) -> tuple:
     """Create a reasonable chunk size."""
     if mp is None:
         raise ImportError('RAiDER.utilFcns: getChunkSize - multiprocessing is not available')
@@ -804,7 +804,7 @@ def calcgeoh(
     p = np.zeros_like(t)
     z_heights = np.zeros_like(t)
 
-    # surface pressure
+    # log of surface pressure
     # Note that we integrate from the ground up, so processing will happen from the largest model level to 0
     sp: FloatArray2D = np.exp(lnsp)
 
@@ -870,7 +870,7 @@ def transform_coords(proj1: CRS, proj2: CRS, x: float, y: float) -> np.ndarray:
     return transformer.transform(x, y)
 
 
-def get_nearest_wmtimes(t0: dt.datetime, time_delta: int) -> List[dt.datetime]:
+def get_nearest_wmtimes(t0: dt.datetime, time_delta: int) -> list[dt.datetime]:
     """Get the nearest two available times to the requested time given a time step.
 
     Args:
@@ -928,6 +928,7 @@ def get_dt(t1: dt.datetime, t2: dt.datetime) -> float:
 
 
 # Tell PyYAML how to serialize pathlib Paths
+# fmt: off
 yaml.add_representer(
     pathlib.PosixPath,
     lambda dumper, data: dumper.represent_scalar(
@@ -942,6 +943,7 @@ yaml.add_representer(
         data
     )
 )
+# fmt: on
 
 def write_yaml(content: dict[str, Any], dst: Union[str, Path]) -> Path:
     """Write a new yaml file from a dictionary with template.yaml as a base.
