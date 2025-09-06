@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [PEP 440](https://www.python.org/dev/peps/pep-0440/)
 and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.0]
 ### Removed
 * [764](https://github.com/dbekaert/RAiDER/pull/764) - Removed Python 3.8 support. Python 3.9 is now the minimum version officially required to run RAiDER.
 * [753](https://github.com/dbekaert/RAiDER/pull/753) - Removed support for ERA-Interim.
