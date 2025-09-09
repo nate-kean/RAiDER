@@ -33,54 +33,6 @@ _LON0 = 0
 _LAT0 = 0
 
 
-@pytest.fixture
-def era5():
-    wm = ERA5()
-    return wm
-
-
-@pytest.fixture
-def era5t():
-    wm = ERA5T()
-    return wm
-
-
-@pytest.fixture
-def hres():
-    wm = HRES()
-    return wm
-
-
-@pytest.fixture
-def gmao():
-    wm = GMAO()
-    return wm
-
-
-@pytest.fixture
-def merra2():
-    wm = MERRA2()
-    return wm
-
-
-@pytest.fixture
-def hrrr():
-    wm = HRRR()
-    return wm
-
-
-@pytest.fixture
-def hrrrak():
-    wm = HRRRAK()
-    return wm
-
-
-@pytest.fixture
-def ncmr():
-    wm = NCMR()
-    return wm
-
-
 T = TypeVar('T')
 
 
@@ -258,27 +210,27 @@ def test_mrwmf() -> None:
         './ERA-5_2020_01_01_T00_00_00.nc'
 
 
-def test_era5(era5: ERA5) -> None:
+def test_era5() -> None:
     """Test ERA-5."""
-    wm = era5
+    wm = ERA5()
     assert wm._humidityType == 'q'
     assert wm._Name == 'ERA-5'
     assert wm._valid_range[0] == datetime.datetime(1950, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
-def test_era5t(era5t: ERA5T) -> None:
+def test_era5t() -> None:
     """Test ERA-5."""
-    wm = era5t
+    wm = ERA5T()
     assert wm._humidityType == 'q'
     assert wm._Name == 'ERA-5T'
     assert wm._valid_range[0] == datetime.datetime(1950, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
-def test_hres(hres: HRES) -> None:
+def test_hres() -> None:
     """Test HRES."""
-    wm = hres
+    wm = HRES()
     assert wm._humidityType == 'q'
     assert wm._Name == 'HRES'
     assert wm._valid_range[0] == datetime.datetime(1983, 4, 20).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
@@ -289,27 +241,27 @@ def test_hres(hres: HRES) -> None:
     assert wm._levels == 91
 
 
-def test_gmao(gmao: GMAO) -> None:
+def test_gmao() -> None:
     """Test GMAO."""
-    wm = gmao
+    wm = GMAO()
     assert wm._humidityType == 'q'
     assert wm._Name == 'GMAO'
     assert wm._valid_range[0] == datetime.datetime(2014, 2, 20).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
-def test_merra2(merra2: MERRA2) -> None:
+def test_merra2() -> None:
     """Test MERRA-2."""
-    wm = merra2
+    wm = MERRA2()
     assert wm._humidityType == 'q'
     assert wm._Name == 'MERRA2'
     assert wm._valid_range[0] == datetime.datetime(1980, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
-def test_hrrr(hrrr: HRRR) -> None:
+def test_hrrr() -> None:
     """Test HRRR."""
-    wm = hrrr
+    wm = HRRR()
     assert wm._humidityType == 'q'
     assert wm._Name == 'HRRR'
     assert wm._valid_range[0] == datetime.datetime(2016, 7, 15).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
@@ -325,9 +277,9 @@ def test_hrrr(hrrr: HRRR) -> None:
         wm.checkValidBounds(np.array([45, 47, 300, 310]))
 
 
-def test_hrrrak(hrrrak: HRRRAK) -> None:
+def test_hrrrak() -> None:
     """Test HRRR-AK."""
-    wm = hrrrak
+    wm = HRRRAK()
     assert wm._Name == 'HRRR-AK'
     assert wm._valid_range[0] == datetime.datetime(2018, 7, 13).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
 
@@ -343,9 +295,9 @@ def test_hrrrak(hrrrak: HRRRAK) -> None:
     wm.checkTime(datetime.datetime(2018, 7, 15).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
 
 
-def test_ncmr(ncmr: NCMR) -> None:
     """Test NCMR"""
-    wm = ncmr
+def test_ncmr() -> None:
+    wm = NCMR()
     assert wm._humidityType == 'q'
     assert wm._Name == 'NCMR'
     assert wm._valid_range[0] == datetime.datetime(2015, 12, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
@@ -440,17 +392,17 @@ def test_get_bounds_indices_4() -> None:
     assert bounds_list == (0, 4, 0, 9)
 
 
-def test_hrrr_badloc(wm:hrrr=HRRR) -> None:
+def test_hrrr_badloc() -> None:
     """Test HRRR out of bounds."""
-    wm = wm()
+    wm = HRRR()
     wm.set_latlon_bounds([-10, 10, -10, 10])
     wm.setTime(datetime.datetime(2020, 10, 1, 0, 0, 0))
     with pytest.raises(ValueError):
         wm._fetch(Path('dummy_filename'))
 
-def test_hrrrak_dl(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
+def test_hrrrak_dl(tmp_path: Path) -> None:
     """Test HRRR-AK."""
-    wm = wm()
+    wm = HRRRAK()
     d  = tmp_path / "files"
     d.mkdir()
     fname = d / "hrrr_ak.nc"
@@ -460,9 +412,9 @@ def test_hrrrak_dl(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
     wm._fetch(fname)
     assert True
 
-def test_hrrrak_dl2(tmp_path: Path, wm:hrrrak=HRRRAK) -> None:
+def test_hrrrak_dl2(tmp_path: Path) -> None:
     """Test the international date line crossing."""
-    wm = wm()
+    wm = HRRRAK()
     d  = tmp_path / "files"
     d.mkdir()
     fname = d / "hrrr_ak.nc"
