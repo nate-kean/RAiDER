@@ -1,4 +1,6 @@
 import datetime as dt
+import shutil
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -14,14 +16,14 @@ from RAiDER.models.model_levels import (
     LEVELS_137_HEIGHTS,
 )
 from RAiDER.models.weatherModel import TIME_RES, WeatherModel
+from RAiDER.types import FloatArray1D, FloatArray2D, FloatArray3D
 
 
 class ECMWF(WeatherModel):
     """Implement ECMWF models."""
 
     def __init__(self) -> None:
-        # initialize a weather model
-        WeatherModel.__init__(self)
+        super().__init__()
 
         # model constants
         self._k1 = 0.776  # [K/Pa]
@@ -46,70 +48,15 @@ class ECMWF(WeatherModel):
         self._a = A_137_HRES
         self._b = B_137_HRES
 
-    def load_weather(self, f=None, *args, **kwargs) -> None:
+    def load_weather(self, filename=None, *args, **kwargs) -> None:
         """
         Consistent class method to be implemented across all weather model types.
         As a result of calling this method, all of the variables (x, y, z, p, q,
         t, wet_refractivity, hydrostatic refractivity, e) should be fully
         populated.
         """
-        f = f if f is not None else self.files[0]
-        self._load_model_level(f)
-
-    def _load_model_level(self, fname) -> None:
-        # read data from netcdf file
-        lats, lons, xs, ys, t, q, lnsp, z = self._makeDataCubes(fname, verbose=False)
-
-        # ECMWF appears to give me this backwards
-        if lats[0] > lats[1]:
-            z = z[::-1]
-            lnsp = lnsp[::-1]
-            t = t[:, ::-1]
-            q = q[:, ::-1]
-            lats = lats[::-1]
-        # Lons is usually ok, but we'll throw in a check to be safe
-        if lons[0] > lons[1]:
-            z = z[..., ::-1]
-            lnsp = lnsp[..., ::-1]
-            t = t[..., ::-1]
-            q = q[..., ::-1]
-            lons = lons[::-1]
-        # pyproj gets fussy if the latitude is wrong, plus our
-        # interpolator isn't clever enough to pick up on the fact that
-        # they are the same
-        lons[lons > 180] -= 360
-
-        self._t = t
-        self._q = q
-        geo_hgt, pres, hgt = self._calculategeoh(z, lnsp)
-
-        self._lons, self._lats = np.meshgrid(lons, lats)
-
-        # ys is latitude
-        self._get_heights(self._lats, hgt.transpose(1, 2, 0))
-        h = self._zs.copy()
-
-        # We want to support both pressure levels and true pressure grids.
-        # If the shape has one dimension, we'll scale it up to act as a
-        # grid, otherwise we'll leave it alone.
-        if len(pres.shape) == 1:
-            self._p = np.broadcast_to(pres[:, np.newaxis, np.newaxis], self._zs.shape)
-        else:
-            self._p = pres
-
-        # Re-structure everything from (heights, lats, lons) to (lons, lats, heights)
-        self._p = self._p.transpose(1, 2, 0)
-        self._t = self._t.transpose(1, 2, 0)
-        self._q = self._q.transpose(1, 2, 0)
-
-        # Flip all the axis so that zs are in order from bottom to top
-        # lats / lons are simply replicated to all heights so they don't need flipped
-        self._p = np.flip(self._p, axis=2)
-        self._t = np.flip(self._t, axis=2)
-        self._q = np.flip(self._q, axis=2)
-        self._ys = self._lats.copy()
-        self._xs = self._lons.copy()
-        self._zs = np.flip(h, axis=2)
+        filename = filename if filename is not None else self.files[0]
+        self._load_model_level(filename)
 
     def _fetch(self, out: Path) -> None:
         """Fetch a weather model from ECMWF."""
@@ -176,42 +123,83 @@ class ECMWF(WeatherModel):
         if c.url == 'https://cds.climate.copernicus.eu/api/v2':
             logger.warning(
                 'Old CDS API configuration detected: ECMWF released a breaking change in late 2024 that expired all '
-                "existing credentials. This run may fail with a 404 HTTP error, in which case you may have to "
+                'existing credentials. This run may fail with a 404 HTTP error, in which case you may have to '
                 'regenerate your CDS API credentials at https://cds.climate.copernicus.eu/how-to-api.'
             )
-
-        if self._model_level_type == 'pl':
-            var = ['z', 'q', 't']
-        else:
-            var = '129/130/133/152'  # 'lnsp', 'q', 'z', 't'
-
-        bbox = [lat_max, lon_min, lat_min, lon_max]
 
         # round to the closest legal time
         corrected_DT = util.round_date(acqTime, dt.timedelta(hours=self._time_res))
         if not corrected_DT == acqTime:
             logger.warning('Rounded given datetime from  %s to %s', acqTime, corrected_DT)
 
-        # I referenced https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5
-        dataDict = {
-            'class': 'ea',
-            'expver': '1',
-            'levelist': 'all',
-            'levtype': f'{self._model_level_type}',  # 'ml' for model levels or 'pl' for pressure levels
-            'param': var,
-            'stream': 'oper',
-            'type': 'an',
-            'date': corrected_DT.strftime('%Y-%m-%d'),
-            'time': corrected_DT.strftime('%H:%M'),
-            # step: With type=an, step is always "0". With type=fc, step can
-            # be any of "3/6/9/12".
-            'step': '0',
-            'area': bbox,
-            'grid': [0.25, 0.25],
-            'format': 'netcdf',
-        }
+        with tempfile.TemporaryDirectory() as temp_dir_str:
+            temp_dir = Path(temp_dir_str)
+            out_path_lnsp_z = temp_dir / f'{out_path.stem}_lnsp_z'
+            out_path_t_q = temp_dir / f'{out_path.stem}_t_q'
 
-        c.retrieve('reanalysis-era5-complete', dataDict, str(out_path))
+            # Developed from https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5
+            params = {
+                'class': 'ea',
+                'expver': '1',
+                'levelist': 'all',
+                'levtype': self._model_level_type,  # 'ml' for model levels or 'pl' for pressure levels
+                'stream': 'oper',
+                'type': 'an',
+                'date': corrected_DT.strftime('%Y-%m-%d'),
+                'time': corrected_DT.strftime('%H:%M'),
+                # step: With type=an, step is always "0". With type=fc, step can
+                # be any of "3/6/9/12".
+                'step': '0',
+                'area': [lat_max, lon_min, lat_min, lon_max],
+                'grid': [0.25, 0.25],
+                'format': 'netcdf',
+            }
+            # Make two separate requests: one for lnsp and z, and the other for t and q.
+            params['param'] = ['lnsp', 'z']
+            c.retrieve('reanalysis-era5-complete', params, out_path_lnsp_z)
+            params['param'] = ['q', 't']
+            c.retrieve('reanalysis-era5-complete', params, out_path_t_q)
+
+            # RAiDER requires z data for all levels, but ERA-5 only provides it for
+            # the surface level. z can be computed for all levels using lnsp, t, and
+            # q, so that is what we will do.
+            # We will use the t/q dataset as a base to make a full dataset with
+            # lnsp, t, and q, and full z data.
+            shutil.copy(out_path_t_q, out_path)
+
+            with xr.open_dataset(out_path_lnsp_z) as ds_lnsp_z, xr.open_dataset(out_path_t_q) as ds_t_q:
+                # Compute full z
+                z_full, _, _ = util.calcgeoh(
+                    # .squeeze(): data comes in with dimensions:
+                    # (valid time, model level, latitude, longitude),
+                    # and we need it in:
+                    # (model level, latitude, longitude),
+                    # and there is always exactly one valid time
+                    # (i.e., shape is always (1, ..., ..., ...)).
+                    lnsp=ds_lnsp_z['lnsp'].values.squeeze(),
+                    z_surface=ds_lnsp_z['z'].values.squeeze(),
+                    t=ds_t_q['t'].values.squeeze(),
+                    q=ds_t_q['q'].values.squeeze(),
+                    a=self._a,
+                    b=self._b,
+                    num_levels=self._levels,
+                    R_d=self._R_d,
+                )
+                # Add the full z cube to the output dataset.
+                ds_out = ds_t_q.assign(
+                    z=xr.Variable(
+                        # Copy over t's dimensions as z's.
+                        # Could also have used q; all three are the same.
+                        dims=ds_t_q['t'].dims,
+                        # Present z_full as though it were wrapped in an array to
+                        # match the shape of the rest of the data.
+                        data=np.broadcast_to(z_full, (1, *z_full.shape)),
+                    ),
+                    # To fit the shape of the rest of the dataset, this is NaN on
+                    # every level but the first (the surface).
+                    lnsp=ds_lnsp_z['lnsp'],
+                )
+                ds_out.to_netcdf(out_path)
 
     def _download_ecmwf(self, lat_min, lat_max, lat_step, lon_min, lon_max, lon_step, time, out: Path) -> None:
         """Used for HRES."""
@@ -250,15 +238,65 @@ class ECMWF(WeatherModel):
             str(out),
         )
 
-    def _load_pressure_level(self, filename, *args, **kwargs) -> None:
+    def _load_model_level(self, filename, *args, **kwargs) -> None:
+        # read data from netcdf file
+        lats, lons, _, _, t, q, lnsp, z = self._makeDataCubes(Path(filename))
+
+        # ECMWF appears to give me this backwards
+        if lats[0] > lats[1]:
+            z: FloatArray3D = z[::-1]
+            lnsp: FloatArray2D = lnsp[::-1]
+            t: FloatArray3D = t[:, ::-1]
+            q: FloatArray3D = q[:, ::-1]
+            lats: FloatArray1D = lats[::-1]
+        # Lons is usually ok, but we'll throw in a check to be safe
+        if lons[0] > lons[1]:
+            z: FloatArray3D = z[..., ::-1]
+            lnsp: FloatArray2D = lnsp[..., ::-1]
+            t: FloatArray3D = t[..., ::-1]
+            q: FloatArray3D = q[..., ::-1]
+            lons: FloatArray1D = lons[::-1]
+        # pyproj gets fussy if the latitude is wrong, plus our
+        # interpolator isn't clever enough to pick up on the fact that
+        # they are the same
+        lons[lons > 180] -= 360
+
+        geo_hgt, p, hgt = self._calculategeoh(z[0, :], lnsp, t, q)
+
+        self._lons, self._lats = np.meshgrid(lons, lats)
+
+        # ys is latitude
+        self._get_heights(self._lats, hgt.transpose(1, 2, 0))  # sets self._zs
+
+        # We want to support both pressure levels and true pressure grids.
+        # If the shape has one dimension, we'll scale it up to act as a
+        # grid, otherwise we'll leave it alone.
+        if p.ndim == 1:
+            p = np.broadcast_to(p[:, np.newaxis, np.newaxis], self._zs.shape)
+
+        # Re-structure everything from (heights, lats, lons) to (lons, lats, heights)
+        p = p.transpose(1, 2, 0)
+        t = t.transpose(1, 2, 0)
+        q = q.transpose(1, 2, 0)
+
+        # Flip all the axes so that zs are in order from bottom to top
+        # lats / lons are simply replicated to all heights so they don't need flipped
+        self._p = np.flip(p, axis=2)
+        self._t = np.flip(t, axis=2)
+        self._q = np.flip(q, axis=2)
+        self._ys = self._lats.copy()
+        self._xs = self._lons.copy()
+        self._zs = np.flip(self._zs, axis=2)
+
+    def _load_pressure_level(self, filename) -> None:
         with xr.open_dataset(filename) as block:
             # Pull the data
             z = np.squeeze(block['z'].values)
             t = np.squeeze(block['t'].values)
             q = np.squeeze(block['q'].values)
-            lats = np.squeeze(block.latitude.values)
-            lons = np.squeeze(block.longitude.values)
-            levels = np.squeeze(block.level.values) * 100
+            lats = np.squeeze(block['latitude'].values)
+            lons = np.squeeze(block['longitude'].values)
+            levels = np.squeeze(block['level'].values) * 100
 
         z = np.flip(z, axis=1)
 
@@ -303,7 +341,11 @@ class ECMWF(WeatherModel):
         self._t = np.flip(self._t, axis=2)
         self._q = np.flip(self._q, axis=2)
 
-    def _makeDataCubes(self, fname, verbose=False):
+    def _makeDataCubes(
+        self,
+        path: Path,
+        verbose: bool = False,
+    ) -> WeatherModel.DataCubes:
         """
         Create a cube of data representing temperature and relative humidity
         at specified pressure levels.
@@ -311,26 +353,23 @@ class ECMWF(WeatherModel):
         # get ll_bounds
         S, N, W, E = self._ll_bounds
 
-        with xr.open_dataset(fname) as ds:
-            ds = ds.assign_coords(longitude=(((ds.longitude + 180) % 360) - 180))
+        with xr.open_dataset(path) as ds:
+            ds = ds.assign_coords(longitude=(((ds['longitude'] + 180) % 360) - 180))
 
             # mask based on query bounds
-            m1 = (S <= ds.latitude) & (N >= ds.latitude)
-            m2 = (W <= ds.longitude) & (E >= ds.longitude)
+            m1 = (S <= ds['latitude']) & (N >= ds['latitude'])
+            m2 = (W <= ds['longitude']) & (E >= ds['longitude'])
             block = ds.where(m1 & m2, drop=True)
 
             # Pull the data
-            z = np.squeeze(block['z'].values)[0, ...]
-            t = np.squeeze(block['t'].values)
-            q = np.squeeze(block['q'].values)
-            lnsp = np.squeeze(block['lnsp'].values)[0, ...]
-            lats = np.squeeze(block.latitude.values)
-            lons = np.squeeze(block.longitude.values)
-
-            xs = lons.copy()
-            ys = lats.copy()
+            t = block['t'].values.squeeze()
+            q = block['q'].values.squeeze()
+            lnsp = block['lnsp'].values[0, 0]
+            z = block['z'].values.squeeze()
+            lats = block['latitude'].values
+            lons = block['longitude'].values
 
         if z.size == 0:
             raise RuntimeError('There is no data in z, you may have a problem with your mask')
 
-        return lats, lons, xs, ys, t, q, lnsp, z
+        return lats, lons, lats, lons, t, q, lnsp, z

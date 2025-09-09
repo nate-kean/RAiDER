@@ -27,7 +27,7 @@ from RAiDER.delayFcns import getInterpolators
 from RAiDER.llreader import AOI, BoundingBox, Geocube
 from RAiDER.logger import logger
 from RAiDER.losreader import LOS, build_ray
-from RAiDER.types import CRSLike
+from RAiDER.types import CRSLike, FloatArray1D, FloatArray2D, FloatArray3D
 from RAiDER.utilFcns import parse_crs
 
 
@@ -114,8 +114,8 @@ def tropo_delay(
 
         try:
             ifWet, ifHydro = getInterpolators(ds, 'ztd')
-        except RuntimeError:
-            raise RuntimeError(f'Failed to get weather model {weather_model_file} interpolators.')
+        except RuntimeError as exc:
+            raise RuntimeError(f'Failed to get weather model {weather_model_file} interpolators.') from exc
 
         wetDelay = ifWet(pnts)
         hydroDelay = ifHydro(pnts)
@@ -402,12 +402,12 @@ def writeResultsToXarray(datetime: dt.datetime, xpts, ypts, zpts, crs, wetDelay,
 
 
 def transformPoints(
-    lats: np.ndarray,
-    lons: np.ndarray,
-    hgts: np.ndarray,
+    lats: FloatArray2D,
+    lons: FloatArray2D,
+    hgts: FloatArray2D,
     old_proj: CRSLike,
     new_proj: CRSLike,
-) -> np.ndarray:
+) -> FloatArray3D:
     """
     Transform lat/lon/hgt data to an array of points in a new projection.
 
@@ -419,7 +419,7 @@ def transformPoints(
         new_proj: CRS   - the new projection in which to return the points
 
     Returns:
-        ndarray: the array of query points in the weather model coordinate system (YX)
+        ndarray: the array of query points in the weather model coordinate system (YXZ)
     """
     # Flags for flipping inputs or outputs
     old_proj = parse_crs(old_proj)
@@ -430,7 +430,8 @@ def transformPoints(
     # in_flip = old_proj.axis_info[0].direction
     # out_flip = new_proj.axis_info[0].direction
 
-    res = t.transform(lons, lats, hgts)
+    # lon/lat/height
+    res: tuple[FloatArray1D, FloatArray1D, FloatArray1D] = t.transform(lons, lats, hgts, errcheck=True)
 
     # lat/lon/height
-    return np.stack([res[1], res[0], res[2]], axis=-1)
+    return np.stack((res[1], res[0], res[2]), axis=-1)

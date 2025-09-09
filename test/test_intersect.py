@@ -67,10 +67,21 @@ def test_cube_intersect(tmp_path: Path, wm: str) -> None:
     np.testing.assert_almost_equal(hyd, gold[wm], decimal=4)
 
 
-@pytest.mark.parametrize('wm', 'ERA5'.split())
-def test_gnss_intersect(tmp_path: Path, wm: str) -> None:
+@pytest.mark.parametrize(
+    'wm_name,gold',
+    (
+        ('ERA5', 2.34514),
+        # Can be enabled when known-good data is added
+        pytest.param('ERA5T', np.nan, marks=pytest.mark.skip),
+        pytest.param('GMAO', np.nan, marks=pytest.mark.skip),
+        pytest.param('MERRA2', np.nan, marks=pytest.mark.skip),
+        pytest.param('NCMR', np.nan, marks=pytest.mark.skip),
+        pytest.param('HRRR', np.nan, marks=pytest.mark.skip),
+    ),
+)
+def test_gnss_intersect(tmp_path: Path, wm_name: str, gold: np.float64) -> None:
     gnss_file = SCENARIO_DIR / 'stations.csv'
-    outdir = tmp_path / 'output'
+    out_dir = tmp_path / 'output'
 
     id = 'TORP'
 
@@ -81,10 +92,10 @@ def test_gnss_intersect(tmp_path: Path, wm: str) -> None:
     grp = {
         'date_group': {'date_start': date},
         'time_group': {'time': time, 'interpolate_time': 'none'},
-        'weather_model': wm,
+        'weather_model': wm_name,
         'aoi_group': {'station_file': str(gnss_file)},
         'runtime_group': {
-            'output_directory': outdir,
+            'output_directory': out_dir,
             'weather_model_directory': WM_DIR,
         },
         'verbose': False,
@@ -96,9 +107,8 @@ def test_gnss_intersect(tmp_path: Path, wm: str) -> None:
     ## run raider and intersect
     calcDelays([str(cfg)])
 
-    gold = {'ERA5': 2.34514, 'GMAO': np.nan, 'HRRR': np.nan}
-    df = pd.read_csv(outdir / f'{wm}_Delay_{date}T{time.replace(":", "")}_ztd.csv')
+    df = pd.read_csv(out_dir / f'{wm_name}_Delay_{date}T{time.replace(":", "")}_ztd.csv')
     td = df['totalDelay'][df['ID'] == id].values
 
     # test for equality with golden data
-    np.testing.assert_almost_equal(td.item(), gold[wm], decimal=4)
+    np.testing.assert_almost_equal(td.item(), gold, decimal=4)

@@ -8,7 +8,7 @@ from test import TEST_DIR
 
 def test_download_dem_1() -> None:
     SCENARIO_1 = TEST_DIR / 'scenario_4'
-    hts, meta = download_dem(dem_path=SCENARIO_1 / 'warpedDEM.dem', overwrite=False)
+    hts, meta = download_dem(dem_path=SCENARIO_1 / 'warpedDEM.rdr', overwrite=False)
     assert hts.shape == (45, 226)
     assert meta is not None
     assert meta['crs'] is None

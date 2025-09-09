@@ -1,4 +1,5 @@
 import datetime as dt
+from abc import abstractmethod
 
 import numpy as np
 from pyproj import CRS
@@ -11,8 +12,8 @@ from RAiDER.models.weatherModel import WeatherModel
 
 class customModelReader(WeatherModel):
     def __init__(self) -> None:
-        WeatherModel.__init__(self)
         self._humidityType = 'q'  # can be "q" (specific humidity) or "rh" (relative humidity)
+        super().__init__()
         self._model_level_type = 'pl'  # Default, pressure levels are "pl", and model levels are "ml"
         self._classname = 'abcd'  # name of the custom weather model
         self._dataset = 'abcd'  # same name as above
@@ -150,21 +151,17 @@ class customModelReader(WeatherModel):
         """
         pass
 
-    def _makeDataCubes(self, filename) -> None:
+    @abstractmethod
+    def _makeDataCubes(self, filename) -> WeatherModel.DataCubes:
         """
         Auxilliary function:
         Read 3-D data cubes from downloaded file or directly from weather model weblink (in which case, there is no
-        need to download and save any file; rather, the weblink needs to be hardcoded in the custom reader, e.g. GMAO)
-        Input:
-        filename - filename of the downloaded weather model file from the server
-        Outputs:
-        lats - latitude (3-D data cube)
-        lons - longitude (3-D data cube)
-        xs - x-direction grid dimension of the native weather model coordinates (3-D data cube; if in lat/lon, _xs = _lons)
-        ys - y-direction grid dimension of the native weather model coordinates (3-D data cube; if in lat/lon, _ys = _lats)
-        t - temperature (3-D data cube)
-        q - humidity (3-D data cube; could be relative humidity or specific humidity)
-        p - pressure level (3-D data cube; could be pressure level (preferred) or surface pressure)
-        hgt - height (3-D data cube; could be geopotential height or topographic height (preferred)).
+        need to download and save any file; rather, the weblink needs to be hardcoded in the custom reader, e.g. GMAO).
+        
+        Args:
+            filename - filename of the downloaded weather model file from the server.
+
+        Returns:
+            WeatherModel.DataCubes
         """
         pass

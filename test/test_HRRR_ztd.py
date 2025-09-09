@@ -9,19 +9,19 @@ from RAiDER.utilFcns import write_yaml
 from test import WM_DIR
 
 
-def test_scenario_1(tmp_path: Path, data_for_hrrr_ztd: Path, mocker: MockerFixture) -> None:
+def test_hrrr_ztd(tmp_path: Path, data_for_hrrr_ztd: Path, mocker: MockerFixture) -> None:
     mocker.patch('RAiDER.processWM.prepareWeatherModel', side_effect=[str(data_for_hrrr_ztd)])
 
     dct_group = {
-       'aoi_group': {'bounding_box': [36, 37, -92, -91]},
-       'date_group': {'date_start': 20200101},
-       'time_group': {'time': '12:00:00', 'interpolate_time': 'none'},
-       'weather_model': 'HRRR',
-       'height_group': {'height_levels': [0, 50, 100, 500, 1000]},
-       'runtime_group': {
+        'aoi_group': {'bounding_box': [36, 37, -92, -91]},
+        'date_group': {'date_start': 20200101},
+        'time_group': {'time': '12:00:00', 'interpolate_time': 'none'},
+        'weather_model': 'HRRR',
+        'height_group': {'height_levels': [0, 50, 100, 500, 1000]},
+        'runtime_group': {
             'output_directory': tmp_path,
-            'weather_model_directory': WM_DIR
-        }
+            'weather_model_directory': WM_DIR,
+        },
     }
 
     cfg = write_yaml(dct_group, tmp_path / 'temp.yaml')

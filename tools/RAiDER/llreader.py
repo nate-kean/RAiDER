@@ -11,22 +11,17 @@ from pathlib import Path
 from typing import Literal, Optional, Union
 
 import numpy as np
+import pandas as pd
 import pyproj
 import xarray as xr
-
-from RAiDER.types import CRSLike
-
-
-import pandas as pd
-
 from pyproj import CRS
 
 from RAiDER.logger import logger
-from RAiDER.types import BB, RIO, LookDir
+from RAiDER.types import BB, RIO, CRSLike, LookDir
 
 
 class AOI:
-    """ Instantiates a generic AOI class object. """
+    """Instantiates a generic AOI class object."""
     _output_directory: Path
     _bounding_box: Optional[BB.SNWE]
     _proj: Optional[CRS]
@@ -34,8 +29,8 @@ class AOI:
     _cube_spacing_m: Optional[float]
     _type: str
 
-    def __init__(self, cube_spacing_in_m: Optional[float]=None) -> None:
-        self._output_directory = Path.cwd()
+    def __init__(self, cube_spacing_in_m: Optional[float]=None, output_directory: Union[Path, str]=Path.cwd()) -> None:
+        self._output_directory = Path(output_directory)
         self._bounding_box = None
         self._proj = CRS.from_epsg(4326)
         self._geotransform = None
@@ -192,8 +187,14 @@ class StationFile(AOI):
     _demfile: Optional[Path]
     _type: Literal['station_file']
 
-    def __init__(self, station_file: Path, demFile: Optional[Path]=None, cube_spacing_in_m: Optional[float]=None) -> None:
-        super().__init__(cube_spacing_in_m)
+    def __init__(
+        self,
+        station_file: Path,
+        demFile: Optional[Path]=None,
+        cube_spacing_in_m: Optional[float]=None,
+        output_directory: Union[Path, str]=Path.cwd(),
+    ) -> None:
+        super().__init__(cube_spacing_in_m, output_directory)
         self._filename = station_file
         self._demfile = demFile
         self._bounding_box = bounds_from_csv(station_file)
@@ -235,7 +236,7 @@ class StationFile(AOI):
             # write the elevations to the file
             df['Hgt_m'] = z_out
             df.to_csv(self._filename, index=False)
-            self.__init__(self._filename)
+            self._demfile = None
             return z_out
 
 
@@ -247,8 +248,18 @@ class RasterRDR(AOI):
     _demfile: Optional[Path]
     _convention: str  # TODO: can probably be narrowed down to a few Literals
 
-    def __init__(self, lat_file: Path, lon_file: Optional[Path]=None, hgt_file: Optional[Path]=None, dem_file: Optional[Path]=None, convention='isce', cube_spacing_in_m: Optional[float]=None) -> None:
-        super().__init__(cube_spacing_in_m)
+    def __init__(
+        self,
+        lat_file: Path,
+        lon_file: Optional[Path]=None,
+        *,
+        hgt_file: Optional[Path]=None,
+        dem_file: Optional[Path]=None,
+        convention='isce',
+        cube_spacing_in_m: Optional[float]=None,
+        output_directory: Union[Path, str]=Path.cwd(),
+    ) -> None:
+        super().__init__(cube_spacing_in_m, output_directory)
         self._type = 'radar_rasters'
         self._latfile = lat_file
         self._lonfile = lon_file
@@ -314,8 +325,13 @@ class BoundingBox(AOI):
     """Parse a bounding box AOI."""
     _type: Literal['bounding_box']
 
-    def __init__(self, bbox: Optional[BB.SNWE], cube_spacing_in_m: Optional[float]=None) -> None:
-        super().__init__(cube_spacing_in_m)
+    def __init__(
+        self,
+        bbox: Optional[BB.SNWE],
+        cube_spacing_in_m: Optional[float]=None,
+        output_directory: Union[Path, str]=Path.cwd(),
+    ) -> None:
+        super().__init__(cube_spacing_in_m, output_directory)
         self._bounding_box = bbox
         self._type = 'bounding_box'
 
@@ -326,8 +342,14 @@ class GeocodedFile(AOI):
     p: RIO.Profile
     _is_dem: bool
 
-    def __init__(self, path: Path, is_dem: bool=False, cube_spacing_in_m: Optional[float]=None) -> None:
-        super().__init__(cube_spacing_in_m)
+    def __init__(
+        self,
+        path: Path,
+        is_dem: bool=False,
+        cube_spacing_in_m: Optional[float]=None,
+        output_directory: Union[Path, str]=Path.cwd(),
+    ) -> None:
+        super().__init__(cube_spacing_in_m, output_directory)
 
         from RAiDER.utilFcns import rio_extents, rio_profile, rio_stats
 
@@ -371,9 +393,9 @@ class Geocube(AOI):
     path: Path
     _type: Literal['Geocube']
 
-    def __init__(self, path_cube: Path, cube_spacing_in_m: Optional[float]=None) -> None:
+    def __init__(self, path_cube: Path, cube_spacing_in_m: Optional[float]=None, output_directory=os.getcwd()) -> None:
         from RAiDER.utilFcns import rio_stats
-        super().__init__(cube_spacing_in_m)
+        super().__init__(cube_spacing_in_m, output_directory)
         self.path = path_cube
         self._type = 'Geocube'
         self._bounding_box = self.get_extent()
@@ -381,21 +403,21 @@ class Geocube(AOI):
 
     def get_extent(self):
         with xr.open_dataset(self.path) as ds:
-            S, N = ds.latitude.min().item(), ds.latitude.max().item()
-            W, E = ds.longitude.min().item(), ds.longitude.max().item()
+            S, N = ds['latitude'].min().item(), ds['latitude'].max().item()
+            W, E = ds['longitude'].min().item(), ds['longitude'].max().item()
         return [S, N, W, E]
 
     ## untested
     def readLL(self) -> tuple[np.ndarray, np.ndarray]:
         with xr.open_dataset(self.path) as ds:
-            lats = ds.latitutde.data()
-            lons = ds.longitude.data()
+            lats = ds['latitutde'].data()
+            lons = ds['longitude'].data()
         Lats, Lons = np.meshgrid(lats, lons)
         return Lats, Lons
 
     def readZ(self):
         with xr.open_dataset(self.path) as ds:
-            heights = ds.heights.data
+            heights = ds['heights'].data
         return heights
 
 
