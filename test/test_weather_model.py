@@ -7,7 +7,6 @@ from typing import TypeVar
 
 import numpy as np
 import pytest
-from numpy import nan
 from scipy.interpolate import RegularGridInterpolator as rgi
 
 from RAiDER.constants import _ZMIN, _ZREF
@@ -51,9 +50,11 @@ class MockWeatherModel(WeatherModel):
         self._k2 = 1
         self._k3 = 1
 
-        self._Name = "MOCK"
-        self._valid_range = (dt.datetime(1970, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())), 
-                             dt.datetime.now(dt.timezone.utc))
+        self._Name = 'MOCK'
+        self._valid_range = (
+            dt.datetime(1970, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())),
+            dt.datetime.now(dt.timezone.utc),
+        )
         self._lag_time = dt.timedelta(days=15)
 
     def _fetch(self, ll_bounds, time, out):  # noqa: ANN202
@@ -61,30 +62,31 @@ class MockWeatherModel(WeatherModel):
 
     def load_weather(self, *args, **kwargs) -> None:  # noqa: D102
         _N_Z = 32
-        self._ys = np.arange(-2,3) + _LAT0
-        self._xs = np.arange(-3,4) + _LON0
+        self._ys = np.arange(-2, 3) + _LAT0
+        self._xs = np.arange(-3, 4) + _LON0
         self._zs = np.linspace(0, 1e5, _N_Z)
         self._t = np.ones((len(self._ys), len(self._xs), _N_Z))
         self._e = self._t.copy()
-        self._e[:,3:,:] = 2
+        self._e[:, 3:, :] = 2
 
         _p = np.arange(31, -1, -1)
         self._p = np.broadcast_to(_p, self._t.shape)
 
         self._true_hydro_refr = np.broadcast_to(_p, (self._t.shape))
         self._true_wet_ztd = 1e-6 * 2 * np.broadcast_to(np.flip(self._zs), (self._t.shape))
-        self._true_wet_ztd[:,3:] = 2 * self._true_wet_ztd[:,3:]
+        self._true_wet_ztd[:, 3:] = 2 * self._true_wet_ztd[:, 3:]
 
         self._true_hydro_ztd = np.zeros(self._t.shape)
         for layer in range(len(self._zs)):
-            self._true_hydro_ztd[:,:,layer] = 1e-6 * 0.5 * (self._zs[-1] - self._zs[layer]) * _p[layer]
+            self._true_hydro_ztd[:, :, layer] = 1e-6 * 0.5 * (self._zs[-1] - self._zs[layer]) * _p[layer]
 
         self._true_wet_refr = 2 * np.ones(self._t.shape)
-        self._true_wet_refr[:,3:] = 4
+        self._true_wet_refr[:, 3:] = 4
 
     def interpWet(self):  # noqa: ANN201, D102
         _ifWet = rgi((self._ys, self._xs, self._zs), self._true_wet_refr)
         return _ifWet
+
     def interpHydro(self):  # noqa: ANN201, D102
         _ifHydro = rgi((self._ys, self._xs, self._zs), self._true_hydro_refr)
         return _ifHydro
@@ -93,6 +95,7 @@ class MockWeatherModel(WeatherModel):
 @pytest.fixture
 def model():  # noqa: ANN201, D103
     return MockWeatherModel()
+
 
 def test_weatherModel_basic1(model: MockWeatherModel) -> None:
     """Test uniform_in_z."""
@@ -125,13 +128,15 @@ def test_weatherModel_basic1(model: MockWeatherModel) -> None:
 def test_uniform_in_z_small(model: MockWeatherModel) -> None:
     """Test uniform_in_z."""
     # Uneven z spacing, but averages to [1, 2]
+    # fmt: off
     model._zs = np.array([
-        [[1., 2.],
+        [[1.0, 2.0],
          [0.9, 1.1]],
 
-        [[1., 2.6],
+        [[1.0, 2.6],
          [1.1, 2.3]]
     ])
+    # fmt: on
     model._xs = np.array([1, 2, 2])
     model._ys = np.array([2, 3, 2])
     model._p = np.arange(8).reshape(2, 2, 2)
@@ -144,13 +149,15 @@ def test_uniform_in_z_small(model: MockWeatherModel) -> None:
 
     # Note that when the lower bound is exactly equal we get a value, but
     # when the upper bound is exactly equal we get the fill
+    # fmt: off
     interpolated = np.array([
-        [[0, nan],
-         [2.5, nan]],
+        [[0.0, np.nan],
+         [2.5, np.nan]],
 
-        [[4., 4.625],
-         [nan, 6.75]]
+        [[4.0,    4.625],
+         [np.nan, 6.75 ]]
     ])
+    # fmt: on
 
     assert np.allclose(model._p, interpolated, equal_nan=True, rtol=0)
     assert np.allclose(model._t, interpolated * 2, equal_nan=True, rtol=0)
@@ -183,12 +190,9 @@ def test_uniform_in_z_large(model: MockWeatherModel) -> None:
 
     interpolated = np.tile(np.arange(y), (x, 1))
 
-    assert np.allclose(np.nanmean(model._p, axis=-1),
-                       interpolated, equal_nan=True, rtol=0)
-    assert np.allclose(np.nanmean(model._t, axis=-1),
-                       interpolated * 2, equal_nan=True, rtol=0)
-    assert np.allclose(np.nanmean(model._e, axis=-1),
-                       interpolated * 3, equal_nan=True, rtol=0)
+    assert np.allclose(np.nanmean(model._p, axis=-1), interpolated, equal_nan=True, rtol=0)
+    assert np.allclose(np.nanmean(model._t, axis=-1), interpolated * 2, equal_nan=True, rtol=0)
+    assert np.allclose(np.nanmean(model._e, axis=-1), interpolated * 3, equal_nan=True, rtol=0)
 
     assert np.allclose(model._zs, zlevels, atol=0.05, rtol=0)
 
@@ -198,8 +202,7 @@ def test_mwmf() -> None:
     name = 'ERA-5'
     time = dt.datetime(2020, 1, 1)
     ll_bounds = (-90, 90, -180, 180)
-    assert make_weather_model_filename(name, time, ll_bounds) == \
-        'ERA-5_2020_01_01_T00_00_00_90S_90N_180W_180E.nc'
+    assert make_weather_model_filename(name, time, ll_bounds) == 'ERA-5_2020_01_01_T00_00_00_90S_90N_180W_180E.nc'
 
 
 def test_mrwmf() -> None:
@@ -207,8 +210,7 @@ def test_mrwmf() -> None:
     outLoc = './'
     name = 'ERA-5'
     time = dt.datetime(2020, 1, 1)
-    assert make_raw_weather_data_filename(outLoc, name, time) == \
-        './ERA-5_2020_01_01_T00_00_00.nc'
+    assert make_raw_weather_data_filename(outLoc, name, time) == './ERA-5_2020_01_01_T00_00_00.nc'
 
 
 def test_era5() -> None:
@@ -308,11 +310,13 @@ def test_find_svp() -> None:
     """Test the svp function."""
     t = np.arange(0, 100, 10) + 273.15
     svp_test = find_svp(t)
+    # fmt: off
     svp_true = np.array([
-        611.21, 1227.5981, 2337.2825, 4243.5093,
-        7384.1753, 12369.2295, 20021.443, 31419.297,
-        47940.574, 71305.16
+          611.21,    1227.5981,  2337.2825,  4243.5093,
+         7384.1753, 12369.2295, 20021.443,  31419.297,
+        47940.574,  71305.16
     ])
+    # fmt: on
     assert np.allclose(svp_test, svp_true)
 
 
@@ -354,7 +358,7 @@ def test_get_bounds_indices_2() -> None:
     """Test bounds indices."""
     snwe = [-10, 10, 170, -170]
     l = np.arange(-20, 20)
-    l2 = (((np.arange(160, 200) + 180) % 360) - 180)
+    l2 = ((np.arange(160, 200) + 180) % 360) - 180
     lats, lons = np.meshgrid(l, l2)
     with pytest.raises(ValueError):
         get_bounds_indices(snwe, lats, lons)
@@ -377,7 +381,7 @@ def test_get_bounds_indices_3() -> None:
     """Test bounds indices."""
     snwe = [-10, 10, -10, 10]
     l = np.arange(-20, 20)
-    l2 = (((np.arange(160, 200) + 180) % 360) - 180)
+    l2 = ((np.arange(160, 200) + 180) % 360) - 180
     lats, lons = np.meshgrid(l, l2)
     with pytest.raises(NoWeatherModelData):
         get_bounds_indices(snwe, lats, lons)
@@ -401,26 +405,27 @@ def test_hrrr_badloc() -> None:
     with pytest.raises(ValueError):
         wm._fetch(Path('dummy_filename'))
 
+
 def test_hrrrak_dl(tmp_path: Path) -> None:
     """Test HRRR-AK."""
     wm = HRRRAK()
-    d  = tmp_path / "files"
+    d = tmp_path / 'files'
     d.mkdir()
-    fname = d / "hrrr_ak.nc"
+    fname = d / 'hrrr_ak.nc'
     wm.set_latlon_bounds([65, 67, -160, -150])
     wm.setTime(dt.datetime(2020, 12, 1, 0, 0, 0))
 
     wm._fetch(fname)
 
+
 def test_hrrrak_dl2(tmp_path: Path) -> None:
     """Test the international date line crossing."""
     wm = HRRRAK()
-    d  = tmp_path / "files"
+    d = tmp_path / 'files'
     d.mkdir()
-    fname = d / "hrrr_ak.nc"
+    fname = d / 'hrrr_ak.nc'
 
     wm.set_latlon_bounds([50, 52, 179, -179])
     wm.setTime(dt.datetime(2020, 12, 1, 0, 0, 0))
 
     wm._fetch(fname)
-
