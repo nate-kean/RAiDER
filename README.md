@@ -2,7 +2,7 @@
 
 Raytracing Atmospheric Delay Estimation for RADAR
 
-[![Language](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/)
+[![Language](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/dbekaert/RAiDER/blob/dev/LICENSE)
 [![CircleCI](https://circleci.com/gh/dbekaert/RAiDER.svg?style=svg)](https://circleci.com/gh/dbekaert/RAiDER)
 [![Coverage Status](https://coveralls.io/repos/github/dbekaert/RAiDER/badge.svg?branch=dev)](https://coveralls.io/github/dbekaert/RAiDER?branch=dev)
@@ -18,7 +18,7 @@ THIS IS RESEARCH CODE PROVIDED TO YOU "AS IS" WITH NO WARRANTIES OF CORRECTNESS.
 1. [Getting Started](#1-getting-started)
     - [Installing With Conda](#installing-with-conda)
     - [Using the Docker Image](#using-the-docker-image)
-    - [Installing from Source](#installing-from-source)
+    - [Installing from Source](docs/Installing_from_source.md)
 2. [Setup of third party weather model access](#2-setup-of-third-party-weather-model-access)
 3. [Running RAiDER and Documentation](#3-running-raider-and-documentation)
 4. [Citing](#4-citation)
@@ -47,29 +47,29 @@ conda activate RAiDER
 ### Using the Docker image
 
 RAiDER provides a [docker container image](https://docs.docker.com/get-started/) with all the necessary dependencies pre-installed. To get the latest released version: 
-```
+```sh
 docker pull ghcr.io/dbekaert/raider:latest
 ```
 a specific release version (>=v0.2.0 only):
-```
+```sh
 docker pull ghcr.io/dbekaert/raider:0.2.0
 ```
 or the current development version:
-```
+```sh
 docker pull ghcr.io/dbekaert/raider:test
 ```
 
 To run `raider.py` inside the container:
-```
+```sh
 docker run -it --rm ghcr.io/dbekaert/raider:latest
 ```
 To mount your current directory inside the container so that files will be written back to your local machine:
-```
+```sh
 docker run -it -v ${PWD}:/home/raider/work --rm ghcr.io/dbekaert/raider:latest
 cd work
 ```
 To jump into a `bash` shell inside the container:
-```
+```sh
 docker run -it --rm --entrypoint /bin/bash ghcr.io/dbekaert/raider:latest -l
 ```
 
@@ -99,12 +99,26 @@ TODO
 Contributions are welcome and heartily encourage! See our [contributing guide](https://github.com/dbekaert/RAiDER/blob/dev/CONTRIBUTING.md).
 
 ### Development install
-For development, we recommend installing directly from source.
-```
+For development, we recommend installing directly from source.  
+Solving can take a long time (upwards of an hour), so we also recommend 
+taking advantage of the included lockfile to install faster.
+```sh
+# Clone the project
 git clone https://github.com/dbekaert/RAiDER.git
 cd RAiDER
-conda env create -f environment.yml
+
+# Install conda-lock (if not already installed)
+pip install condax
+condax install conda-lock
+
+# Create RAiDER environment using the lockfile
+conda-lock install
+# Or solve and create from scratch without lockfile:
+# conda env create -f environment.yml
+
 conda activate RAiDER
+
+# Symlink project folder in as a pip package in the environment
 python -m pip install -e .
 ```
 For more details on installing from source see [here](https://github.com/dbekaert/RAiDER/blob/dev/docs/Installing_from_source.md).

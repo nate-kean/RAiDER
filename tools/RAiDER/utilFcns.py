@@ -4,9 +4,10 @@ import datetime as dt
 import pathlib
 import re
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Optional, Union, cast
 
 import numpy as np
+import numpy.typing as npt
 import rasterio
 import xarray as xr
 import yaml
@@ -14,24 +15,14 @@ from numpy import ndarray
 from pyproj import CRS, Proj, Transformer
 
 import RAiDER
-from RAiDER.constants import (
-    R_EARTH_MAX_WGS84 as Rmax,
-)
-from RAiDER.constants import (
-    R_EARTH_MIN_WGS84 as Rmin,
-)
-from RAiDER.constants import (
-    _THRESHOLD_SECONDS,
-)
-from RAiDER.constants import (
-    _g0 as g0,
-)
-from RAiDER.constants import (
-    _g1 as G1,
-)
+from RAiDER.constants import R_EARTH_MAX_WGS84 as Rmax
+from RAiDER.constants import R_EARTH_MIN_WGS84 as Rmin
+from RAiDER.constants import _THRESHOLD_SECONDS
+from RAiDER.constants import _g0 as G0
+from RAiDER.constants import _g1 as G1
 from RAiDER.llreader import AOI
 from RAiDER.logger import logger
-from RAiDER.types import BB, RIO, CRSLike
+from RAiDER.types import BB, RIO, CRSLike, FloatArray2D, FloatArray3D
 
 
 # Optional imports
@@ -234,7 +225,7 @@ def rio_stats(path: Path, band: int=1) -> tuple[RIO.Statistics, Optional[CRS], R
     # Turn off PAM to avoid creating .aux.xml files
     with rasterio.Env(GDAL_PAM_ENABLED='NO'):
         with rasterio.open(path) as src:
-            stats = src.statistics(band)
+            stats = src.stats(indexes=(band,))[0]
             proj = src.crs
             gt = src.transform.to_gdal()
 
@@ -304,7 +295,7 @@ def writeArrayToRaster(
     logger.info('Wrote: %s', path)
 
 
-def round_date(date: dt.datetime, precision: int) -> dt.datetime:
+def round_date(date: dt.datetime, precision: dt.timedelta) -> dt.datetime:
     """Rounds the date to the nearest precision in seconds."""
     # First try rounding up
     # Timedelta since the beginning of time
@@ -388,7 +379,7 @@ def geo_to_ht(lats: ndarray, hts: ndarray) -> ndarray:
 
     Compare to MetPy:
     (https://unidata.github.io/MetPy/latest/api/generated/metpy.calc.geopotential_to_height.html)
-    # h = (geopotential * Re) / (g0 * Re - geopotential)
+    # h = (geopotential * Re) / (G0 * Re - geopotential)
     # Assumes a sphere instead of an ellipsoid
 
     Args:
@@ -405,7 +396,7 @@ def geo_to_ht(lats: ndarray, hts: ndarray) -> ndarray:
     Re = get_Re(lats)  # Earth radius function of latitude
 
     # Calculate Geometric Height, h
-    h = (hts * Re) / (g_ll / g0 * Re - hts)
+    h = (hts * Re) / (g_ll / G0 * Re - hts)
 
     return h
 
@@ -556,34 +547,34 @@ def UTM_to_WGS84(z: np.array, ltr: np.array, x: np.array, y: np.array) -> tuple[
     ltr = np.ravel(ltr)
     x = np.ravel(x)
     y = np.ravel(y)
-    
+
     # Validate that all input arrays have the same length
     if not (len(z) == len(ltr) == len(x) == len(y)):
-        raise ValueError("All input arrays must have the same length.")
-    
+        raise ValueError('All input arrays must have the same length.')
+
     # Initialize arrays for lat and lon
     lat = np.empty_like(x, dtype=float)
     lon = np.empty_like(x, dtype=float)
-    
+
     # Iterate over all coordinates
     for ind in range(len(z)):
         zz = z[ind]
         ll = ltr[ind]
         xx = x[ind]
         yy = y[ind]
-        
+
         # Perform the transformation
         coordinates = unproject(zz, ll, xx, yy)
-        
+
         # Assign the results to lat and lon
         lon[ind] = coordinates[0]
         lat[ind] = coordinates[1]
-    
+
     # Reshape and return the results
     return np.reshape(lon, x.shape), np.reshape(lat, x.shape)
 
 
-def transform_bbox(snwe_in: list, dest_crs: int=4326, src_crs: int=4326, buffer: float=100.0) -> Tuple[np.array]:
+def transform_bbox(snwe_in: list, dest_crs: int = 4326, src_crs: int = 4326, buffer: float = 100.0) -> tuple[np.array]:
     """Transform bbox to lat/lon or another CRS for use with rest of workflow."""
     """
     Returns: SNWE
@@ -620,7 +611,7 @@ def transform_bbox(snwe_in: list, dest_crs: int=4326, src_crs: int=4326, buffer:
     return snwe
 
 
-def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> List[np.array]:
+def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> list[np.array]:
     """Clip box to multiple of spacing."""
     return [
         np.floor(bbox[0] / spacing) * spacing,
@@ -630,7 +621,7 @@ def clip_bbox(bbox: Union[list, tuple, ndarray], spacing: Union[int, float]) -> 
     ]
 
 
-def requests_retry_session(retries: int=10, session=None):  # noqa: ANN001, ANN201
+def requests_retry_session(retries: int = 10, session=None):  # noqa: ANN001, ANN201
     """https://www.peterbe.com/plog/best-practice-with-retries-with-requests."""
     import requests
     from requests.adapters import HTTPAdapter
@@ -647,27 +638,42 @@ def requests_retry_session(retries: int=10, session=None):  # noqa: ANN001, ANN2
     return session
 
 
-def writeWeatherVarsXarray(lat: float, lon: float, h: float, q: float, p: float, t: float, datetime: dt.datetime, crs: float, outName: str=None, NoDataValue: int=-9999, chunk: list=(1, 91, 144)) -> None:
-    """Does not return anything."""
-    # I added datetime as an input to the function and just copied these two lines from merra2 for the attrs_dict
-    attrs_dict = {
-        'datetime': datetime.strftime('%Y_%m_%dT%H_%M_%S'),
-        'date_created': datetime.now().strftime('%Y_%m_%dT%H_%M_%S'),
-        'NoDataValue': NoDataValue,
-        'chunksize': chunk,
-        # 'mapping_name': mapping_name,
-    }
-
-    dimension_dict = {
-        'latitude': (('y', 'x'), lat),
-        'longitude': (('y', 'x'), lon),
-    }
-
+def writeWeatherVarsXarray(
+    lat: npt.NDArray[np.floating],
+    lon: npt.NDArray[np.floating],
+    h: npt.NDArray[np.floating],
+    q: npt.NDArray[np.floating],
+    p: npt.NDArray[np.floating],
+    t: npt.NDArray[np.floating],
+    datetime: dt.datetime,
+    crs: CRS,
+    out_path: Path,
+    NoDataValue: int = -9999,
+    chunksize: tuple[int, ...] = (1, 91, 144),
+) -> None:
+    assert len(h.shape) == 3, "Invalid h array dimensions"
+    assert len(q.shape) == 3, "Invalid q array dimensions"
+    assert len(p.shape) == 3, "Invalid p array dimensions"
+    assert len(t.shape) == 3, "Invalid t array dimensions"
     dataset_dict = {
         'h': (('z', 'y', 'x'), h),
         'q': (('z', 'y', 'x'), q),
         'p': (('z', 'y', 'x'), p),
         't': (('z', 'y', 'x'), t),
+    }
+    assert len(lat.shape) == 2, "Invalid lats array dimensions"
+    assert len(lon.shape) == 2, "Invalid lons array dimensions"
+    dimension_dict = {
+        'latitude': (('y', 'x'), lat),
+        'longitude': (('y', 'x'), lon),
+    }
+    # I added datetime as an input to the function and just copied these two lines from merra2 for the attrs_dict
+    attrs_dict = {
+        'datetime': datetime.strftime('%Y_%m_%dT%H_%M_%S'),
+        'date_created': datetime.now().strftime('%Y_%m_%dT%H_%M_%S'),
+        'NoDataValue': NoDataValue,
+        'chunksize': chunksize,
+        # 'mapping_name': mapping_name,
     }
 
     ds = xr.Dataset(
@@ -692,7 +698,7 @@ def writeWeatherVarsXarray(lat: float, lon: float, h: float, q: float, p: float,
     for var in ds.data_vars:
         ds[var].attrs['grid_mapping'] = 'proj'
 
-    ds.to_netcdf(outName)
+    ds.to_netcdf(out_path)
     del ds
 
 
@@ -704,7 +710,7 @@ def convertLons(inLons: np.ndarray) -> np.ndarray:
     return outLons
 
 
-def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
+def read_NCMR_loginInfo(filepath: str = None) -> tuple[str, str, str]:
     """Returns login information."""
     from pathlib import Path
 
@@ -715,7 +721,7 @@ def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
         lines = f.readlines()
 
     if len(lines) < 3:
-        raise ValueError("The login file must have at least three lines")
+        raise ValueError('The login file must have at least three lines')
 
     def parse_line(line, expected_key):  # noqa: ANN001, ANN202
         parts = line.strip().split(': ')
@@ -723,25 +729,11 @@ def read_NCMR_loginInfo(filepath: str = None) -> Tuple[str, str, str]:
             raise ValueError(f"Improperly formatted login file: Expected '{expected_key}: <value>'")
         return parts[1]
 
-    url = parse_line(lines[0], "url")
-    username = parse_line(lines[1], "username")
-    password = parse_line(lines[2], "password")
+    url = parse_line(lines[0], 'url')
+    username = parse_line(lines[1], 'username')
+    password = parse_line(lines[2], 'password')
 
     return url, username, password
-
-
-def read_EarthData_loginInfo(filepath: str = None) -> Tuple[str, str]:
-    """Returns username and password."""
-    from netrc import netrc
-
-    nrc = netrc(filepath) if filepath else netrc()
-    try:
-        urs_usr, _, urs_pwd = nrc.hosts['urs.earthdata.nasa.gov']
-        if not urs_usr or not urs_pwd:
-            raise ValueError("Invalid login information in netrc")
-        return urs_usr, urs_pwd
-    except KeyError:
-        raise KeyError("No entry for urs.earthdata.nasa.gov in netrc")
 
 
 def show_progress(block_num: Union[int, float], block_size: Union[int, float], total_size: Union[int, float]) -> None:
@@ -751,7 +743,7 @@ def show_progress(block_num: Union[int, float], block_size: Union[int, float], t
         pbar
     except NameError:
         pbar = None
-    
+
     if pbar is None:
         try:
             pbar = progressbar.ProgressBar(maxval=total_size)
@@ -767,7 +759,7 @@ def show_progress(block_num: Union[int, float], block_size: Union[int, float], t
         pbar = None
 
 
-def getChunkSize(in_shape: ndarray) -> Tuple:
+def getChunkSize(in_shape: ndarray) -> tuple:
     """Create a reasonable chunk size."""
     if mp is None:
         raise ImportError('RAiDER.utilFcns: getChunkSize - multiprocessing is not available')
@@ -778,37 +770,43 @@ def getChunkSize(in_shape: ndarray) -> Tuple:
     return chunkSize
 
 
-def calcgeoh(lnsp: ndarray, t: ndarray, q: ndarray, z: ndarray, a: ndarray, b: ndarray, R_d: float, num_levels: int) -> Tuple[np.ndarray]:
+def calcgeoh(
+    lnsp: FloatArray2D,
+    t: FloatArray3D,
+    q: FloatArray3D,
+    z_surface: FloatArray2D,
+    a: list[float],
+    b: list[float],
+    R_d: float,
+    num_levels: int,
+) -> tuple[FloatArray3D, FloatArray3D, FloatArray3D]:
     """
-    Calculate pressure, geopotential, and geopotential height
-    from the surface pressure and model levels provided by a weather model.
+    Calculate pressure, geopotential, and geopotential height from the surface
+    pressure and model levels provided by a weather model.  
     The model levels are numbered from the highest eleveation to the lowest.
 
     Args:
-    ----------
-        lnsp: ndarray         - [y, x] array of log surface pressure
-        t: ndarray            - [z, y, x] cube of temperatures
-        q: ndarray            - [z, y, x] cube of specific humidity
-        z: ndarray - [z, y, x] cube of geopotential values
-        a: ndarray            - [z] vector of a values
-        b: ndarray            - [z] vector of b values
-        R_d: float            - R_d from weather model
-        num_levels: int       - integer number of model levels
+        lnsp:        [y, x] array of log surface pressure
+        t:           [z, y, x] array of temperatures
+        q:           [z, y, x] array of specific humidity
+        z:           [y, x] array of surface geopotential values
+        a:           [z] array of a values
+        b:           [z] array of b values
+        R_d:         R_d from weather model
+        num_levels:  integer number of model levels
 
     Returns:
-    -------
-        geopotential - The geopotential in units of height times acceleration
-        pressurelvs  - The pressure at each of the model levels for each of
-                       the input points
-        geoheight    - The geopotential heights
+        z:          The geopotential in units of height times acceleration
+        p:          The pressure at each of the model levels for each of the input points
+        z_heights:  The geopotential heights
     """
-    geopotential = np.zeros_like(t)
-    pressurelvs = np.zeros_like(geopotential)
-    geoheight = np.zeros_like(geopotential)
+    z = np.zeros_like(t)
+    p = np.zeros_like(t)
+    z_heights = np.zeros_like(t)
 
-    # log surface pressure
-    # Note that we integrate from the ground up, so from the largest model level to 0
-    sp = np.exp(lnsp)
+    # log of surface pressure
+    # Note that we integrate from the ground up, so processing will happen from the largest model level to 0
+    sp: FloatArray2D = np.exp(lnsp)
 
     if len(a) != num_levels + 1 or len(b) != num_levels + 1:
         raise ValueError(
@@ -816,47 +814,51 @@ def calcgeoh(lnsp: ndarray, t: ndarray, q: ndarray, z: ndarray, a: ndarray, b: n
             'respectively. Of course, these three numbers should be equal.'
         )
 
-    # Integrate up into the atmosphere from *lowest level*
-    z_h = 0  # initial value
-    for lev, t_level, q_level in zip(range(num_levels, 0, -1), t[::-1], q[::-1]):
-        # lev is the level number 1-60, we need a corresponding index
-        # into ts and qs
-        # ilevel = num_levels - lev # << this was Ray's original, but is a typo
+    # Integrate up into the atmosphere from the *lowest level*
+    z_h: FloatArray2D = z_surface.copy()
+    t_level: float
+    q_level: float
+    for level, t_level, q_level in zip(range(num_levels, 0, -1), t[::-1], q[::-1]):
+        # level's lower bound is 1, but arrays index at zero, so declare a variable
+        # that is level - 1 for indexing into arrays
+        # idx_level = num_levels - level # << this was Ray's original, but is a typo
         # because indexing like that results in pressure and height arrays that
         # are in the opposite orientation to the t/q arrays.
-        ilevel = lev - 1
+        idx_level = level - 1
 
         # compute moist temperature
-        t_level = t_level * (1 + 0.609133 * q_level)
+        t_level *= 1 + 0.609133 * q_level
 
         # compute the pressures (on half-levels)
-        Ph_lev = a[lev - 1] + (b[lev - 1] * sp)
-        Ph_levplusone = a[lev] + (b[lev] * sp)
+        ph_lev: FloatArray2D = a[level - 1] + (b[level - 1] * sp)
+        ph_levplusone: FloatArray2D = a[level] + (b[level] * sp)
 
-        pressurelvs[ilevel] = Ph_lev  # + Ph_levplusone) / 2  # average pressure at half-levels above and below
+        p[idx_level] = ph_lev  # + Ph_levplusone) / 2  # average pressure at half-levels above and below
 
-        if lev == 1:
-            dlogP = np.log(Ph_levplusone / 0.1)
-            alpha = np.log(2)
+        if level == 1:
+            d_logp: FloatArray2D = np.log(ph_levplusone / 0.1)
+            alpha: FloatArray2D = np.array([[np.log(2)]])
         else:
-            dlogP = np.log(Ph_levplusone) - np.log(Ph_lev)
-            alpha = 1 - ((Ph_lev / (Ph_levplusone - Ph_lev)) * dlogP)
+            d_logp = np.log(ph_levplusone) - np.log(ph_lev)
+            alpha = cast(FloatArray2D, 1 - ((ph_lev / (ph_levplusone - ph_lev)) * d_logp))
 
-        TRd = t_level * R_d
+        t_R_d = t_level * R_d
 
         # z_f is the geopotential of this full level
         # integrate from previous (lower) half-level z_h to the full level
-        z_f = z_h + TRd * alpha + z
+        z_f: FloatArray2D = z_h + t_R_d * alpha
+        # (Nate Kean): z was being added here when I found it but the types don't compute if you do that
+        # z_f: FloatArray2D = z_h + t_R_d * alpha + z
 
         # Geopotential (add in surface geopotential)
-        geopotential[ilevel] = z_f
-        geoheight[ilevel] = geopotential[ilevel] / g0
+        z[idx_level] = z_f
+        z_heights[idx_level] = z[idx_level] / G0
 
         # z_h is the geopotential of 'half-levels'
         # integrate z_h to next half level
-        z_h += TRd * dlogP
+        z_h += t_R_d * d_logp
 
-    return geopotential, pressurelvs, geoheight
+    return z, p, z_heights
 
 
 def transform_coords(proj1: CRS, proj2: CRS, x: float, y: float) -> np.ndarray:
@@ -868,12 +870,12 @@ def transform_coords(proj1: CRS, proj2: CRS, x: float, y: float) -> np.ndarray:
     return transformer.transform(x, y)
 
 
-def get_nearest_wmtimes(t0: dt.datetime, time_delta: int) -> List[dt.datetime]:
+def get_nearest_wmtimes(t0: dt.datetime, time_delta: int) -> list[dt.datetime]:
     """Get the nearest two available times to the requested time given a time step.
 
     Args:
-        t0          - user-requested Python datetime
-        time_delta  - time interval of weather model
+        t0:          user-requested Python datetime
+        time_delta:  time interval of weather model
 
     Returns:
         tuple: list of datetimes representing the one or two closest
@@ -926,6 +928,7 @@ def get_dt(t1: dt.datetime, t2: dt.datetime) -> float:
 
 
 # Tell PyYAML how to serialize pathlib Paths
+# fmt: off
 yaml.add_representer(
     pathlib.PosixPath,
     lambda dumper, data: dumper.represent_scalar(
@@ -940,6 +943,7 @@ yaml.add_representer(
         data
     )
 )
+# fmt: on
 
 def write_yaml(content: dict[str, Any], dst: Union[str, Path]) -> Path:
     """Write a new yaml file from a dictionary with template.yaml as a base.
@@ -974,3 +978,9 @@ def parse_crs(proj: CRSLike) -> CRS:
     elif isinstance(proj, int):
         return CRS.from_epsg(proj)
     raise TypeError(f'Data type "{type(proj)}" not supported for CRS')
+
+
+if int(np.__version__.split('.')[0]) >= 2:
+    np_trapezoid = np.trapezoid
+else:
+    np_trapezoid = np.trapz

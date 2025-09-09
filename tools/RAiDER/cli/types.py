@@ -95,7 +95,8 @@ class TimeGroup:
     
     @staticmethod
     def coerce_into_time(val: Union[int, str]) -> dt.time:
-        val = str(val)
+        if isinstance(val, int):
+            return dt.datetime.fromtimestamp(val, tz=dt.timezone.utc).time()
         all_formats = map(''.join, itertools.product(TimeGroup.TIME_FORMATS, TimeGroup.TIMEZONE_FORMATS))
         for tf in all_formats:
             try:

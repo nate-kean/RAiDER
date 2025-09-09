@@ -20,16 +20,18 @@ authors = [
 ]
 description = "Raytracing Atmospheric Delay Estimation for RADAR"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "Apache License 2.0"}
 classifiers=[
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
 ]
 # dependencies = []
 dynamic = ["version"]
@@ -77,11 +79,12 @@ quote-style = "single"
 
 [tool.ruff.lint]
 extend-select = [
-    "I",   # isort: https://docs.astral.sh/ruff/rules/#isort-i
-    "UP",  # pyupgrade: https://docs.astral.sh/ruff/rules/#pyupgrade-up
-    "D",   # pydocstyle: https://docs.astral.sh/ruff/rules/#pydocstyle-d
-    "ANN", # annotations: https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
-    "PTH", # use-pathlib-pth: https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+    "I",      # isort: https://docs.astral.sh/ruff/rules/#isort-i
+    "UP",     # pyupgrade: https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "D",      # pydocstyle: https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    "ANN",    # annotations: https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
+    "PTH",    # use-pathlib-pth: https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+    "NPY201"  # https://docs.astral.sh/ruff/rules/numpy2-deprecation/#numpy2-deprecation-npy201
 ]
 ignore = ["ANN101", "D200", "D205", "D212"]
 

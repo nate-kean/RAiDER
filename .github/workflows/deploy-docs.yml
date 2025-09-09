@@ -10,13 +10,14 @@ jobs:
     name: Build site and deploy
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: mamba-org/provision-with-micromamba@v16
+      - uses: mamba-org/setup-micromamba@v2
         with:
-          extra-specs: |
+          environment-file: environment.yml
+          create-args: >-
             python=3.10
 
       - name: install RAiDER
