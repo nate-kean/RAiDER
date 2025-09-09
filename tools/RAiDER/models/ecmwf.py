@@ -129,7 +129,7 @@ class ECMWF(WeatherModel):
 
         server.retrieve(
             {
-                'class': self._classname,  # ERA-Interim
+                'class': self._classname,  # HRES
                 'dataset': self._dataset,
                 'expver': f'{self._expver}',
                 # They warn me against all, but it works well
