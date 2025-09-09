@@ -1,31 +1,32 @@
-from collections.abc import Iterable
-import datetime
+import datetime as dt
 import operator
-import pytest
+from collections.abc import Iterable
+from functools import reduce
+from pathlib import Path
 from typing import TypeVar
 
 import numpy as np
-from functools import reduce
+import pytest
 from numpy import nan
 from scipy.interpolate import RegularGridInterpolator as rgi
-from pathlib import Path
 
 from RAiDER.constants import _ZMIN, _ZREF
+from RAiDER.models.customExceptions import (
+    DatetimeOutsideRange,
+    NoWeatherModelData,
+)
+from RAiDER.models.era5 import ERA5
+from RAiDER.models.era5t import ERA5T
+from RAiDER.models.gmao import GMAO
+from RAiDER.models.hres import HRES
+from RAiDER.models.hrrr import HRRR, HRRRAK, get_bounds_indices
+from RAiDER.models.merra2 import MERRA2
+from RAiDER.models.ncmr import NCMR
 from RAiDER.models.weatherModel import (
     WeatherModel,
     find_svp,
     make_raw_weather_data_filename,
     make_weather_model_filename,
-)
-from RAiDER.models.era5 import ERA5
-from RAiDER.models.era5t import ERA5T
-from RAiDER.models.hres import HRES
-from RAiDER.models.hrrr import HRRR, HRRRAK, get_bounds_indices
-from RAiDER.models.gmao import GMAO
-from RAiDER.models.merra2 import MERRA2
-from RAiDER.models.ncmr import NCMR
-from RAiDER.models.customExceptions import (
-    DatetimeOutsideRange, NoWeatherModelData,
 )
 
 
@@ -51,9 +52,9 @@ class MockWeatherModel(WeatherModel):
         self._k3 = 1
 
         self._Name = "MOCK"
-        self._valid_range = (datetime.datetime(1970, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())), 
-                             datetime.datetime.now(datetime.timezone.utc))
-        self._lag_time = datetime.timedelta(days=15)
+        self._valid_range = (dt.datetime(1970, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())), 
+                             dt.datetime.now(dt.timezone.utc))
+        self._lag_time = dt.timedelta(days=15)
 
     def _fetch(self, ll_bounds, time, out):  # noqa: ANN202
         pass
@@ -103,22 +104,22 @@ def test_weatherModel_basic1(model: MockWeatherModel) -> None:
     # check some defaults
     assert wm._humidityType == 'q'
 
-    wm.setTime(datetime.datetime(2020, 1, 1, 6, 0, 0))
-    assert wm._time == datetime.datetime(2020, 1, 1, 6, 0, 0).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    wm.setTime(dt.datetime(2020, 1, 1, 6, 0, 0))
+    assert wm._time == dt.datetime(2020, 1, 1, 6, 0, 0).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
 
     wm.setTime('2020-01-01T00:00:00')
-    assert wm._time == datetime.datetime(2020, 1, 1, 0, 0, 0).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._time == dt.datetime(2020, 1, 1, 0, 0, 0).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
 
     wm.setTime('19720229', fmt='%Y%m%d')  # test a leap year
-    assert wm._time == datetime.datetime(1972, 2, 29, 0, 0, 0).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._time == dt.datetime(1972, 2, 29, 0, 0, 0).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
 
     with pytest.raises(DatetimeOutsideRange):
-        wm.checkTime(datetime.datetime(1950, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
+        wm.checkTime(dt.datetime(1950, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
-    wm.checkTime(datetime.datetime(2000, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
+    wm.checkTime(dt.datetime(2000, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
     with pytest.raises(DatetimeOutsideRange):
-        wm.checkTime(datetime.datetime.now().replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
+        wm.checkTime(dt.datetime.now().replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
 
 def test_uniform_in_z_small(model: MockWeatherModel) -> None:
@@ -195,7 +196,7 @@ def test_uniform_in_z_large(model: MockWeatherModel) -> None:
 def test_mwmf() -> None:
     """Test making a raw weather model filename."""
     name = 'ERA-5'
-    time = datetime.datetime(2020, 1, 1)
+    time = dt.datetime(2020, 1, 1)
     ll_bounds = (-90, 90, -180, 180)
     assert make_weather_model_filename(name, time, ll_bounds) == \
         'ERA-5_2020_01_01_T00_00_00_90S_90N_180W_180E.nc'
@@ -205,7 +206,7 @@ def test_mrwmf() -> None:
     """Test making the raw weather model file using ERA-5."""
     outLoc = './'
     name = 'ERA-5'
-    time = datetime.datetime(2020, 1, 1)
+    time = dt.datetime(2020, 1, 1)
     assert make_raw_weather_data_filename(outLoc, name, time) == \
         './ERA-5_2020_01_01_T00_00_00.nc'
 
@@ -215,7 +216,7 @@ def test_era5() -> None:
     wm = ERA5()
     assert wm._humidityType == 'q'
     assert wm._Name == 'ERA-5'
-    assert wm._valid_range[0] == datetime.datetime(1950, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(1950, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
@@ -224,7 +225,7 @@ def test_era5t() -> None:
     wm = ERA5T()
     assert wm._humidityType == 'q'
     assert wm._Name == 'ERA-5T'
-    assert wm._valid_range[0] == datetime.datetime(1950, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(1950, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
@@ -233,7 +234,7 @@ def test_hres() -> None:
     wm = HRES()
     assert wm._humidityType == 'q'
     assert wm._Name == 'HRES'
-    assert wm._valid_range[0] == datetime.datetime(1983, 4, 20).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(1983, 4, 20).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
     assert wm._proj.to_epsg() == 4326
     assert wm._levels == 137
 
@@ -246,7 +247,7 @@ def test_gmao() -> None:
     wm = GMAO()
     assert wm._humidityType == 'q'
     assert wm._Name == 'GMAO'
-    assert wm._valid_range[0] == datetime.datetime(2014, 2, 20).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(2014, 2, 20).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
@@ -255,7 +256,7 @@ def test_merra2() -> None:
     wm = MERRA2()
     assert wm._humidityType == 'q'
     assert wm._Name == 'MERRA2'
-    assert wm._valid_range[0] == datetime.datetime(1980, 1, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(1980, 1, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
     assert wm._proj.to_epsg() == 4326
 
 
@@ -264,11 +265,11 @@ def test_hrrr() -> None:
     wm = HRRR()
     assert wm._humidityType == 'q'
     assert wm._Name == 'HRRR'
-    assert wm._valid_range[0] == datetime.datetime(2016, 7, 15).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(2016, 7, 15).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
     assert wm._proj.to_epsg() is None
     with pytest.raises(DatetimeOutsideRange):
-        wm.checkTime(datetime.datetime(2010, 7, 15).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
-    wm.checkTime(datetime.datetime(2018, 7, 12).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
+        wm.checkTime(dt.datetime(2010, 7, 15).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
+    wm.checkTime(dt.datetime(2018, 7, 12).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
     assert isinstance(wm, HRRR)
     wm.checkValidBounds(np.array([35, 40, -95, -90]))
@@ -281,7 +282,7 @@ def test_hrrrak() -> None:
     """Test HRRR-AK."""
     wm = HRRRAK()
     assert wm._Name == 'HRRR-AK'
-    assert wm._valid_range[0] == datetime.datetime(2018, 7, 13).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(2018, 7, 13).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
 
     assert isinstance(wm, HRRRAK)
     wm.checkValidBounds(np.array([45, 47, 200, 210]))
@@ -290,17 +291,17 @@ def test_hrrrak() -> None:
         wm.checkValidBounds(np.array([15, 20, 265, 270]))
 
     with pytest.raises(DatetimeOutsideRange):
-        wm.checkTime(datetime.datetime(2018, 7, 12).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
+        wm.checkTime(dt.datetime(2018, 7, 12).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
-    wm.checkTime(datetime.datetime(2018, 7, 15).replace(tzinfo=datetime.timezone(offset=datetime.timedelta())))
+    wm.checkTime(dt.datetime(2018, 7, 15).replace(tzinfo=dt.timezone(offset=dt.timedelta())))
 
 
-    """Test NCMR"""
 def test_ncmr() -> None:
+    """Test NCMR."""
     wm = NCMR()
     assert wm._humidityType == 'q'
     assert wm._Name == 'NCMR'
-    assert wm._valid_range[0] == datetime.datetime(2015, 12, 1).replace(tzinfo=datetime.timezone(offset=datetime.timedelta()))
+    assert wm._valid_range[0] == dt.datetime(2015, 12, 1).replace(tzinfo=dt.timezone(offset=dt.timedelta()))
 
 
 def test_find_svp() -> None:
@@ -373,7 +374,7 @@ def test_get_bounds_indices_2b() -> None:
 
 
 def test_get_bounds_indices_3() -> None:
-    """Test bounds indices"""
+    """Test bounds indices."""
     snwe = [-10, 10, -10, 10]
     l = np.arange(-20, 20)
     l2 = (((np.arange(160, 200) + 180) % 360) - 180)
@@ -396,7 +397,7 @@ def test_hrrr_badloc() -> None:
     """Test HRRR out of bounds."""
     wm = HRRR()
     wm.set_latlon_bounds([-10, 10, -10, 10])
-    wm.setTime(datetime.datetime(2020, 10, 1, 0, 0, 0))
+    wm.setTime(dt.datetime(2020, 10, 1, 0, 0, 0))
     with pytest.raises(ValueError):
         wm._fetch(Path('dummy_filename'))
 
@@ -407,10 +408,9 @@ def test_hrrrak_dl(tmp_path: Path) -> None:
     d.mkdir()
     fname = d / "hrrr_ak.nc"
     wm.set_latlon_bounds([65, 67, -160, -150])
-    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 0))
+    wm.setTime(dt.datetime(2020, 12, 1, 0, 0, 0))
 
     wm._fetch(fname)
-    assert True
 
 def test_hrrrak_dl2(tmp_path: Path) -> None:
     """Test the international date line crossing."""
@@ -420,8 +420,7 @@ def test_hrrrak_dl2(tmp_path: Path) -> None:
     fname = d / "hrrr_ak.nc"
 
     wm.set_latlon_bounds([50, 52, 179, -179])
-    wm.setTime(datetime.datetime(2020, 12, 1, 0, 0, 0))
+    wm.setTime(dt.datetime(2020, 12, 1, 0, 0, 0))
 
     wm._fetch(fname)
-    assert True
 
