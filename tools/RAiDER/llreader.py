@@ -332,7 +332,7 @@ class GeocodedFile(AOI):
 
         self._filename = path
         self.p = rio_profile(path)
-        self._bounding_box = transform_bbox(rio_extents(self.p), dest_crs=4326, src_crs=32617)
+        self._bounding_box = transform_bbox(rio_extents(self.p), dest_crs=4326, src_crs=self.p['crs'])
         self._is_dem = is_dem
         _, self._proj, self._geotransform = rio_stats(path)
         self._type = 'geocoded_file'
